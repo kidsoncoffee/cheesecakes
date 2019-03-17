@@ -1,19 +1,21 @@
 package com.kidsoncoffee.paramtests;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import com.kidsoncoffee.paramtests.annotations.BDDParameters.Expectations;
-import com.kidsoncoffee.paramtests.annotations.BDDParameters.Requisites;
-import com.squareup.javapoet.*;
+import com.google.common.collect.Lists;
+import com.kidsoncoffee.paramtests.generator.ParameterizedTestsGenerator;
 
-import javax.annotation.processing.*;
-import javax.lang.model.element.*;
-import javax.lang.model.util.Elements;
-import javax.tools.Diagnostic;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.Processor;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import java.util.Collection;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static javax.lang.model.SourceVersion.RELEASE_8;
 
@@ -25,214 +27,37 @@ import static javax.lang.model.SourceVersion.RELEASE_8;
 @SupportedSourceVersion(RELEASE_8)
 public class BDDParametersProcessor extends AbstractProcessor {
 
-  private Messager messager;
-  private Filer filer;
-  private Elements elementUtils;
+  private List<ParameterizedTestsGenerator> generators;
 
   @Override
-  public void init(ProcessingEnvironment processingEnv) {
-    this.messager = processingEnv.getMessager();
-    this.filer = processingEnv.getFiler();
-    this.elementUtils = processingEnv.getElementUtils();
+  public void init(final ProcessingEnvironment processingEnv) {
+    this.generators = Lists.newArrayList(ServiceLoader.load(ParameterizedTestsGenerator.class));
+    this.generators.forEach(g -> g.init(processingEnv));
   }
 
   @Override
   public Set<String> getSupportedAnnotationTypes() {
-    final Set<String> annotations = new HashSet<>();
-    annotations.add(Requisites.class.getCanonicalName());
-    annotations.add(Expectations.class.getCanonicalName());
-    return annotations;
+    return this.generators.stream()
+        .map(ParameterizedTestsGenerator::getAnnotationsToProcess)
+        .flatMap(Collection::stream)
+        .map(Class::getCanonicalName)
+        .collect(Collectors.toSet());
   }
 
   @Override
-  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    final Table<PackageElement, Name, List<Element>> elements = HashBasedTable.create();
-    for (final Element element : roundEnv.getElementsAnnotatedWith(Requisites.class)) {
-      final PackageElement pkg = this.elementUtils.getPackageOf(element);
-      final Name testCase = element.getEnclosingElement().getSimpleName();
+  public boolean process(
+      final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
-      if (!elements.contains(pkg, testCase)) {
-        elements.put(pkg, testCase, new ArrayList<>());
-      }
-      elements.get(pkg, testCase).add(element);
-    }
-    for (final Element element : roundEnv.getElementsAnnotatedWith(Expectations.class)) {
-      final PackageElement pkg = this.elementUtils.getPackageOf(element);
-      final Name testCase = element.getEnclosingElement().getSimpleName();
+    for (final ParameterizedTestsGenerator generator : this.generators) {
+      final List<Element> elements =
+          generator.getAnnotationsToProcess().stream()
+              .map(roundEnv::getElementsAnnotatedWith)
+              .flatMap(Collection::stream)
+              .collect(Collectors.toList());
 
-      if (!elements.contains(pkg, testCase)) {
-        elements.put(pkg, testCase, new ArrayList<>());
-      }
-      elements.get(pkg, testCase).add(element);
+      generator.createDefinitions(elements).forEach(generator::generate);
     }
 
-    System.out.println(elements);
-
-    final List<MethodSpec> classMethods = new ArrayList<>();
-
-    for (PackageElement packageElement : elements.rowKeySet()) {
-      for (Map.Entry<Name, List<Element>> classes : elements.row(packageElement).entrySet()) {
-        final Name clazz = classes.getKey();
-        final List<Element> classesElements = classes.getValue();
-
-        final ClassName className =
-            ClassName.get(
-                packageElement.getQualifiedName().toString(),
-                String.format("%sParameters", clazz.toString()));
-
-        final List<TypeSpec> testCaseSpecs = new ArrayList<>();
-        for (Map.Entry<Name, List<Element>> testCases : elements.row(packageElement).entrySet()) {
-          final Name testCase = testCases.getKey();
-          final List<Element> testCaseElements = testCases.getValue();
-
-          final ClassName testCaseClass =
-              ClassName.get(className.reflectionName(), testCase.toString());
-
-          classMethods.add(
-              MethodSpec.methodBuilder(testCase.toString())
-                  .addModifiers(Modifier.STATIC)
-                  .returns(testCaseClass)
-                  .addStatement("return new $T()", testCaseClass)
-                  .build());
-
-          final List<MethodSpec> testCaseMethods = new ArrayList<>();
-          final List<FieldSpec> testCaseFields = new ArrayList<>();
-          for (Element testCaseElement : testCaseElements) {
-            final String elementName = testCaseElement.getSimpleName().toString();
-            final TypeName elementType = TypeName.get(testCaseElement.asType());
-
-            final FieldSpec fieldSpec = FieldSpec.builder(elementType, elementName).build();
-            testCaseFields.add(fieldSpec);
-
-            final ParameterSpec parameterSpec =
-                ParameterSpec.builder(elementType, elementName)
-                    .addModifiers(Modifier.FINAL)
-                    .build();
-
-            testCaseMethods.add(
-                MethodSpec.methodBuilder(elementName)
-                    .returns(testCaseClass)
-                    .addParameter(parameterSpec)
-                    .addStatement("this.$N = $N", fieldSpec, parameterSpec)
-                    .addStatement("return this")
-                    .build());
-
-            testCaseMethods.add(
-                MethodSpec.methodBuilder("get" + elementName)
-                    .returns(elementType)
-                    .addStatement("return this.$N", fieldSpec)
-                    .build());
-          }
-
-          testCaseSpecs.add(
-              TypeSpec.classBuilder(testCaseClass)
-                  .addModifiers(Modifier.STATIC)
-                  .addFields(testCaseFields)
-                  .addMethods(testCaseMethods)
-                  .build());
-        }
-
-        final TypeSpec typeSpec =
-            TypeSpec.classBuilder(className)
-                .addMethods(classMethods)
-                .addTypes(testCaseSpecs)
-                .build();
-        try {
-          JavaFile.builder(packageElement.getQualifiedName().toString(), typeSpec)
-              .build()
-              .writeTo(this.filer);
-        } catch (IOException e) {
-          throw new UncheckedIOException(e);
-        }
-      }
-    }
     return false;
-  }
-
-  private void processTestCaseParameters(RoundEnvironment roundEnv) {
-    final Table<PackageElement, Name, List<Element>> elements = HashBasedTable.create();
-    for (final Element element : roundEnv.getElementsAnnotatedWith(Requisites.class)) {
-      if (!element.getKind().equals(ElementKind.PARAMETER)) {
-        this.messager.printMessage(
-            Diagnostic.Kind.ERROR,
-            String.format(
-                "Only parameters can be annotated with @%s.", Requisites.class.getSimpleName()),
-            element);
-      }
-      final PackageElement pkg = this.elementUtils.getPackageOf(element);
-      final Name testCase = element.getEnclosingElement().getSimpleName();
-
-      if (!elements.contains(pkg, testCase)) {
-        elements.put(pkg, testCase, new ArrayList<>());
-      }
-      elements.get(pkg, testCase).add(element);
-    }
-
-    final List<MethodSpec> classMethods = new ArrayList<>();
-
-    for (PackageElement packageElement : elements.rowKeySet()) {
-      final ClassName className =
-          ClassName.get(packageElement.getQualifiedName().toString(), "GeneratedBDDParameters");
-
-      final List<TypeSpec> testCaseSpecs = new ArrayList<>();
-      for (Map.Entry<Name, List<Element>> testCases : elements.row(packageElement).entrySet()) {
-        final Name testCase = testCases.getKey();
-        final List<Element> testCaseElements = testCases.getValue();
-
-        final ClassName testCaseClass =
-            ClassName.get(className.reflectionName(), testCase.toString());
-
-        classMethods.add(
-            MethodSpec.methodBuilder(testCase.toString())
-                .addModifiers(Modifier.STATIC)
-                .returns(testCaseClass)
-                .addStatement("return new $T()", testCaseClass)
-                .build());
-
-        final List<MethodSpec> testCaseMethods = new ArrayList<>();
-        final List<FieldSpec> testCaseFields = new ArrayList<>();
-        for (Element testCaseElement : testCaseElements) {
-          final String elementName = testCaseElement.getSimpleName().toString();
-          final TypeName elementType = TypeName.get(testCaseElement.asType());
-
-          final FieldSpec fieldSpec = FieldSpec.builder(elementType, elementName).build();
-          testCaseFields.add(fieldSpec);
-
-          final ParameterSpec parameterSpec =
-              ParameterSpec.builder(elementType, elementName).addModifiers(Modifier.FINAL).build();
-
-          testCaseMethods.add(
-              MethodSpec.methodBuilder(elementName)
-                  .returns(testCaseClass)
-                  .addParameter(parameterSpec)
-                  .addStatement("this.$N = $N", fieldSpec, parameterSpec)
-                  .addStatement("return this")
-                  .build());
-
-          testCaseMethods.add(
-              MethodSpec.methodBuilder("get" + elementName)
-                  .returns(elementType)
-                  .addStatement("return this.$N", fieldSpec)
-                  .build());
-        }
-
-        testCaseSpecs.add(
-            TypeSpec.classBuilder(testCaseClass)
-                .addModifiers(Modifier.STATIC)
-                .addFields(testCaseFields)
-                .addMethods(testCaseMethods)
-                .build());
-      }
-
-      final TypeSpec typeSpec =
-          TypeSpec.classBuilder(className).addMethods(classMethods).addTypes(testCaseSpecs).build();
-      try {
-        JavaFile.builder(packageElement.getQualifiedName().toString(), typeSpec)
-            .build()
-            .writeTo(this.filer);
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
-    }
   }
 }
