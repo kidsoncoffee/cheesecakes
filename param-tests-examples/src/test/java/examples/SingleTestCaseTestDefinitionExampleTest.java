@@ -1,4 +1,4 @@
-package com.kidsoncoffee.paramtests.examples;
+package examples;
 
 import com.kidsoncoffee.paramtests.annotations.BDDParameters.Expectations;
 import com.kidsoncoffee.paramtests.annotations.BDDParameters.Requisites;

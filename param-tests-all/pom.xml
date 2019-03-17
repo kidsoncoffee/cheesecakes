@@ -13,7 +13,7 @@
     <artifactId>param-tests-all</artifactId>
 
     <dependencies>
-        <!-- PROJECT -->
+        <!-- PROJECT COMPILE -->
         <dependency>
             <groupId>com.kidsoncoffee</groupId>
             <artifactId>param-tests-annotations</artifactId>
@@ -26,11 +26,16 @@
             <groupId>com.kidsoncoffee</groupId>
             <artifactId>param-tests-generator-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.kidsoncoffee</groupId>
+            <artifactId>param-tests-runner</artifactId>
+        </dependency>
 
         <!-- PROJECT RUNTIME -->
         <dependency>
             <groupId>com.kidsoncoffee</groupId>
             <artifactId>param-tests-generator-runtime</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.kidsoncoffee</groupId>

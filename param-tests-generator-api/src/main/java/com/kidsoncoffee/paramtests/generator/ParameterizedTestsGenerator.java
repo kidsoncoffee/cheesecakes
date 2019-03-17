@@ -17,5 +17,5 @@ public interface ParameterizedTestsGenerator {
 
   List<ParameterizedTestsDefinition> createDefinitions(final List<Element> elements);
 
-  void generate(final ParameterizedTestsDefinition definition);
+  boolean generate(final ParameterizedTestsDefinition definition);
 }

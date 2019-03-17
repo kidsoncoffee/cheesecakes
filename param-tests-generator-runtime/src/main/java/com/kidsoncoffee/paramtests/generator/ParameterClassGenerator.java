@@ -1,6 +1,5 @@
 package com.kidsoncoffee.paramtests.generator;
 
-import com.google.auto.service.AutoService;
 import com.kidsoncoffee.paramtests.TestCaseParameters;
 import com.kidsoncoffee.paramtests.TestCaseParametersBlock;
 import com.kidsoncoffee.paramtests.annotations.BDDParameters.Expectations;
@@ -23,9 +22,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +35,6 @@ import static java.util.Arrays.asList;
  * @author fernando.chovich
  * @since 1.0
  */
-@AutoService(ParameterizedTestsGenerator.class)
 public class ParameterClassGenerator implements ParameterizedTestsGenerator {
 
   private Filer filer;
@@ -91,7 +87,7 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
   }
 
   @Override
-  public void generate(final ParameterizedTestsDefinition definition) {
+  public boolean generate(final ParameterizedTestsDefinition definition) {
     final TypeName parametersType = TypeName.get(TestCaseParameters.class);
     final TypeName parametersBlockType = TypeName.get(TestCaseParametersBlock.class);
 
@@ -141,8 +137,14 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
 
     try {
       JavaFile.builder(definition.getTestClassPackage(), typeSpec).build().writeTo(this.filer);
+      return true;
     } catch (IOException e) {
-      throw new UncheckedIOException(e);
+      /*throw new UncheckedIOException(
+      String.format(
+          "Unable to write Parameters class for '%s.%s'.",
+          definition.getTestClassPackage(), definition.getTestClassName()),
+      e);*/
+      return false;
     }
   }
 
@@ -169,7 +171,7 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
   }
 
   private static Pair<FieldSpec, List<MethodSpec>> createBuilder(
-          final TypeName parameterType, final TypeMirror type, final String name) {
+      final TypeName parameterType, final TypeMirror type, final String name) {
 
     final TypeName typeName = TypeName.get(type);
 
@@ -195,88 +197,4 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
 
     return Pair.of(field, asList(setter, getter));
   }
-
-  /*static class SingleTestCaseTestDefinitionExampleTestParameters implements TestCase {
-
-  static final Requisites given() {
-      return new SingleTestCaseTestDefinitionExampleTestParameters().requisites;
-  }
-
-  final Requisites requisites;
-  final Expectations expectations;
-
-  public SingleTestCaseTestDefinitionExampleTestParameters() {
-      this.requisites = new Requisites(this);
-      this.expectations = new Expectations(this);
-  }
-
-  class Requisites implements TestCase {
-      private final TestCase testCase;
-
-      private String name;
-
-      private String surname;
-
-      public Requisites(TestCase testCase) {
-          this.testCase = testCase;
-      }
-
-      public String getName() {
-          return name;
-      }
-
-      public Requisites name(String name) {
-          this.name = name;
-          return this;
-      }
-
-      public String getSurname() {
-          return surname;
-      }
-
-      public Requisites surname(String surname) {
-          this.surname = surname;
-          return this;
-      }
-
-      Expectations then() {
-          return expectations;
-      }
-
-      @Override
-      public TestCase get() {
-          return this.testCase;
-      }
-  }
-
-  class Expectations implements TestCase {
-      private final TestCase testCase;
-      */
-  /*
-          private String fullName;
-
-          public Expectations(TestCase testCase) {
-              this.testCase = testCase;
-          }
-
-          public String getFullName() {
-              return fullName;
-          }
-
-          public Expectations fullname(String fullName) {
-              this.fullName = fullName;
-              return this;
-          }
-
-          @Override
-          public TestCase get() {
-              return this.testCase;
-          }
-      }
-
-      @Override
-      public TestCase get() {
-          return this;
-      }
-  }*/
 }

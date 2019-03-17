@@ -10,27 +10,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.kidsoncoffee</groupId>
-    <artifactId>param-tests-processor</artifactId>
-
+    <artifactId>param-tests-examples</artifactId>
     <dependencies>
         <!-- PROJECT -->
         <dependency>
             <groupId>com.kidsoncoffee</groupId>
-            <artifactId>param-tests-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.kidsoncoffee</groupId>
-            <artifactId>param-tests-generator-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.kidsoncoffee</groupId>
-            <artifactId>param-tests-generator-runtime</artifactId>
+            <artifactId>param-tests-all</artifactId>
         </dependency>
 
         <!-- 3rd PARTY -->
         <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.kidsoncoffee.paramtests.generator.ParameterizedTestsGenerator;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
@@ -15,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static javax.lang.model.SourceVersion.RELEASE_8;
@@ -29,14 +31,18 @@ public class BDDParametersProcessor extends AbstractProcessor {
 
   private List<ParameterizedTestsGenerator> generators;
 
+  private Messager messager;
+
   @Override
   public void init(final ProcessingEnvironment processingEnv) {
+    this.messager = processingEnv.getMessager();
     this.generators = Lists.newArrayList(ServiceLoader.load(ParameterizedTestsGenerator.class));
     this.generators.forEach(g -> g.init(processingEnv));
   }
 
   @Override
   public Set<String> getSupportedAnnotationTypes() {
+    // TODO fchovich ADD LOGGER. IF NO GENERATORS
     return this.generators.stream()
         .map(ParameterizedTestsGenerator::getAnnotationsToProcess)
         .flatMap(Collection::stream)
@@ -47,7 +53,7 @@ public class BDDParametersProcessor extends AbstractProcessor {
   @Override
   public boolean process(
       final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
-
+    final AtomicBoolean generated = new AtomicBoolean(false);
     for (final ParameterizedTestsGenerator generator : this.generators) {
       final List<Element> elements =
           generator.getAnnotationsToProcess().stream()
@@ -55,9 +61,15 @@ public class BDDParametersProcessor extends AbstractProcessor {
               .flatMap(Collection::stream)
               .collect(Collectors.toList());
 
-      generator.createDefinitions(elements).forEach(generator::generate);
+      generated.compareAndSet(
+          !generated.get(),
+          generator.createDefinitions(elements).stream()
+              .map(generator::generate)
+              .filter(b -> b)
+              .findAny()
+              .orElse(false));
     }
 
-    return false;
+    return generated.get();
   }
 }
