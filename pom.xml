@@ -6,35 +6,60 @@
 
     <groupId>com.kidsoncoffee</groupId>
     <artifactId>param-tests</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>param-tests-annotations</module>
+        <module>param-tests-examples</module>
+        <module>param-tests-processor</module>
+        <module>param-tests-runner</module>
+    </modules>
+
+    <properties>
+        <java.source>8</java.source>
+        <java.target>8</java.target>
+        <!-- VERSIONS -->
+        <autoservice.version>1.0-rc1</autoservice.version>
+        <javapoet.version>1.11.1</javapoet.version>
+        <junit.version>4.12</junit.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>${java.source}</source>
+                    <target>${java.target}</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
-            <version>1.11.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-            <version>1.0-rc1</version>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.kidsoncoffee</groupId>
+                <artifactId>param-tests-annotations</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup</groupId>
+                <artifactId>javapoet</artifactId>
+                <version>${javapoet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>${autoservice.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

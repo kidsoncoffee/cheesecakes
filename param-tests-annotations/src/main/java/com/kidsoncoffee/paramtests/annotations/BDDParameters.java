@@ -1,4 +1,4 @@
-package com.kidsoncoffe.paramtests;
+package com.kidsoncoffee.paramtests.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,9 +9,13 @@ import java.lang.annotation.Target;
  * @author fernando.chovich
  * @since 1.0
  */
-public @interface BDDParameters {
+public final class BDDParameters {
 
-  @Target(ElementType.PARAMETER)
+  @Target({ElementType.PARAMETER, ElementType.FIELD})
   @Retention(RetentionPolicy.RUNTIME)
   public @interface Requisites {}
+
+  @Target({ElementType.PARAMETER, ElementType.FIELD})
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Expectations {}
 }
