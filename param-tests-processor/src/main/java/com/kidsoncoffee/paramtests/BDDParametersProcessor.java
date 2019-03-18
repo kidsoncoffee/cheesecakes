@@ -1,7 +1,7 @@
 package com.kidsoncoffee.paramtests;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.Lists;
+import com.kidsoncoffee.paramtests.generator.ParameterClassGenerator;
 import com.kidsoncoffee.paramtests.generator.ParameterizedTestsGenerator;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -14,11 +14,11 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.util.Collection;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static javax.lang.model.SourceVersion.RELEASE_8;
 
 /**
@@ -36,7 +36,8 @@ public class BDDParametersProcessor extends AbstractProcessor {
   @Override
   public void init(final ProcessingEnvironment processingEnv) {
     this.messager = processingEnv.getMessager();
-    this.generators = Lists.newArrayList(ServiceLoader.load(ParameterizedTestsGenerator.class));
+    // TODO fchovich MAKE THIS A RUNTIME DEPENDENCY
+    this.generators = asList(new ParameterClassGenerator());
     this.generators.forEach(g -> g.init(processingEnv));
   }
 

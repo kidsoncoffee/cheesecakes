@@ -99,39 +99,61 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
     final ClassName requisitesClassName = ClassName.get(className.simpleName(), "Requisites");
     final ClassName expectationsClassName = ClassName.get(className.simpleName(), "Expectations");
 
-    final FieldSpec requisitesField = FieldSpec.builder(requisitesClassName, "requisites").build();
+    final FieldSpec requisitesField =
+        FieldSpec.builder(requisitesClassName, "requisites")
+            .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+            .build();
     final FieldSpec expectationsField =
-        FieldSpec.builder(expectationsClassName, "expectations").build();
+        FieldSpec.builder(expectationsClassName, "expectations")
+            .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+            .build();
+
+    final MethodSpec constructor =
+        MethodSpec.constructorBuilder()
+            .addStatement("this.$N = new $T(this)", requisitesField, requisitesClassName)
+            .addStatement("this.$N = new $T(this)", expectationsField, expectationsClassName)
+            .build();
+
+    final MethodSpec requisitesGetter =
+        MethodSpec.methodBuilder("getRequisites")
+            .addModifiers(Modifier.PUBLIC)
+            .addStatement("return this.$N", requisitesField)
+            .returns(requisitesField.type)
+            .build();
+
+    final MethodSpec expectationsGetter =
+        MethodSpec.methodBuilder("getExpectations")
+            .addModifiers(Modifier.PUBLIC)
+            .addStatement("return this.$N", expectationsField)
+            .returns(expectationsField.type)
+            .build();
 
     final TypeSpec.Builder requisitesInnerClass =
         createParameterBlock(
-            requisitesClassName, definition.getRequisites(), parametersType, parametersBlockType);
+            className, requisitesClassName, definition.getRequisites(), parametersBlockType);
 
     final TypeSpec.Builder expectationsInnerClass =
         createParameterBlock(
-            expectationsClassName,
-            definition.getExpectations(),
-            parametersType,
-            parametersBlockType);
+            className, expectationsClassName, definition.getExpectations(), parametersBlockType);
 
     requisitesInnerClass.addMethod(
         MethodSpec.methodBuilder("then")
-            .addStatement("return this.$N", expectationsField)
+            .addStatement("return $T.this.$N", className, expectationsField)
             .returns(expectationsClassName)
             .build());
 
     final MethodSpec givenMethod =
         MethodSpec.methodBuilder("given")
             .addModifiers(Modifier.STATIC)
-            .returns(parametersBlockType)
-            .addStatement("return this.$N", requisitesField)
+            .returns(requisitesClassName)
+            .addStatement("return new $T().$N", className, requisitesField)
             .build();
 
     final TypeSpec typeSpec =
         TypeSpec.classBuilder(className)
             .addSuperinterface(parametersType)
             .addFields(asList(requisitesField, expectationsField))
-            .addMethods(asList(givenMethod))
+            .addMethods(asList(constructor, requisitesGetter, expectationsGetter, givenMethod))
             .addTypes(asList(requisitesInnerClass.build(), expectationsInnerClass.build()))
             .build();
 
@@ -149,50 +171,78 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
   }
 
   private static TypeSpec.Builder createParameterBlock(
+      final ClassName parametersClassName,
       final ClassName blockName,
       final Map<String, TypeMirror> parameters,
-      final TypeName parametersType,
       final TypeName parametersBlockType) {
     final List<FieldSpec> fields = new ArrayList<>();
     final List<MethodSpec> methods = new ArrayList<>();
 
     parameters.entrySet().stream()
-        .map(r -> createBuilder(parametersType, r.getValue(), r.getKey()))
+        .map(r -> createBuilder(blockName, r.getValue(), r.getKey()))
         .forEach(
             p -> {
               fields.add(p.getLeft());
               methods.addAll(p.getRight());
             });
 
+    final FieldSpec testCaseField =
+        FieldSpec.builder(TestCaseParameters.class, "testCase")
+            .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+            .build();
+
+    fields.add(testCaseField);
+
+    final ParameterSpec testCaseParameter =
+        ParameterSpec.builder(TestCaseParameters.class, "testCase")
+            .addModifiers(Modifier.FINAL)
+            .build();
+
+    methods.add(
+        MethodSpec.constructorBuilder()
+            .addParameter(testCaseParameter)
+            .addStatement("this.$N = $N", testCaseField, testCaseParameter)
+            .build());
+
+    methods.add(
+        MethodSpec.methodBuilder("getTestCase")
+            .addModifiers(Modifier.PUBLIC)
+            .addAnnotation(Override.class)
+            .addStatement("return $N", testCaseField)
+            .returns(ClassName.get(TestCaseParameters.class))
+            .build());
+
     return TypeSpec.classBuilder(blockName)
-        .addSuperinterface(parametersBlockType)
         .addFields(fields)
+        .addSuperinterface(parametersBlockType)
         .addMethods(methods);
   }
 
   private static Pair<FieldSpec, List<MethodSpec>> createBuilder(
-      final TypeName parameterType, final TypeMirror type, final String name) {
+      ClassName blockName, final TypeMirror type, final String name) {
 
     final TypeName typeName = TypeName.get(type);
 
     final FieldSpec field =
-        FieldSpec.builder(typeName, name).addModifiers(Modifier.PRIVATE, Modifier.FINAL).build();
+        FieldSpec.builder(typeName, name).addModifiers(Modifier.PRIVATE).build();
 
     final ParameterSpec parameterSpec =
         ParameterSpec.builder(typeName, name).addModifiers(Modifier.FINAL).build();
 
     final MethodSpec setter =
         MethodSpec.methodBuilder(name)
+            .addModifiers(Modifier.PUBLIC)
             .addParameter(parameterSpec)
             .addStatement("this.$N = $N", field, parameterSpec)
             .addStatement("return this")
-            .returns(parameterType)
+            .returns(blockName)
             .build();
 
     final MethodSpec getter =
         MethodSpec.methodBuilder(String.format("get%s", WordUtils.capitalize(name)))
+            .addModifiers(Modifier.PUBLIC)
             .addStatement("return this.$N", field)
-            .returns(parameterType)
+            .returns(typeName)
             .build();
 
     return Pair.of(field, asList(setter, getter));
