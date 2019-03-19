@@ -13,13 +13,24 @@
     <artifactId>param-tests-runner</artifactId>
 
     <dependencies>
+        <!-- PROJECT -->
         <dependency>
             <groupId>com.kidsoncoffee</groupId>
             <artifactId>param-tests-annotations</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.kidsoncoffee</groupId>
+            <artifactId>param-tests-api</artifactId>
+        </dependency>
+
+        <!-- 3rd PARTY -->
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
         </dependency>
     </dependencies>
 </project>

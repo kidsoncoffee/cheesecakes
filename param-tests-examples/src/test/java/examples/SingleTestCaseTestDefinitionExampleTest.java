@@ -1,10 +1,12 @@
 package examples;
 
+import com.kidsoncoffee.paramtests.ParameterizedTests;
+import com.kidsoncoffee.paramtests.TestCaseDefinition;
 import com.kidsoncoffee.paramtests.TestCaseParametersBlock;
 import com.kidsoncoffee.paramtests.annotations.BDDParameters.Expectations;
 import com.kidsoncoffee.paramtests.annotations.BDDParameters.Requisites;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static examples.SingleTestCaseTestDefinitionExampleTestParameters.given;
 
@@ -12,16 +14,15 @@ import static examples.SingleTestCaseTestDefinitionExampleTestParameters.given;
  * @author fernando.chovich
  * @since 1.0
  */
-@Ignore
+@RunWith(ParameterizedTests.class)
 public class SingleTestCaseTestDefinitionExampleTest {
 
   // TODO fchovich create analysis tool for syntatic sugar
-  // TODO fchovich if only one test case method we shouldn't have to specify method
-  // @SingleTestCase
+  @TestCaseDefinition
   private static final TestCaseParametersBlock TEST_CASE =
       given().name("John").surname("Doe").then().expectedFullName("John Doe");
 
-  // @SingleTestCase
+  @TestCaseDefinition
   private static final TestCaseParametersBlock TEST_CASE_2 =
       given().name("Mary").surname("Doe").then().expectedFullName("Mary Doe");
 

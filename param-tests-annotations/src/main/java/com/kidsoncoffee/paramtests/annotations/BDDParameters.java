@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
  * @author fernando.chovich
  * @since 1.0
  */
+// TODO fchovich parameterize the name of the builder field
 public final class BDDParameters {
 
   @Target({ElementType.PARAMETER, ElementType.FIELD})

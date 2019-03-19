@@ -2,8 +2,7 @@ package com.kidsoncoffee.paramtests.generator;
 
 import org.immutables.value.Value;
 
-import javax.lang.model.type.TypeMirror;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author fernando.chovich
@@ -15,7 +14,7 @@ public interface ParameterizedTestsDefinition {
 
   String getTestClassPackage();
 
-  Map<String, TypeMirror> getRequisites();
+  List<ParameterizedTestsBlockDefinition> getRequisites();
 
-  Map<String, TypeMirror> getExpectations();
+  List<ParameterizedTestsBlockDefinition> getExpectations();
 }
