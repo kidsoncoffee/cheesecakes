@@ -8,14 +8,14 @@ import com.kidsoncoffee.paramtests.annotations.BDDParameters.Requisites;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static examples.SingleTestCaseTestDefinitionExampleTestParameters.given;
+import static examples.SingleTestCaseExampleTestParameters.SingleTestCase.given;
 
 /**
  * @author fernando.chovich
  * @since 1.0
  */
 @RunWith(ParameterizedTests.class)
-public class SingleTestCaseTestDefinitionExampleTest {
+public class SingleTestCaseExampleTest {
 
   // TODO fchovich create analysis tool for syntatic sugar
   @TestCaseDefinition

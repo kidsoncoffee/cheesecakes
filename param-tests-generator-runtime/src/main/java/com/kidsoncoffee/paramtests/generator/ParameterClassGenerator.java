@@ -1,5 +1,7 @@
 package com.kidsoncoffee.paramtests.generator;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.kidsoncoffee.paramtests.TestCaseParameters;
 import com.kidsoncoffee.paramtests.TestCaseParametersBlock;
 import com.kidsoncoffee.paramtests.annotations.BDDParameters.Expectations;
@@ -42,7 +44,7 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
   private Elements elementUtils;
 
   @Override
-  public void init(ProcessingEnvironment processingEnvironment) {
+  public void init(final ProcessingEnvironment processingEnvironment) {
     this.filer = processingEnvironment.getFiler();
     this.elementUtils = processingEnvironment.getElementUtils();
   }
@@ -59,22 +61,43 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
             .filter(e -> e.getKind().equals(ElementKind.PARAMETER))
             .collect(Collectors.toList());
 
+    // TODO fchovich VALIDATE THAT ALL PARAMETERS ARE ANNOTATED
+
     if (parameters.isEmpty()) {
       return Collections.emptyList();
     }
 
-    final Element testClass = parameters.get(0).getEnclosingElement().getEnclosingElement();
-
-    return Collections.singletonList(
-        ImmutableParameterizedTestsDefinition.builder()
-            .testClassName(testClass.getSimpleName().toString())
-            .testClassPackage(this.elementUtils.getPackageOf(testClass).toString())
-            .requisites(extract(Requisites.class, parameters))
-            .expectations(extract(Expectations.class, parameters))
-            .build());
+    final Table<Element, Element, List<Element>> groupedElements = groupElements(parameters);
+    return groupedElements.cellSet().stream()
+        .map(
+            cell ->
+                ImmutableParameterizedTestsDefinition.builder()
+                    .testClassName(cell.getRowKey().getSimpleName().toString())
+                    .testClassPackage(this.elementUtils.getPackageOf(cell.getRowKey()).toString())
+                    .testMethodName(cell.getColumnKey().getSimpleName().toString())
+                    .requisites(extract(Requisites.class, cell.getValue()))
+                    .expectations(extract(Expectations.class, cell.getValue()))
+                    .build())
+        .collect(Collectors.toList());
   }
 
-  private List<ParameterizedTestsBlockDefinition> extract(
+  private static Table<Element, Element, List<Element>> groupElements(List<Element> parameters) {
+    final Table<Element, Element, List<Element>> groupedElements = HashBasedTable.create();
+
+    for (final Element parameter : parameters) {
+      final Element methodElement = parameter.getEnclosingElement();
+      final Element classElement = methodElement.getEnclosingElement();
+
+      if (!groupedElements.contains(classElement, methodElement)) {
+        groupedElements.put(classElement, methodElement, new ArrayList<>());
+      }
+      groupedElements.get(classElement, methodElement).add(parameter);
+    }
+
+    return groupedElements;
+  }
+
+  private static List<ParameterizedTestsBlockDefinition> extract(
       final Class<? extends Annotation> annotation, final List<Element> elements) {
     final List<ParameterizedTestsBlockDefinition> blockDefinitions = new ArrayList<>();
     for (int i = 0; i < elements.size(); i++) {
@@ -97,12 +120,17 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
     final TypeName parametersType = TypeName.get(TestCaseParameters.class);
     final TypeName parametersBlockType = TypeName.get(TestCaseParametersBlock.class);
 
-    final ClassName className =
+    final ClassName classClassName =
         ClassName.get(
             def.getTestClassPackage(), String.format("%sParameters", def.getTestClassName()));
 
-    final ClassName requisitesClassName = ClassName.get(className.simpleName(), "Requisites");
-    final ClassName expectationsClassName = ClassName.get(className.simpleName(), "Expectations");
+    final ClassName methodClassName =
+        ClassName.get(classClassName.simpleName(), WordUtils.capitalize(def.getTestMethodName()));
+
+    final ClassName requisitesClassName =
+        ClassName.get(classClassName.simpleName(), methodClassName.simpleName(), "Requisites");
+    final ClassName expectationsClassName =
+        ClassName.get(classClassName.simpleName(), methodClassName.simpleName(), "Expectations");
 
     final FieldSpec requisitesField =
         FieldSpec.builder(requisitesClassName, "requisites")
@@ -173,7 +201,7 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
 
     requisitesInnerClass.addMethod(
         MethodSpec.methodBuilder("then")
-            .addStatement("return $T.this.$N", className, expectationsField)
+            .addStatement("return $T.this.$N", methodClassName, expectationsField)
             .returns(expectationsClassName)
             .build());
 
@@ -181,11 +209,12 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
         MethodSpec.methodBuilder("given")
             .addModifiers(Modifier.STATIC)
             .returns(requisitesClassName)
-            .addStatement("return new $T().$N", className, requisitesField)
+            .addStatement("return new $T().$N", methodClassName, requisitesField)
             .build();
 
-    final TypeSpec typeSpec =
-        TypeSpec.classBuilder(className)
+    final TypeSpec methodClass =
+        TypeSpec.classBuilder(methodClassName)
+            .addModifiers(Modifier.STATIC)
             .addSuperinterface(parametersType)
             .addFields(asList(requisitesField, expectationsField, injectionablesField))
             .addMethods(
@@ -198,15 +227,13 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
             .addTypes(asList(requisitesInnerClass.build(), expectationsInnerClass.build()))
             .build();
 
+    final TypeSpec classClass =
+        TypeSpec.classBuilder(classClassName).addTypes(asList(methodClass)).build();
+
     try {
-      JavaFile.builder(def.getTestClassPackage(), typeSpec).build().writeTo(this.filer);
+      JavaFile.builder(def.getTestClassPackage(), classClass).build().writeTo(this.filer);
       return true;
     } catch (IOException e) {
-      /*throw new UncheckedIOException(
-      String.format(
-          "Unable to write Parameters class for '%s.%s'.",
-          definition.getTestClassPackage(), definition.getTestClassName()),
-      e);*/
       return false;
     }
   }

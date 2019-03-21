@@ -14,6 +14,8 @@ public interface ParameterizedTestsDefinition {
 
   String getTestClassPackage();
 
+  String getTestMethodName();
+
   List<ParameterizedTestsBlockDefinition> getRequisites();
 
   List<ParameterizedTestsBlockDefinition> getExpectations();

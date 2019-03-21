@@ -2,6 +2,7 @@ package com.kidsoncoffee.paramtests;
 
 import com.google.auto.service.AutoService;
 import com.kidsoncoffee.paramtests.generator.ParameterClassGenerator;
+import com.kidsoncoffee.paramtests.generator.ParameterizedTestsDefinition;
 import com.kidsoncoffee.paramtests.generator.ParameterizedTestsGenerator;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -62,13 +63,15 @@ public class BDDParametersProcessor extends AbstractProcessor {
               .flatMap(Collection::stream)
               .collect(Collectors.toList());
 
-      generated.compareAndSet(
-          !generated.get(),
-          generator.createDefinitions(elements).stream()
-              .map(generator::generate)
-              .filter(b -> b)
-              .findAny()
-              .orElse(false));
+      if (elements.isEmpty()) {
+        continue;
+      }
+
+      for (final ParameterizedTestsDefinition definition : generator.createDefinitions(elements)) {
+        final boolean defGen = generator.generate(definition);
+
+        generated.compareAndSet(false, defGen);
+      }
     }
 
     return generated.get();
