@@ -12,6 +12,6 @@ public interface TestCaseParameters {
 
   TestCaseParametersBlock getExpectations();
 
-  // TODO fchovich MAYBE JUST HAVE A MAP OF PARAMETER NAMES AND GETTERS
+  // TODO fchovich REMOVE THIS. USE REFLECTION TO INJECT.
   List<Supplier> getInjectionables();
 }

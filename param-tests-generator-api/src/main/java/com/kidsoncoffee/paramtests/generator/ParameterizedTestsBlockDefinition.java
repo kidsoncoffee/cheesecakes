@@ -10,9 +10,12 @@ import javax.lang.model.type.TypeMirror;
  */
 @Value.Immutable
 public interface ParameterizedTestsBlockDefinition {
+  // TODO fchovich REMOVE AND USE REFLECTION
   int getOverallOrder();
 
-  String getName();
+  String getMethodName();
+
+  String getParameterName();
 
   TypeMirror getType();
 }

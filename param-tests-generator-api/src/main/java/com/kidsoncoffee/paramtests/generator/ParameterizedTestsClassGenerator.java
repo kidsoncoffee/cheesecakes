@@ -9,13 +9,13 @@ import java.util.List;
  * @author fernando.chovich
  * @since 1.0
  */
-public interface ParameterizedTestsGenerator {
+public interface ParameterizedTestsClassGenerator<T extends ParameterizedTestClassDefinition> {
 
   void init(final ProcessingEnvironment processingEnvironment);
 
   List<Class<? extends Annotation>> getAnnotationsToProcess();
 
-  List<ParameterizedTestsDefinition> createDefinitions(final List<Element> elements);
+  List<T> createDefinitions(final List<Element> elements);
 
-  boolean generate(final ParameterizedTestsDefinition definition);
+  boolean generate(final T definition);
 }

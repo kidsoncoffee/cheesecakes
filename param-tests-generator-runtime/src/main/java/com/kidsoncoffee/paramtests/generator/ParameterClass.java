@@ -9,12 +9,10 @@ import java.util.List;
  * @since 1.0
  */
 @Value.Immutable
-public interface ParameterizedTestsDefinition {
+public interface ParameterClass extends ParameterizedTestClassDefinition {
   String getTestClassName();
 
   String getTestClassPackage();
-
-  String getTestMethodName();
 
   List<ParameterizedTestsBlockDefinition> getRequisites();
 

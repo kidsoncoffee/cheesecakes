@@ -1,7 +1,5 @@
 package com.kidsoncoffee.paramtests.generator;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import com.kidsoncoffee.paramtests.TestCaseParameters;
 import com.kidsoncoffee.paramtests.TestCaseParametersBlock;
 import com.kidsoncoffee.paramtests.annotations.BDDParameters.Expectations;
@@ -28,7 +26,9 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -38,7 +38,7 @@ import static java.util.Arrays.asList;
  * @author fernando.chovich
  * @since 1.0
  */
-public class ParameterClassGenerator implements ParameterizedTestsGenerator {
+public class ParameterClassGenerator implements ParameterizedTestsClassGenerator<ParameterClass> {
 
   private Filer filer;
   private Elements elementUtils;
@@ -55,7 +55,7 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
   }
 
   @Override
-  public List<ParameterizedTestsDefinition> createDefinitions(final List<Element> elements) {
+  public List<ParameterClass> createDefinitions(final List<Element> elements) {
     final List<Element> parameters =
         elements.stream()
             .filter(e -> e.getKind().equals(ElementKind.PARAMETER))
@@ -67,34 +67,20 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
       return Collections.emptyList();
     }
 
-    final Table<Element, Element, List<Element>> groupedElements = groupElements(parameters);
-    return groupedElements.cellSet().stream()
+    final Map<Element, List<Element>> groupedElements =
+        parameters.stream()
+            .collect(Collectors.groupingBy(e -> e.getEnclosingElement().getEnclosingElement()));
+
+    return groupedElements.entrySet().stream()
         .map(
-            cell ->
-                ImmutableParameterizedTestsDefinition.builder()
-                    .testClassName(cell.getRowKey().getSimpleName().toString())
-                    .testClassPackage(this.elementUtils.getPackageOf(cell.getRowKey()).toString())
-                    .testMethodName(cell.getColumnKey().getSimpleName().toString())
-                    .requisites(extract(Requisites.class, cell.getValue()))
-                    .expectations(extract(Expectations.class, cell.getValue()))
+            entry ->
+                ImmutableParameterClass.builder()
+                    .testClassName(entry.getKey().getSimpleName().toString())
+                    .testClassPackage(this.elementUtils.getPackageOf(entry.getKey()).toString())
+                    .requisites(extract(Requisites.class, entry.getValue()))
+                    .expectations(extract(Expectations.class, entry.getValue()))
                     .build())
         .collect(Collectors.toList());
-  }
-
-  private static Table<Element, Element, List<Element>> groupElements(List<Element> parameters) {
-    final Table<Element, Element, List<Element>> groupedElements = HashBasedTable.create();
-
-    for (final Element parameter : parameters) {
-      final Element methodElement = parameter.getEnclosingElement();
-      final Element classElement = methodElement.getEnclosingElement();
-
-      if (!groupedElements.contains(classElement, methodElement)) {
-        groupedElements.put(classElement, methodElement, new ArrayList<>());
-      }
-      groupedElements.get(classElement, methodElement).add(parameter);
-    }
-
-    return groupedElements;
   }
 
   private static List<ParameterizedTestsBlockDefinition> extract(
@@ -107,7 +93,8 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
       }
       blockDefinitions.add(
           ImmutableParameterizedTestsBlockDefinition.builder()
-              .name(element.getSimpleName().toString())
+              .parameterName(element.getSimpleName().toString())
+              .methodName(element.getEnclosingElement().getSimpleName().toString())
               .type(element.asType())
               .overallOrder(i)
               .build());
@@ -116,7 +103,7 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
   }
 
   @Override
-  public boolean generate(final ParameterizedTestsDefinition def) {
+  public boolean generate(final ParameterClass def) {
     final TypeName parametersType = TypeName.get(TestCaseParameters.class);
     final TypeName parametersBlockType = TypeName.get(TestCaseParametersBlock.class);
 
@@ -124,118 +111,178 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
         ClassName.get(
             def.getTestClassPackage(), String.format("%sParameters", def.getTestClassName()));
 
-    final ClassName methodClassName =
-        ClassName.get(classClassName.simpleName(), WordUtils.capitalize(def.getTestMethodName()));
+    final Map<
+            String,
+            Pair<List<ParameterizedTestsBlockDefinition>, List<ParameterizedTestsBlockDefinition>>>
+        indexed = indexByMethodName(def);
 
-    final ClassName requisitesClassName =
-        ClassName.get(classClassName.simpleName(), methodClassName.simpleName(), "Requisites");
-    final ClassName expectationsClassName =
-        ClassName.get(classClassName.simpleName(), methodClassName.simpleName(), "Expectations");
-
-    final FieldSpec requisitesField =
-        FieldSpec.builder(requisitesClassName, "requisites")
-            .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-            .build();
-    final FieldSpec expectationsField =
-        FieldSpec.builder(expectationsClassName, "expectations")
-            .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-            .build();
-
-    final ParameterizedTypeName injectionablesType =
-        ParameterizedTypeName.get(List.class, Supplier.class);
-    final FieldSpec injectionablesField =
-        FieldSpec.builder(injectionablesType, "injectionables")
-            .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-            .build();
-
-    final MethodSpec.Builder constructor =
-        MethodSpec.constructorBuilder()
-            .addStatement("this.$N = new $T(this)", requisitesField, requisitesClassName)
-            .addStatement("this.$N = new $T(this)", expectationsField, expectationsClassName)
-            .addStatement("this.$N = new $T<>()", injectionablesField, ArrayList.class);
-
-    def.getRequisites()
-        .forEach(
-            d ->
-                constructor.addStatement(
-                    "this.$N.add(this.$N::$N)",
-                    injectionablesField,
-                    requisitesField,
-                    formatGetterMethodName(d.getName())));
-
-    def.getExpectations()
-        .forEach(
-            d ->
-                constructor.addStatement(
-                    "this.$N.add(this.$N::$N)",
-                    injectionablesField,
-                    expectationsField,
-                    formatGetterMethodName(d.getName())));
-
-    final MethodSpec requisitesGetter =
-        MethodSpec.methodBuilder("getRequisites")
-            .addModifiers(Modifier.PUBLIC)
-            .addStatement("return this.$N", requisitesField)
-            .returns(requisitesField.type)
-            .build();
-
-    final MethodSpec expectationsGetter =
-        MethodSpec.methodBuilder("getExpectations")
-            .addModifiers(Modifier.PUBLIC)
-            .addStatement("return this.$N", expectationsField)
-            .returns(expectationsField.type)
-            .build();
-
-    final MethodSpec injectionablesGetter =
-        MethodSpec.methodBuilder("getInjectionables")
-            .addStatement("return this.$N", injectionablesField)
-            .addModifiers(Modifier.PUBLIC)
-            .returns(injectionablesType)
-            .build();
-
-    final TypeSpec.Builder requisitesInnerClass =
-        createParameterBlock(requisitesClassName, def.getRequisites(), parametersBlockType);
-
-    final TypeSpec.Builder expectationsInnerClass =
-        createParameterBlock(expectationsClassName, def.getExpectations(), parametersBlockType);
-
-    requisitesInnerClass.addMethod(
-        MethodSpec.methodBuilder("then")
-            .addStatement("return $T.this.$N", methodClassName, expectationsField)
-            .returns(expectationsClassName)
-            .build());
-
-    final MethodSpec givenMethod =
-        MethodSpec.methodBuilder("given")
-            .addModifiers(Modifier.STATIC)
-            .returns(requisitesClassName)
-            .addStatement("return new $T().$N", methodClassName, requisitesField)
-            .build();
-
-    final TypeSpec methodClass =
-        TypeSpec.classBuilder(methodClassName)
-            .addModifiers(Modifier.STATIC)
-            .addSuperinterface(parametersType)
-            .addFields(asList(requisitesField, expectationsField, injectionablesField))
-            .addMethods(
-                asList(
-                    constructor.build(),
-                    requisitesGetter,
-                    expectationsGetter,
-                    injectionablesGetter,
-                    givenMethod))
-            .addTypes(asList(requisitesInnerClass.build(), expectationsInnerClass.build()))
-            .build();
+    final List<TypeSpec> methodInnerClasses =
+        generateTestMethodInnerClasses(
+            parametersType, parametersBlockType, classClassName, indexed);
 
     final TypeSpec classClass =
-        TypeSpec.classBuilder(classClassName).addTypes(asList(methodClass)).build();
+        TypeSpec.classBuilder(classClassName).addTypes(methodInnerClasses).build();
 
     try {
+      // TODO fchovich ADD COMMENTS TO GENERATED CLASS
       JavaFile.builder(def.getTestClassPackage(), classClass).build().writeTo(this.filer);
       return true;
     } catch (IOException e) {
       return false;
     }
+  }
+
+  private static List<TypeSpec> generateTestMethodInnerClasses(
+      final TypeName parametersType,
+      final TypeName parametersBlockType,
+      final ClassName classClassName,
+      final Map<
+              String,
+              Pair<
+                  List<ParameterizedTestsBlockDefinition>, List<ParameterizedTestsBlockDefinition>>>
+          indexed) {
+    final List<TypeSpec> methodClasses = new ArrayList<>();
+
+    for (Map.Entry<
+            String,
+            Pair<List<ParameterizedTestsBlockDefinition>, List<ParameterizedTestsBlockDefinition>>>
+        methodEntry : indexed.entrySet()) {
+      final String testMethodName = methodEntry.getKey();
+      final ClassName methodClassName =
+          ClassName.get(classClassName.simpleName(), WordUtils.capitalize(testMethodName));
+
+      final ClassName requisitesClassName =
+          ClassName.get(classClassName.simpleName(), methodClassName.simpleName(), "Requisites");
+      final ClassName expectationsClassName =
+          ClassName.get(classClassName.simpleName(), methodClassName.simpleName(), "Expectations");
+
+      final FieldSpec requisitesField =
+          FieldSpec.builder(requisitesClassName, "requisites")
+              .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+              .build();
+      final FieldSpec expectationsField =
+          FieldSpec.builder(expectationsClassName, "expectations")
+              .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+              .build();
+
+      final ParameterizedTypeName injectionablesType =
+          ParameterizedTypeName.get(List.class, Supplier.class);
+      final FieldSpec injectionablesField =
+          FieldSpec.builder(injectionablesType, "injectionables")
+              .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+              .build();
+
+      final MethodSpec.Builder constructor =
+          MethodSpec.constructorBuilder()
+              .addStatement("this.$N = new $T(this)", requisitesField, requisitesClassName)
+              .addStatement("this.$N = new $T(this)", expectationsField, expectationsClassName)
+              .addStatement("this.$N = new $T<>()", injectionablesField, ArrayList.class);
+
+      methodEntry
+          .getValue()
+          .getLeft()
+          .forEach(
+              d ->
+                  constructor.addStatement(
+                      "this.$N.add(this.$N::$N)",
+                      injectionablesField,
+                      requisitesField,
+                      formatGetterMethodName(d.getParameterName())));
+
+      methodEntry
+          .getValue()
+          .getRight()
+          .forEach(
+              d ->
+                  constructor.addStatement(
+                      "this.$N.add(this.$N::$N)",
+                      injectionablesField,
+                      expectationsField,
+                      formatGetterMethodName(d.getParameterName())));
+
+      final MethodSpec requisitesGetter =
+          MethodSpec.methodBuilder("getRequisites")
+              .addModifiers(Modifier.PUBLIC)
+              .addStatement("return this.$N", requisitesField)
+              .returns(requisitesField.type)
+              .build();
+
+      final MethodSpec expectationsGetter =
+          MethodSpec.methodBuilder("getExpectations")
+              .addModifiers(Modifier.PUBLIC)
+              .addStatement("return this.$N", expectationsField)
+              .returns(expectationsField.type)
+              .build();
+
+      final MethodSpec injectionablesGetter =
+          MethodSpec.methodBuilder("getInjectionables")
+              .addStatement("return this.$N", injectionablesField)
+              .addModifiers(Modifier.PUBLIC)
+              .returns(injectionablesType)
+              .build();
+
+      final TypeSpec.Builder requisitesInnerClass =
+          createParameterBlock(
+              requisitesClassName, methodEntry.getValue().getLeft(), parametersBlockType);
+
+      final TypeSpec.Builder expectationsInnerClass =
+          createParameterBlock(
+              expectationsClassName, methodEntry.getValue().getRight(), parametersBlockType);
+
+      requisitesInnerClass.addMethod(
+          MethodSpec.methodBuilder("then")
+              .addStatement("return $T.this.$N", methodClassName, expectationsField)
+              .returns(expectationsClassName)
+              .build());
+
+      final MethodSpec givenMethod =
+          MethodSpec.methodBuilder("given")
+              .addModifiers(Modifier.STATIC)
+              .returns(requisitesClassName)
+              .addStatement("return new $T().$N", methodClassName, requisitesField)
+              .build();
+
+      final TypeSpec methodClass =
+          TypeSpec.classBuilder(methodClassName)
+              .addModifiers(Modifier.STATIC)
+              .addSuperinterface(parametersType)
+              .addFields(asList(requisitesField, expectationsField, injectionablesField))
+              .addMethods(
+                  asList(
+                      constructor.build(),
+                      requisitesGetter,
+                      expectationsGetter,
+                      injectionablesGetter,
+                      givenMethod))
+              .addTypes(asList(requisitesInnerClass.build(), expectationsInnerClass.build()))
+              .build();
+      methodClasses.add(methodClass);
+    }
+    return methodClasses;
+  }
+
+  private static Map<
+          String,
+          Pair<List<ParameterizedTestsBlockDefinition>, List<ParameterizedTestsBlockDefinition>>>
+      indexByMethodName(ParameterClass def) {
+    final Map<String, List<ParameterizedTestsBlockDefinition>> indexedRequisites =
+        def.getRequisites().stream()
+            .collect(Collectors.groupingBy(ParameterizedTestsBlockDefinition::getMethodName));
+    final Map<String, List<ParameterizedTestsBlockDefinition>> indexedExpectations =
+        def.getExpectations().stream()
+            .collect(Collectors.groupingBy(ParameterizedTestsBlockDefinition::getMethodName));
+
+    final HashSet<String> methods = new HashSet<>(indexedRequisites.keySet());
+    methods.addAll(indexedExpectations.keySet());
+
+    return methods.stream()
+        .collect(
+            Collectors.toMap(
+                m -> m,
+                m ->
+                    Pair.of(
+                        indexedRequisites.getOrDefault(m, Collections.emptyList()),
+                        indexedExpectations.getOrDefault(m, Collections.emptyList()))));
   }
 
   private static TypeSpec.Builder createParameterBlock(
@@ -246,7 +293,7 @@ public class ParameterClassGenerator implements ParameterizedTestsGenerator {
     final List<MethodSpec> methods = new ArrayList<>();
 
     parameters.stream()
-        .map(r -> createBuilder(blockName, r.getType(), r.getName()))
+        .map(r -> createBuilder(blockName, r.getType(), r.getParameterName()))
         .forEach(
             p -> {
               fields.add(p.getLeft());

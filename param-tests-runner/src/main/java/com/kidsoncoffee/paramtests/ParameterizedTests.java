@@ -8,6 +8,7 @@ import org.junit.runners.model.InitializationError;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author fernando.chovich
@@ -28,10 +29,12 @@ public class ParameterizedTests extends Suite {
     // TODO fchovich USE TYPE INSTEAD OF ANNOTATION
     for (FrameworkField def : this.getTestClass().getAnnotatedFields(TestCaseDefinition.class)) {
       final TestCaseParameters parameters = getTestCaseParameters(def);
+      final TestCaseBinding binding = def.getAnnotation(TestCaseBinding.class);
       final ParameterizedTest test =
           ImmutableParameterizedTest.builder()
               .name(parameters.toString())
               .parameters(parameters)
+              .binding(binding != null ? Optional.of(binding.value()) : Optional.empty())
               .build();
       runners.add(new ParameterizedTestMethodRunner(getTestClass().getJavaClass(), test));
     }

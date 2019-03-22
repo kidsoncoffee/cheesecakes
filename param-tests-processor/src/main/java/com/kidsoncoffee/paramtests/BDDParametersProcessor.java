@@ -2,8 +2,8 @@ package com.kidsoncoffee.paramtests;
 
 import com.google.auto.service.AutoService;
 import com.kidsoncoffee.paramtests.generator.ParameterClassGenerator;
-import com.kidsoncoffee.paramtests.generator.ParameterizedTestsDefinition;
-import com.kidsoncoffee.paramtests.generator.ParameterizedTestsGenerator;
+import com.kidsoncoffee.paramtests.generator.ParameterizedTestClassDefinition;
+import com.kidsoncoffee.paramtests.generator.ParameterizedTestsClassGenerator;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;
@@ -13,13 +13,13 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.asList;
 import static javax.lang.model.SourceVersion.RELEASE_8;
 
 /**
@@ -30,15 +30,16 @@ import static javax.lang.model.SourceVersion.RELEASE_8;
 @SupportedSourceVersion(RELEASE_8)
 public class BDDParametersProcessor extends AbstractProcessor {
 
-  private List<ParameterizedTestsGenerator> generators;
+  private final List<ParameterizedTestsClassGenerator> generators = new ArrayList<>();
 
+  // TODO fchovich USE THIS!
   private Messager messager;
 
   @Override
   public void init(final ProcessingEnvironment processingEnv) {
     this.messager = processingEnv.getMessager();
     // TODO fchovich MAKE THIS A RUNTIME DEPENDENCY
-    this.generators = asList(new ParameterClassGenerator());
+    this.generators.add(new ParameterClassGenerator());
     this.generators.forEach(g -> g.init(processingEnv));
   }
 
@@ -46,8 +47,9 @@ public class BDDParametersProcessor extends AbstractProcessor {
   public Set<String> getSupportedAnnotationTypes() {
     // TODO fchovich ADD LOGGER. IF NO GENERATORS
     return this.generators.stream()
-        .map(ParameterizedTestsGenerator::getAnnotationsToProcess)
+        .map(ParameterizedTestsClassGenerator::getAnnotationsToProcess)
         .flatMap(Collection::stream)
+        .map(c -> ((Class) c)) // TODO fchovich DON'T UNDERSTAND THIS
         .map(Class::getCanonicalName)
         .collect(Collectors.toSet());
   }
@@ -56,7 +58,8 @@ public class BDDParametersProcessor extends AbstractProcessor {
   public boolean process(
       final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
     final AtomicBoolean generated = new AtomicBoolean(false);
-    for (final ParameterizedTestsGenerator generator : this.generators) {
+    for (final ParameterizedTestsClassGenerator<? extends ParameterizedTestClassDefinition>
+        generator : this.generators) {
       final List<Element> elements =
           generator.getAnnotationsToProcess().stream()
               .map(roundEnv::getElementsAnnotatedWith)
@@ -67,13 +70,20 @@ public class BDDParametersProcessor extends AbstractProcessor {
         continue;
       }
 
-      for (final ParameterizedTestsDefinition definition : generator.createDefinitions(elements)) {
-        final boolean defGen = generator.generate(definition);
-
-        generated.compareAndSet(false, defGen);
-      }
+      generated.compareAndSet(false, callGenerator(generator, elements).get());
     }
 
     return generated.get();
+  }
+
+  private static <
+          V extends ParameterizedTestClassDefinition, T extends ParameterizedTestsClassGenerator<V>>
+      AtomicBoolean callGenerator(final T generator, final List<Element> elements) {
+    final AtomicBoolean generated = new AtomicBoolean(false);
+    for (final V definition : generator.createDefinitions(elements)) {
+      final boolean defGen = generator.generate(definition);
+      generated.compareAndSet(false, defGen);
+    }
+    return generated;
   }
 }
