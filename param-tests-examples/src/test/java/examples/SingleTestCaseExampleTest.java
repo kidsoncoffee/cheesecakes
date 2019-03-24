@@ -1,14 +1,14 @@
 package examples;
 
-import com.kidsoncoffee.paramtests.ParameterizedTests;
-import com.kidsoncoffee.paramtests.TestCaseDefinition;
-import com.kidsoncoffee.paramtests.TestCaseParametersBlock;
-import com.kidsoncoffee.paramtests.annotations.BDDParameters.Expectations;
-import com.kidsoncoffee.paramtests.annotations.BDDParameters.Requisites;
+import com.kidsoncoffee.paramtests.ScenarioBlock;
+import com.kidsoncoffee.paramtests.annotations.Parameters;
+import com.kidsoncoffee.paramtests.annotations.Parameters.Expectations;
+import com.kidsoncoffee.paramtests.annotations.Parameters.Requisites;
+import com.kidsoncoffee.paramtests.runner.ParameterizedTests;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static examples.SingleTestCaseExampleTestParameters.SingleTestCase.given;
+import static examples.SingleTestCaseExampleTestScenarios.SingleTestCase.given;
 
 /**
  * @author fernando.chovich
@@ -18,12 +18,12 @@ import static examples.SingleTestCaseExampleTestParameters.SingleTestCase.given;
 public class SingleTestCaseExampleTest {
 
   // TODO fchovich create analysis tool for syntatic sugar
-  @TestCaseDefinition
-  private static final TestCaseParametersBlock TEST_CASE =
+  @Parameters.Scenario("Full name test 1")
+  private static final ScenarioBlock TEST_CASE =
       given().name("John").surname("Doe").then().expectedFullName("John Doe");
 
-  @TestCaseDefinition
-  private static final TestCaseParametersBlock TEST_CASE_2 =
+  @Parameters.Scenario("Full name test 2")
+  private static final ScenarioBlock TEST_CASE_2 =
       given().name("Mary").surname("Doe").then().expectedFullName("Mary Doe");
 
   @Test

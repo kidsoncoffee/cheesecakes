@@ -1,13 +1,12 @@
 package examples;
 
-import com.kidsoncoffee.paramtests.ParameterizedTests;
-import com.kidsoncoffee.paramtests.TestCaseBinding;
-import com.kidsoncoffee.paramtests.TestCaseDefinition;
-import com.kidsoncoffee.paramtests.TestCaseParametersBlock;
-import com.kidsoncoffee.paramtests.annotations.BDDParameters.Expectations;
-import com.kidsoncoffee.paramtests.annotations.BDDParameters.Requisites;
-import examples.MultipleTestCaseExampleTestParameters.SubtractionTestCase;
-import examples.MultipleTestCaseExampleTestParameters.SumTestCase;
+import com.kidsoncoffee.paramtests.ScenarioBlock;
+import com.kidsoncoffee.paramtests.annotations.Parameters;
+import com.kidsoncoffee.paramtests.annotations.Parameters.Expectations;
+import com.kidsoncoffee.paramtests.annotations.Parameters.Requisites;
+import com.kidsoncoffee.paramtests.runner.ParameterizedTests;
+import examples.MultipleTestCaseExampleTestScenarios.SubtractionTestCase;
+import examples.MultipleTestCaseExampleTestScenarios.SumTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -19,24 +18,23 @@ import org.junit.runner.RunWith;
 public class MultipleTestCaseExampleTest {
 
   // TODO fchovich CREATE CHECKSTYLE FOR TEST CASE DEFINITION (UNUSED CONSTANT)
-  // TODO fchovich VALIDATE NO TEST CASE DEFINITIONS FOR RUNNER
-  @TestCaseDefinition
-  @TestCaseBinding("sum")
-  private static final TestCaseParametersBlock SUM_A =
+  // TODO fchovich VALIDATE NO TEST CASE DEFINITIONS FOUND
+  // TODO fchovich VALIDATE CROSS PACKAGE PARAMETER CLASS USAGE
+  // TODO fchovich CREATE TESTS SORTER
+  // TODO fchovich VALIDATE STATIC FINAL TEST CASES
+  @Parameters.Scenario("Test Subtraction 1")
+  private static final ScenarioBlock SUM_A =
       SumTestCase.given().firstValue(1).secondValue(2).then().expectedSum(3);
 
-  @TestCaseDefinition
-  @TestCaseBinding("sum")
-  private static final TestCaseParametersBlock SUM_B =
+  @Parameters.Scenario("Test Sum 1")
+  private static final ScenarioBlock SUM_B =
       SumTestCase.given().firstValue(99).secondValue(2).then().expectedSum(101);
 
-  @TestCaseDefinition
-  @TestCaseBinding("subtraction")
-  private static final TestCaseParametersBlock SUBTRACTION =
+  @Parameters.Scenario("Test Sum 2")
+  private static final ScenarioBlock SUBTRACTION =
       SubtractionTestCase.given().firstValue(3).secondValue(4).then().expectedSubtraction(-1);
 
   @Test
-  @TestCaseBinding("sum")
   public void sumTestCase(
       @Requisites final int firstValue,
       @Requisites final int secondValue,
@@ -52,7 +50,6 @@ public class MultipleTestCaseExampleTest {
   }
 
   @Test
-  @TestCaseBinding("subtraction")
   // TODO fchovich SPECIFY TO USE A COMMON PARAMETER
   public void subtractionTestCase(
       @Requisites final int firstValue,

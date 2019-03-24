@@ -10,35 +10,39 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.kidsoncoffee</groupId>
-    <artifactId>param-tests-all</artifactId>
+    <artifactId>param-tests-processor-parameters-runtime</artifactId>
 
     <dependencies>
-        <!-- PROJECT COMPILE -->
-        <dependency>
-            <groupId>com.kidsoncoffee</groupId>
-            <artifactId>param-tests-annotations</artifactId>
-        </dependency>
+        <!-- PROJECT -->
         <dependency>
             <groupId>com.kidsoncoffee</groupId>
             <artifactId>param-tests-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.kidsoncoffee</groupId>
-            <artifactId>param-tests-runner</artifactId>
+            <artifactId>param-tests-annotations</artifactId>
         </dependency>
-
-        <!-- PROJECT RUNTIME -->
         <dependency>
             <groupId>com.kidsoncoffee</groupId>
-            <artifactId>param-tests-processor-parameters-runtime</artifactId>
-            <scope>runtime</scope>
+            <artifactId>param-tests-processor-parameters-api</artifactId>
         </dependency>
 
         <!-- 3rd PARTY -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>javapoet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -12,17 +12,17 @@
     <modules>
         <module>param-tests-all</module>
         <module>param-tests-annotations</module>
-        <module>param-tests-generator-api</module>
-        <module>param-tests-generator-runtime</module>
-        <module>param-tests-processor</module>
-        <module>param-tests-runner</module>
         <module>param-tests-api</module>
         <module>param-tests-examples</module>
+        <module>param-tests-processor-parameters-api</module>
+        <module>param-tests-processor-parameters-runtime</module>
+        <module>param-tests-runner</module>
     </modules>
 
     <properties>
         <java.source>8</java.source>
         <java.target>8</java.target>
+
         <!-- DEPENDENCIES -->
         <apache.commons-lang3.version>3.5</apache.commons-lang3.version>
         <autoservice.version>1.0-rc1</autoservice.version>
@@ -74,7 +74,12 @@
             </dependency>
             <dependency>
                 <groupId>com.kidsoncoffee</groupId>
-                <artifactId>param-tests-processor</artifactId>
+                <artifactId>param-tests-processor-parameters-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.kidsoncoffee</groupId>
+                <artifactId>param-tests-processor-parameters-runtime</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
