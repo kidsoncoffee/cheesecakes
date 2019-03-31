@@ -5,8 +5,8 @@ import com.kidsoncoffee.cheesecakes.Parameters.Expectations;
 import com.kidsoncoffee.cheesecakes.Parameters.Requisites;
 import com.kidsoncoffee.cheesecakes.SpecificationBlock;
 import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
-import examples.MultipleTestCaseExampleTestScenarios.SubtractionTestCase;
-import examples.MultipleTestCaseExampleTestScenarios.SumTestCase;
+import examples.MultipleTestCaseExampleTestParameters.SubtractionTestCase;
+import examples.MultipleTestCaseExampleTestParameters.SumTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -22,7 +22,7 @@ public class MultipleTestCaseExampleTest {
   // TODO fchovich VALIDATE CROSS PACKAGE PARAMETER CLASS USAGE
   // TODO fchovich CREATE TESTS SORTER
   // TODO fchovich VALIDATE STATIC FINAL TEST CASES
-  @Parameters.Scenario(  "Test Subtraction 1")
+  @Parameters.Scenario("Test Subtraction 1")
   private static final SpecificationBlock SUM_A =
       SumTestCase.given().firstValue(1).secondValue(2).then().expectedSum(3);
 

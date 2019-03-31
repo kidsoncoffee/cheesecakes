@@ -1,17 +1,25 @@
 package com.kidsoncoffee.cheesecakes.runner;
 
+import com.kidsoncoffee.cheesecakes.DataDrivenScenario;
+import com.kidsoncoffee.cheesecakes.Parameters;
 import com.kidsoncoffee.cheesecakes.Specification;
 import com.kidsoncoffee.cheesecakes.SpecificationReference;
-import com.kidsoncoffee.cheesecakes.Parameters;
 import org.junit.runner.Runner;
 import org.junit.runners.Suite;
 import org.junit.runners.model.FrameworkField;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.reflections.Reflections;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author fernando.chovich
@@ -26,10 +34,10 @@ public class Cheesecakes extends Suite {
   public Cheesecakes(final Class<?> klass) throws InitializationError {
     super(klass, Collections.emptyList());
     this.testBinder = new TestCaseParameterResolver();
-    this.runners = createTestCaseRunner();
+    this.runners = createTestCaseRunners();
   }
 
-  private List<Runner> createTestCaseRunner() throws InitializationError {
+  private List<Runner> createTestCaseRunners() throws InitializationError {
     final List<Runner> runners = new ArrayList<>();
 
     // TODO fchovich USE TYPE INSTEAD OF ANNOTATION
@@ -43,15 +51,53 @@ public class Cheesecakes extends Suite {
             ImmutableTestCase.builder()
                 .name(def.getAnnotation(Parameters.Scenario.class).value())
                 .specification(specification)
-                .binding(binding != null ? Optional.of(binding.value()) : Optional.empty())
+                .binding(binding != null ? Optional.of(binding.testMethod()) : Optional.empty())
                 .build();
 
-        runners.add(
-            new TestMethodRunner(
-                getTestClass().getJavaClass(), test, this.testBinder));
+        runners.add(new TestMethodRunner(getTestClass().getJavaClass(), test, this.testBinder));
       }
     }
+
+    for (final FrameworkMethod def :
+        this.getTestClass().getAnnotatedMethods(Parameters.DataDriven.class)) {
+      final List<Specification> specifications = retrieveDataDrivenScenarios(def);
+      /*ImmutableTestCase.builder()
+      .name(def.getAnnotation(Parameters.DataDriven.class).value())
+      .specification()*/
+    }
+
     return runners;
+  }
+
+  private static List<Specification> retrieveDataDrivenScenarios(final FrameworkMethod method) {
+    final String testClassPackage = method.getDeclaringClass().getPackage().getName();
+    final Reflections reflections = new Reflections(testClassPackage);
+    final Set<Class<? extends DataDrivenScenario>> dataDrivenScenarios =
+        reflections.getSubTypesOf(DataDrivenScenario.class);
+    final Method bindingMethod =
+        dataDrivenScenarios.stream()
+            .map(Class::getDeclaredMethods)
+            .flatMap(Arrays::stream)
+            .filter(m -> m.isAnnotationPresent(Parameters.ScenarioBinding.class))
+            .filter(
+                m ->
+                    m.getAnnotation(Parameters.ScenarioBinding.class)
+                        .testClass()
+                        .equals(method.getDeclaringClass()))
+            .filter(
+                m ->
+                    m.getAnnotation(Parameters.ScenarioBinding.class)
+                        .testMethod()
+                        .equalsIgnoreCase(method.getName()))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException(""));
+    try {
+      bindingMethod.setAccessible(true);
+      bindingMethod.invoke(null);
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   private static List<Specification> retrieveScenarios(final FrameworkField field) {

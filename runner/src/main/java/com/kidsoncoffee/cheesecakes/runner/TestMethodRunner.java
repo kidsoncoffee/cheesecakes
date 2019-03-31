@@ -62,6 +62,7 @@ public class TestMethodRunner extends BlockJUnit4ClassRunner {
   @Override
   protected List<FrameworkMethod> computeTestMethods() {
     final List<FrameworkMethod> tests = super.computeTestMethods();
+
     final Optional<String> binding = this.testCase.getBinding();
 
     return binding
@@ -71,7 +72,7 @@ public class TestMethodRunner extends BlockJUnit4ClassRunner {
 
   private List<FrameworkMethod> filterByBinding(List<FrameworkMethod> tests, String s) {
     return tests.stream()
-        .filter(m -> m.getAnnotation(Parameters.ScenarioBinding.class).value().equals(s))
+        .filter(m -> m.getAnnotation(Parameters.ScenarioBinding.class).testMethod().equals(s))
         .collect(Collectors.toList());
   }
 

@@ -29,6 +29,11 @@
             <artifactId>cheesecakes-specification-processor</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>com.kidsoncoffee</groupId>
+            <artifactId>cheesecakes-processor-data-driven-scenarios</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- 3rd PARTY -->
         <dependency>

@@ -11,6 +11,7 @@ import com.kidsoncoffee.paramtests.scenario.domain.ImmutableScenarioBlockDefinit
 import com.kidsoncoffee.paramtests.scenario.domain.ImmutableScenarioDefinition;
 import com.kidsoncoffee.paramtests.scenario.domain.ScenarioBlockDefinition;
 import com.kidsoncoffee.paramtests.scenario.domain.ScenarioDefinition;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -83,11 +84,10 @@ public class ScenarioParametersProcessor extends AbstractProcessor {
   }
 
   @Override
-  public boolean process(
-      final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
+  public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment env) {
     final List<Element> elements =
         annotations.stream()
-            .map(roundEnv::getElementsAnnotatedWith)
+            .map(env::getElementsAnnotatedWith)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
 
@@ -101,6 +101,7 @@ public class ScenarioParametersProcessor extends AbstractProcessor {
     return true;
   }
 
+  // TODO fchovich STUPID DATA STRUCTURES
   private static Map<Pair<String, String>, List<ScenarioDefinition>> groupElements(
       final Elements elementUtils, final List<Element> elements) {
     final List<Element> parameters =
@@ -162,7 +163,7 @@ public class ScenarioParametersProcessor extends AbstractProcessor {
       final String testClassPackage,
       final String testClassName,
       final List<ScenarioDefinition> scenarios) {
-    final String scenariosClassName = format("%sScenarios", testClassName);
+    final String scenariosClassName = format("%sParameters", testClassName);
     final ClassName scenariosType = ClassName.get(testClassPackage, scenariosClassName);
 
     final List<TypeSpec> scenariosTypes =
@@ -256,11 +257,21 @@ public class ScenarioParametersProcessor extends AbstractProcessor {
     final TypeSpec expectationsType =
         createExpectationsType(expectationsClassName, definition.getExpectations());
 
+    // CREATE ANNOTATIONS
+    final AnnotationSpec bindingAnnotation =
+        AnnotationSpec.builder(Parameters.ScenarioBinding.class)
+            .addMember("testClass", "$N.class", definition.getTestClassName())
+            .addMember("testMethod", "$S", definition.getTestMethodName())
+            .build();
+    //    @Parameters.ScenarioBinding(testClass = SingleTestCaseExampleTest.class, testMethod =
+    // "singleTestCase")
+    //
     // CREATE TYPE
 
     return TypeSpec.classBuilder(scenarioName)
         .addSuperinterface(Specification.class)
         .addSuperinterface(Parameters.Binding.class)
+        .addAnnotation(bindingAnnotation)
         .addModifiers(Modifier.STATIC)
         .addFields(asList(requisitesField, expectationsField))
         .addMethods(
@@ -275,7 +286,8 @@ public class ScenarioParametersProcessor extends AbstractProcessor {
   }
 
   private static MethodSpec createParameterNamesGetter(ScenarioDefinition definition) {
-    final ParameterizedTypeName pairType = ParameterizedTypeName.get(Pair.class, Class.class, String.class);
+    final ParameterizedTypeName pairType =
+        ParameterizedTypeName.get(Pair.class, Class.class, String.class);
     final TypeName listType = ParameterizedTypeName.get(ClassName.get(List.class), pairType);
 
     final MethodSpec.Builder getter =
@@ -283,15 +295,17 @@ public class ScenarioParametersProcessor extends AbstractProcessor {
             .addModifiers(Modifier.PUBLIC)
             .addAnnotation(Override.class)
             .returns(listType)
-            .addStatement(
-                "final $T<$T> names = new $T<>()", List.class, pairType, ArrayList.class);
+            .addStatement("final $T<$T> names = new $T<>()", List.class, pairType, ArrayList.class);
 
     Stream.concat(definition.getRequisites().stream(), definition.getExpectations().stream())
         .sorted((o1, o2) -> o1.getOverallOrder())
         .forEach(
             d ->
                 getter.addStatement(
-                    "names.add($T.of($T.class,$S))", Pair.class, d.getAnnotationType(), d.getParameterName()));
+                    "names.add($T.of($T.class,$S))",
+                    Pair.class,
+                    d.getAnnotationType(),
+                    d.getParameterName()));
 
     return getter.addStatement("return names").build();
   }

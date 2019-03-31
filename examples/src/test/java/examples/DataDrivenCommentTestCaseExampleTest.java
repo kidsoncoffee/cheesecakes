@@ -1,6 +1,6 @@
 package examples;
 
-import com.kidsoncoffee.cheesecakes.Parameters;
+import com.kidsoncoffee.cheesecakes.Parameters.DataDriven;
 import com.kidsoncoffee.cheesecakes.Parameters.Expectations;
 import com.kidsoncoffee.cheesecakes.Parameters.Requisites;
 import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
@@ -24,7 +24,7 @@ public class DataDrivenCommentTestCaseExampleTest {
    * 2          | 4           | 6
    */
   @Test
-  @Parameters.DataDriven
+  @DataDriven("The scenario....")
   public void dataDrivenTestCase(
       // TODO fchovich VALIDATE FINALS
       @Requisites final int firstValue,

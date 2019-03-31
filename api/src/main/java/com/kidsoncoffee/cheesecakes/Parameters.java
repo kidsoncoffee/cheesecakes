@@ -2,11 +2,13 @@ package com.kidsoncoffee.cheesecakes;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.swing.text.html.Option;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author fernando.chovich
@@ -41,13 +43,17 @@ public final class Parameters {
     String value() default "";
   }
 
-  @Target({ElementType.METHOD, ElementType.FIELD})
+  @Target({ElementType.METHOD, ElementType.FIELD, ElementType.TYPE})
   @Retention(RetentionPolicy.RUNTIME)
   public @interface ScenarioBinding {
-    String value();
+    Class testClass();
+
+    String testMethod();
   }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
-  public @interface DataDriven {}
+  public @interface DataDriven {
+    String value();
+  }
 }

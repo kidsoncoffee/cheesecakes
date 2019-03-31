@@ -12,6 +12,7 @@
     <modules>
         <module>api</module>
         <module>examples</module>
+        <module>processor-data-driven-scenarios</module>
         <module>specification-processor</module>
         <module>runner</module>
         <!-- AGGREGATE -->
@@ -64,6 +65,11 @@
             <dependency>
                 <groupId>com.kidsoncoffee</groupId>
                 <artifactId>cheesecakes-runner</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.kidsoncoffee</groupId>
+                <artifactId>cheesecakes-processor-data-driven-scenarios</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

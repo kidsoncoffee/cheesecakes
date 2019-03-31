@@ -8,7 +8,7 @@ import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static examples.SingleTestCaseExampleTestScenarios.SingleTestCase.given;
+import static examples.SingleTestCaseExampleTestParameters.SingleTestCase.given;
 
 /**
  * @author fernando.chovich
