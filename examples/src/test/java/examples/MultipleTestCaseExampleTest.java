@@ -4,6 +4,7 @@ import com.kidsoncoffee.cheesecakes.Parameters;
 import com.kidsoncoffee.cheesecakes.Parameters.Expectations;
 import com.kidsoncoffee.cheesecakes.Parameters.Requisites;
 import com.kidsoncoffee.cheesecakes.SpecificationBlock;
+import com.kidsoncoffee.cheesecakes.frosting.Spec;
 import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
 import examples.MultipleTestCaseExampleTestParameters.SubtractionTestCase;
 import examples.MultipleTestCaseExampleTestParameters.SumTestCase;
@@ -23,15 +24,15 @@ public class MultipleTestCaseExampleTest {
   // TODO fchovich CREATE TESTS SORTER
   // TODO fchovich VALIDATE STATIC FINAL TEST CASES
   @Parameters.Scenario("Test Subtraction 1")
-  private static final SpecificationBlock SUM_A =
+  private static final Spec SUM_A =
       SumTestCase.given().firstValue(1).secondValue(2).then().expectedSum(3);
 
   @Parameters.Scenario("Test Sum 1")
-  private static final SpecificationBlock SUM_B =
+  private static final Spec SUM_B =
       SumTestCase.given().firstValue(99).secondValue(2).then().expectedSum(101);
 
   @Parameters.Scenario("Test Sum 2")
-  private static final SpecificationBlock SUBTRACTION =
+  private static final Spec SUBTRACTION =
       SubtractionTestCase.given().firstValue(3).secondValue(4).then().expectedSubtraction(-1);
 
   @Test

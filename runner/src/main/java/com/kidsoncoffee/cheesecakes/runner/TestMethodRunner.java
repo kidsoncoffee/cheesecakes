@@ -20,24 +20,24 @@ import java.util.stream.Collectors;
 public class TestMethodRunner extends BlockJUnit4ClassRunner {
 
   private final TestCase testCase;
-  private final TestCaseParameterResolver testCaseParameterResolver;
+  private final TestCaseInjectablesResolver testCaseInjectablesResolver;
 
   /**
    * Creates a BlockJUnit4ClassRunner to run {@code klass}
    *
    * @param klass
    * @param testCase
-   * @param testCaseParameterResolver
+   * @param testCaseInjectablesResolver
    * @throws InitializationError if the testCase class is malformed.
    */
   public TestMethodRunner(
       final Class<?> klass,
       final TestCase testCase,
-      final TestCaseParameterResolver testCaseParameterResolver)
+      final TestCaseInjectablesResolver testCaseInjectablesResolver)
       throws InitializationError {
     super(klass);
     this.testCase = testCase;
-    this.testCaseParameterResolver = testCaseParameterResolver;
+    this.testCaseInjectablesResolver = testCaseInjectablesResolver;
   }
 
   @Override
@@ -48,7 +48,7 @@ public class TestMethodRunner extends BlockJUnit4ClassRunner {
   @Override
   protected Statement methodInvoker(FrameworkMethod method, Object test) {
     return new InvokeTestCase(
-        method, test, this.testCase, this.testCaseParameterResolver);
+        method, test, this.testCase, this.testCaseInjectablesResolver);
   }
 
   protected void validateInstanceMethods(List<Throwable> errors) {

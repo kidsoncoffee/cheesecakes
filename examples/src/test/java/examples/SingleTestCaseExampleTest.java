@@ -3,7 +3,7 @@ package examples;
 import com.kidsoncoffee.cheesecakes.Parameters;
 import com.kidsoncoffee.cheesecakes.Parameters.Expectations;
 import com.kidsoncoffee.cheesecakes.Parameters.Requisites;
-import com.kidsoncoffee.cheesecakes.Spec;
+import com.kidsoncoffee.cheesecakes.frosting.Spec;
 import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
 import org.junit.Test;
 import org.junit.runner.RunWith;

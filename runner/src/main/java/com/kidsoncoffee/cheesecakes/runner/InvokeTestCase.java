@@ -11,13 +11,13 @@ public class InvokeTestCase extends Statement {
   private final FrameworkMethod testMethod;
   private final Object target;
   private final TestCase testCase;
-  private final TestCaseParameterResolver testBinder;
+  private final TestCaseInjectablesResolver testBinder;
 
   public InvokeTestCase(
       final FrameworkMethod testMethod,
       final Object target,
       final TestCase testCase,
-      final TestCaseParameterResolver testBinder) {
+      final TestCaseInjectablesResolver testBinder) {
     this.testMethod = testMethod;
     this.target = target;
     this.testCase = testCase;

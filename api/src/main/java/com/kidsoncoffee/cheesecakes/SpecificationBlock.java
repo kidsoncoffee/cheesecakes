@@ -1,5 +1,7 @@
 package com.kidsoncoffee.cheesecakes;
 
+import com.kidsoncoffee.cheesecakes.frosting.Spec;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,7 +10,7 @@ import java.util.List;
  * @since 1.0
  */
 public abstract class SpecificationBlock implements SpecificationReference, Spec {
-
+//TODO fchovich REMOVE THiS CLASS
   private final Specification specification;
 
   public SpecificationBlock(Specification specification) {

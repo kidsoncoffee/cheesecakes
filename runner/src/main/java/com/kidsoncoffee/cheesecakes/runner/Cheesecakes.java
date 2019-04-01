@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author fernando.chovich
@@ -27,13 +26,13 @@ import java.util.stream.Collectors;
  */
 public class Cheesecakes extends Suite {
 
-  private final TestCaseParameterResolver testBinder;
+  private final TestCaseInjectablesResolver testBinder;
 
   private final List<Runner> runners;
 
   public Cheesecakes(final Class<?> klass) throws InitializationError {
     super(klass, Collections.emptyList());
-    this.testBinder = new TestCaseParameterResolver();
+    this.testBinder = new TestCaseInjectablesResolver();
     this.runners = createTestCaseRunners();
   }
 
