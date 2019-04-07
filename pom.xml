@@ -10,13 +10,11 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>api</module>
-        <module>examples</module>
-        <module>processor-data-driven-scenarios</module>
-        <module>specification-processor</module>
-        <module>runner</module>
-        <!-- AGGREGATE -->
-        <module>cheesecakes</module>
+        <module>cheesecakes-all</module>
+        <module>cheesecakes-api</module>
+        <module>cheesecakes-examples</module>
+        <module>cheesecakes-processor</module>
+        <module>cheesecakes-runner</module>
     </modules>
 
     <properties>
@@ -24,11 +22,14 @@
         <java.target>8</java.target>
 
         <!-- DEPENDENCIES -->
+        <apache.commons-io.version>2.6</apache.commons-io.version>
         <apache.commons-lang3.version>3.5</apache.commons-lang3.version>
         <autoservice.version>1.0-rc1</autoservice.version>
         <immutables.version>2.7.5</immutables.version>
+        <jackson-databind.version>2.9.8</jackson-databind.version>
         <javapoet.version>1.11.1</javapoet.version>
         <junit.version>4.12</junit.version>
+        <reflections.version>0.9.9-RC1</reflections.version>
     </properties>
 
     <build>
@@ -48,41 +49,36 @@
         <dependencies>
             <!-- PROJECT -->
             <dependency>
-                <groupId>com.kidsoncoffee</groupId>
+                <groupId>com.kidsoncoffee.cheesecakes</groupId>
                 <artifactId>cheesecakes-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.kidsoncoffee</groupId>
+                <groupId>com.kidsoncoffee.cheesecakes</groupId>
                 <artifactId>cheesecakes-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.kidsoncoffee</groupId>
-                <artifactId>cheesecakes-specification-processor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.kidsoncoffee</groupId>
+                <groupId>com.kidsoncoffee.cheesecakes</groupId>
                 <artifactId>cheesecakes-runner</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.kidsoncoffee</groupId>
-                <artifactId>cheesecakes-processor-data-driven-scenarios</artifactId>
+                <groupId>com.kidsoncoffee.cheesecakes</groupId>
+                <artifactId>cheesecakes-processor</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <!-- 3rd PARTY -->
-            <dependency>
-                <groupId>com.google.auto.service</groupId>
-                <artifactId>auto-service</artifactId>
-                <version>${autoservice.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.squareup</groupId>
                 <artifactId>javapoet</artifactId>
                 <version>${javapoet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>${autoservice.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -98,6 +94,21 @@
                 <groupId>org.immutables</groupId>
                 <artifactId>value</artifactId>
                 <version>${immutables.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-databind.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${apache.commons-io.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
