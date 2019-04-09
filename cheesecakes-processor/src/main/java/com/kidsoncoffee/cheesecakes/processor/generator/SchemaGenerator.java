@@ -97,11 +97,15 @@ public class SchemaGenerator {
         ParameterSpec.builder(Class.class, "type", Modifier.FINAL).build();
     final ParameterSpec stepParameter =
         ParameterSpec.builder(SpecificationStepType.class, "step", Modifier.FINAL).build();
+    final ParameterSpec overallOrderParameter =
+        ParameterSpec.builder(int.class, "overallOrder", Modifier.FINAL).build();
 
     final FieldSpec nameField = FieldSpec.builder(String.class, "name", Modifier.FINAL).build();
     final FieldSpec typeField = FieldSpec.builder(Class.class, "type", Modifier.FINAL).build();
     final FieldSpec stepField =
         FieldSpec.builder(SpecificationStepType.class, "step", Modifier.FINAL).build();
+    final FieldSpec overallOrderField =
+        FieldSpec.builder(int.class, "overallOrder", Modifier.FINAL).build();
 
     final ClassName scenarioClassName =
         ClassName.get(featureClassName.toString(), format("%sSchema", scenarioName));
@@ -109,13 +113,15 @@ public class SchemaGenerator {
         TypeSpec.enumBuilder(scenarioClassName)
             .addAnnotation(bindingAnnotation)
             .addSuperinterface(PARAMETER_TYPE)
-            .addFields(asList(nameField, typeField, stepField))
+            .addFields(asList(nameField, typeField, stepField, overallOrderField))
             .addMethod(
                 MethodSpec.constructorBuilder()
-                    .addParameters(asList(nameParameter, typeParameter, stepParameter))
+                    .addParameters(
+                        asList(nameParameter, typeParameter, stepParameter, overallOrderParameter))
                     .addStatement("this.$N = $N", nameField, nameParameter)
                     .addStatement("this.$N = $N", typeField, typeParameter)
                     .addStatement("this.$N = $N", stepField, stepParameter)
+                    .addStatement("this.$N = $N", overallOrderField, overallOrderParameter)
                     .build())
             .addMethod(
                 MethodSpec.methodBuilder("getName")
@@ -137,6 +143,13 @@ public class SchemaGenerator {
                     .addAnnotation(Override.class)
                     .addStatement("return this.$N", stepField)
                     .returns(SpecificationStepType.class)
+                    .build())
+            .addMethod(
+                MethodSpec.methodBuilder("getOverallOrder")
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(Override.class)
+                    .addStatement("return this.$N", overallOrderField)
+                    .returns(int.class)
                     .build());
 
     def.getParameters().forEach(p -> createParameterSchemaConstant(enumBuilder, p));
@@ -148,11 +161,12 @@ public class SchemaGenerator {
     return enumBuilder.addEnumConstant(
         r.getName().toUpperCase(),
         TypeSpec.anonymousClassBuilder(
-                "$S, $T.class, $T.$L",
+                "$S, $T.class, $T.$L, $L",
                 r.getName(),
                 r.getType(),
                 SpecificationStepType.class,
-                r.getStepType().name())
+                r.getStepType().name(),
+                r.getOverallOrder())
             .build());
   }
 }

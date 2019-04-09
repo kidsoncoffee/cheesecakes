@@ -47,8 +47,7 @@ public class TestMethodRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement methodInvoker(FrameworkMethod method, Object test) {
-    return new InvokeTestCase(
-        method, test, this.testCase, this.testCaseInjectablesResolver);
+    return new InvokeTestCase(method, test, this.testCase, this.testCaseInjectablesResolver);
   }
 
   protected void validateInstanceMethods(List<Throwable> errors) {
@@ -63,16 +62,16 @@ public class TestMethodRunner extends BlockJUnit4ClassRunner {
   protected List<FrameworkMethod> computeTestMethods() {
     final List<FrameworkMethod> tests = super.computeTestMethods();
 
-    final Optional<String> binding = this.testCase.getBinding();
+    final Optional<Parameters.ScenarioBinding> binding = this.testCase.getBinding();
 
     return binding
-        .map(s -> filterByBinding(tests, s))
+        .map(s -> filterByBinding(tests, s.testMethod()))
         .orElseGet(() -> filterByType(tests, this.testCase.getSpecification().getClass()));
   }
 
   private List<FrameworkMethod> filterByBinding(List<FrameworkMethod> tests, String s) {
     return tests.stream()
-        .filter(m -> m.getAnnotation(Parameters.ScenarioBinding.class).testMethod().equals(s))
+        .filter(m -> m.getName().equals(s))
         .collect(Collectors.toList());
   }
 

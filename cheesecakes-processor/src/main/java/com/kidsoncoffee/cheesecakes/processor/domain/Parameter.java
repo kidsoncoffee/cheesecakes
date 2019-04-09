@@ -17,4 +17,6 @@ public interface Parameter {
 
   // TODO fchovich SHOULD THIS BE AT THE USER API?
   SpecificationStepType getStepType();
+
+  int getOverallOrder();
 }

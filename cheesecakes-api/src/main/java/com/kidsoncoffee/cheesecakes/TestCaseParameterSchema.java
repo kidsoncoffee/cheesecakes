@@ -10,4 +10,6 @@ public interface TestCaseParameterSchema {
   Class getType();
 
   SpecificationStepType getStep();
+
+  int getOverallOrder();
 }

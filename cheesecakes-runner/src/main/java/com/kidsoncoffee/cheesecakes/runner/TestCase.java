@@ -1,5 +1,6 @@
 package com.kidsoncoffee.cheesecakes.runner;
 
+import com.kidsoncoffee.cheesecakes.Parameters;
 import com.kidsoncoffee.cheesecakes.Specification;
 import org.immutables.value.Value;
 
@@ -15,5 +16,7 @@ public interface TestCase {
 
     Specification getSpecification();
 
-    Optional<String> getBinding();
+    Optional<Parameters.ScenarioBinding> getBinding();
+
+    boolean isDataDriven();
 }

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Collections.emptyList;
 
@@ -77,7 +78,8 @@ public class FeaturesAggregator {
       features.add(
           ImmutableFeature.builder()
               .testClassName(feature.getSimpleName().toString())
-              .testClassPackage(this.elementUtils.getPackageOf(feature).getQualifiedName().toString())
+              .testClassPackage(
+                  this.elementUtils.getPackageOf(feature).getQualifiedName().toString())
               .scenarios(scenarios)
               .build());
     }
@@ -85,17 +87,20 @@ public class FeaturesAggregator {
   }
 
   private static List<ImmutableParameter> extractParameters(final List<Element> parameters) {
-    return parameters.stream()
-        .map(
-            p ->
-                ImmutableParameter.builder()
-                    .name(p.getSimpleName().toString())
-                    .type(p.asType())
-                    .stepType(
-                        p.getAnnotation(Parameters.Requisites.class) != null
-                            ? SpecificationStepType.REQUISITE
-                            : SpecificationStepType.EXPECTATION)
-                    .build())
+    return IntStream.range(0, parameters.size())
+        .mapToObj(
+            i -> {
+              final Element parameter = parameters.get(i);
+              return ImmutableParameter.builder()
+                  .name(parameter.getSimpleName().toString())
+                  .type(parameter.asType())
+                  .stepType(
+                      parameter.getAnnotation(Parameters.Requisites.class) != null
+                          ? SpecificationStepType.REQUISITE
+                          : SpecificationStepType.EXPECTATION)
+                  .overallOrder(i)
+                  .build();
+            })
         .collect(Collectors.toList());
   }
 
