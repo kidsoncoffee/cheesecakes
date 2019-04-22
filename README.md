@@ -12,9 +12,9 @@ How about writing tests this way:
    * WHERE:
    *
    * firstValue | secondValue | expectedSum
-   * -------- | ----------- | -----------
-   * 1               | 2                     | 3
-   * 2               | 4                     | 6
+   * ---------- | ----------- | -----------
+   * 1          | 2           | 3
+   * 2          | 4           | 6
    * </pre>
    */
   @Test
@@ -55,7 +55,7 @@ Create a test case method as you would with regular junit tests, the difference 
 
 ### Write the functional specification
 
-On the method's javadoc, as the last piece of information, add the keyword `Where:`. This informs **Cheesecakes** that every line in the javadoc, after the keyword, will be interpreted as a **data-driven table**. The table must contain a header row, a separator row and at least one **example** row. The number of columns in every row must be the same. You can do this step after writing the test logic as well.
+On the method's javadoc, as the last piece of information, inside `pre` tags, add the keyword `Where:`. This informs **Cheesecakes** that every line in the javadoc, after the keyword, will be interpreted as a **data-driven table**. The table must contain a header row, a separator row and at least one **example** row. The number of columns in every row must be the same. You can do this step after writing the test logic as well.
 
 ### Write the test logic
 
