@@ -16,12 +16,16 @@ import org.junit.runner.RunWith;
 public class DataDrivenCommentTestCaseExampleTest {
 
   /**
+   *
+   *
+   * <pre>
    * WHERE:
    *
    * firstValue | secondValue | expectedSum
    * ---------- | ----------- | -----------
    * 1          | 2           | 3
    * 2          | 4           | 6
+   * </pre>
    */
   @Test
   @DataDriven("The scenario....")
