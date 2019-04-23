@@ -49,7 +49,7 @@ _ ADD HERE AN EYE CATCHING FEATURE
 
 ## Key Features
 
-* Write test scenarios using *data-driven* tables
+* Write test scenarios using *data-driven* tables, with the test method **Javadoc** as the single source of information
 * Injects requisites and expectations directly into the test method parameters
 * Use auto-generated builders to write scenarios programmatically
 
