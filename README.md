@@ -24,16 +24,15 @@
   <a href="#">
       <img src="https://img.shields.io/badge/contributions-welcome-orange.svg"/>
   </a>
-</p>
-<p align="center">
+  <a href="https://opensource.org/licenses/MIT">
+      <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
+  </a>
+  <br/>
   <a href="https://gitter.im/cheesecakes-ddt">
     <img src="https://badges.gitter.im/cheesecakes-ddt.svg"/>
   </a>
   <a href="https://saythanks.io/to/kidsoncoffee">
       <img src="https://img.shields.io/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg"/>
-  </a>
-  <a href="https://opensource.org/licenses/MIT">
-      <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
   </a>
 </p>
 
@@ -57,36 +56,37 @@ _ ADD HERE AN EYE CATCHING FEATURE
 
 ## Quickstart
 
-The following steps goes through all aspects of creating *data-driven* scenarios using **Cheesecakes**. All throughout the instructions are links to more advanced features or in-depth explanation of a particular concept. If you never used **Junit parameterized tests**, it is recommended that you follow this quickstart and then go back and customize to fit your needs.
+The following steps goes through all aspects of creating *data-driven* scenarios using **Cheesecakes**. All throughout the instructions are links to more advanced features or in-depth explanation of a particular concept. We assume that you are already familiar with **Junit** but if you never used **Junit parameterized tests**, it is recommended that you follow this quickstart and then go back and customize to fit your needs.
 
-**1. Import as a dependency**
+1. Import as a dependency
   
-  Add `cheesecakes-all` as a dependency to your project. See the latest release.
+Add `cheesecakes-all` as a dependency to your project. See the latest release.
 
-**1. Create a test case class**
-  
-  As you would with regular junit tests, create a test class, but add **Cheesecakes** as a custom runner.
+2. Create a test case class
+
+As you would with regular junit tests, create a test class, but add **Cheesecakes** as a custom runner.
   * Introduction to junit
 
-**1. Create a test case method**
+3. Create a test case method
   
-  Create a test case method as you would with regular junit tests, the difference that it needs to be annotated with `@DataDriven`. This annotation tells the **Cheesecakes** junit runner to parse the method's java doc.
+Create a test case method as you would with regular junit tests, the difference that it needs to be annotated with `@DataDriven`. This annotation tells the **Cheesecakes** junit runner to parse the method's java doc.
 
 [//]: # (Does it need to be annotated by default?)
 
-**1. Write the functional specification**
+4. Write the functional specification
   
-  On the method's javadoc, as the last piece of information, inside `pre` tags, add the keyword `Where:`. This informs **Cheesecakes** that every line in the javadoc, after the keyword, will be interpreted as a **data-driven table**. The table must contain a header row, a separator row and at least one **example** row. The number of columns in every row must be the same. You can do this step after writing the test logic as well.
+On the method's javadoc, as the last piece of information, inside `pre` tags, add the keyword `Where:`. This informs **Cheesecakes** that every line in the javadoc, after the keyword, will be interpreted as a **data-driven table**. The table must contain a header row, a separator row and at least one **example** row. The number of columns in every row must be the same. You can do this step after writing the test logic as well.
 
-**1. Write the test logic**
+5. Write the test logic
   
-  As you proceed to write the test logic you can declare the method's parameters that will store the values defined in your examples. The name of the parameters must match only one name in the **data-driven table**'s header row.
+As you proceed to write the test logic you can declare the method's parameters that will store the values defined in your examples. The name of the parameters must match only one name in the **data-driven table**'s header row.
 
 [//]: # (Do the example need to specifiy @Requisites or @Expectations by default?)
 
-**1. Run the tests**
-  * How to run tests in intellij
-  * How to run tests in maven
+6. Run the tests
+
+* How to run tests in intellij
+* How to run tests in maven
 
 ## Deep Dive
 
