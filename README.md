@@ -132,7 +132,7 @@ public class MyTest {
 
 The test's scenario examples is written on the **Javadoc** of the test method. It requires:
 * To be the last piece of information in the **Javadoc**.
-* The keyword `Where:`, which indicates that every line after it, in the same **Javadoc**, will be interpreted as a **data-driven table**. The table requires:
+* The keyword `Where:`, which indicates that every line after it, in the same **Javadoc**, will be interpreted as a *data-driven table*, that we call **Scenario Examples**. The table requires:
   * To have a **header row**, a **separator row** and at least one **example row**. 
   * Columns to be separated by a single pipe symbol (`|`).
   * All rows to have the same number of columns.
@@ -182,8 +182,10 @@ While writing the test case logic you can access the values in the example by de
 
 ### Run the tests
 
-* How to run tests in intellij
-* How to run tests in maven
+Now you should be able to run this test successfully and see that each **scenario example** run independently.
+
+* [How to run tests in Intellij](https://www.jetbrains.com/help/idea/performing-tests.html)
+* [How to run tests in Maven](http://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html)
 
 ## Deep Dive
 
