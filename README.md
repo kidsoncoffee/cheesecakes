@@ -1,3 +1,44 @@
+<h1 align="center">
+  <br>
+  <img src="https://cdn.pixabay.com/photo/2017/11/28/00/45/cheesecake-2982634_960_720.png" alt="Cheesecakes" width="400">
+  <br>
+  Cheesecakes
+  <br>
+</h1>
+
+<h4 align="center">A data-driven testing framework built on top of <a href="https://junit.org/junit4/" target="_blank">Junit</a>.</h4>
+
+<p align="center">
+  <a href="https://gitter.im/cheesecakes-ddt">
+    <img src="https://badges.gitter.im/cheesecakes-ddt.svg">
+  </a>
+  <a href="https://travis-ci.org/kidsoncoffee/cheesecakes">
+      <img src="https://travis-ci.org/kidsoncoffee/cheesecakes.svg?branch=master">
+  </a>
+  <a href="https://github.com/kidsoncoffee/cheesecakes/issues">
+      <img src="https://img.shields.io/github/issues/kidsoncoffee/cheesecakes.svg">
+  </a>
+  <a href="#">
+      <img src="https://img.shields.io/badge/contributions-welcome-orange.svg">
+  </a>
+  <a href="https://saythanks.io/to/kidsoncoffee">
+      <img src="https://img.shields.io/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg">
+  </a>
+  <a href="https://opensource.org/licenses/MIT">
+      <img src="https://img.shields.io/badge/license-MIT-blue.svg">
+  </a>
+</p>
+
+<p align="center">
+  <a href="#key-features">Key Features</a> •
+  <a href="#how-to-use">Quickstart</a> •
+  <a href="#how-to-use">Deep dive</a> •
+  <a href="#download">Download</a> •
+  <a href="#credits">Credits</a> •
+  <a href="#related">Related</a> •
+  <a href="#license">License</a>
+</p>
+
 # Cheesecakes
 
 Data-driven junit tests
