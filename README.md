@@ -175,7 +175,7 @@ public class MyTest {
 }
 ```
 
-While writing the test case logic you can access the values in the example by declaring method parameters. They require:
+While writing the test case logic you can access the values of a **scenario example** by declaring method parameters. They require:
 * To have the same name as defined in the **scenario examples** header row.
 * The name must match only one of the **scenario examples** header row.
 
