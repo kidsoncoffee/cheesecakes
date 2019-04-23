@@ -119,9 +119,9 @@ public class MyTest {
 +   * Where:
 +   * 
 +   * firstName | lastName || completeName
-+   * --------- | -------- || -------------
++   * --------- | -------- || --------------
 +   * John      | Doe      || John Doe
-+   * Henry     | Rollins  || Henry Rollins
++   * Exene     | Cervenka || Exene Cervenka
 +   * </pre>
 +   */
   @Test
@@ -142,7 +142,7 @@ Optionally but recommended, it all needs to be inside `<pre>` tags, so you can c
 
 This step can be done after writing the test logic as well.
 
-### Write the test logic
+### Write the test case logic
 
 ```diff
 import com.kidsoncoffee.cheesecakes.Cheesecakes;
@@ -157,18 +157,28 @@ public class MyTest {
    * Where:
    * 
    * firstName | lastName || completeName
-   * --------- | -------- || -------------
+   * --------- | -------- || --------------
    * John      | Doe      || John Doe
-   * Henry     | Rollins  || Henry Rollins
+   * Exene     | Cervenka || Exene Cervenka
    * </pre>
    */
   @Test
-  public void test(){
+-  public void test(){
++  public void test(final String firstName, final String lastName, final String completeName){
++    final String actualCompletaName;
++    
++    when:
++    actualCompleteName = String.format("%s %s", firstName, lastName); 
++    
++    then:
++    assert actualCompleteName.equals(completeName);
   } 
 }
 ```
-  
-As you proceed to write the test logic you can declare the method's parameters that will store the values defined in your examples. The name of the parameters must match only one name in the **data-driven table**'s header row.
+
+While writing the test case logic you can access the values in the example by declaring method parameters. They require:
+* To have the same name as defined in the **scenario examples** header row.
+* The name must match only one of the **scenario examples** header row.
 
 ### Run the tests
 
