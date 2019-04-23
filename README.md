@@ -42,8 +42,7 @@
   <a href="#deep-dive">Deep dive</a> •
   <a href="#download">Download</a> •
   <a href="#credits">Credits</a> •
-  <a href="#related">Related</a> •
-  <a href="#license">License</a>
+  <a href="#related">Related</a> 
 </p>
 
 _ ADD HERE AN EYE CATCHING FEATURE
@@ -194,5 +193,3 @@ Now you should be able to run this test successfully and see that each **scenari
 ## Credits
 
 ## Related
-
-## License
