@@ -62,9 +62,34 @@ All throughout the instructions are links to more advanced features or in-depth 
 
 We assume that **you are already familiar with Junit** (if that's not the case give [this](https://junit.org/junit4/) a reading) but if you never used **Junit parameterized tests**, it is recommended that you follow this quickstart and then go back and customize to fit your needs.
 
-### Import `cheesecakes-all` as a dependency
+### Import the dependency
 
-### Add **Cheesecakes** as the custom runner
+#### Maven
+
+```diff
+<dependencies>
+
++    <dependency>
++      <groupId>com.kidsoncoffee.cheesecakes</groupId>
++      <artifactId>cheesecakes-all</artifactId>
++      <version>LATEST</version>
++      <scope>test</scope>
++    </dependency>
+
+</dependencies>
+```
+
+#### Gradle
+
+```diff
+dependencies {
+
++  testImplementation 'com.kidsoncoffee.cheesecakes:cheesecakes-all:LATEST'
+
+}
+```
+
+### Add the custom runner to your Junit test class
 
 ```diff
 + import com.kidsoncoffee.cheesecakes.Cheesecakes;
@@ -72,13 +97,14 @@ We assume that **you are already familiar with Junit** (if that's not the case g
 + @RunWith(Cheesecakes.class)
 public class MyTest {
 
+  @Test
   public void test(){
   } 
 }
 
 ```
 
-### Write the functional specification
+### Write the test's scenario examples
 
 ```diff
 import com.kidsoncoffee.cheesecakes.Cheesecakes;
@@ -98,19 +124,49 @@ public class MyTest {
 +   * Henry     | Rollins  || Henry Rollins
 +   * </pre>
 +   */
+  @Test
   public void test(){
   } 
 }
 ```
 
-On the method's javadoc, as the last piece of information, inside `pre` tags, add the keyword `Where:`. The keyword informs **Cheesecakes** that every line after it in the *Javadoc*, will be interpreted as a **data-driven table**. The table will require:
-* To contain a header row, a separator row and at least one **example** row. 
-* The number of columns in every row must be the same.
-* That all requisites are in the left of a double pipe symbol (`||`) and all expectations are on the right.
+The test's scenario examples is written on the **Javadoc** of the test method. It requires:
+* To be the last piece of information in the **Javadoc**.
+* The keyword `Where:`, which indicates that every line after it, in the same **Javadoc**, will be interpreted as a **data-driven table**. The table requires:
+  * To have a **header row**, a **separator row** and at least one **example row**. 
+  * Columns to be separated by a single pipe symbol (`|`).
+  * All rows to have the same number of columns.
+  * All rows have all requisites in the left of a double pipe symbol (`||`) and all expectations on the right.
 
-You can do this step after writing the test logic as well.
+Optionally but recommended, it all needs to be inside `<pre>` tags, so you can control formatting.
+
+This step can be done after writing the test logic as well.
 
 ### Write the test logic
+
+```diff
+import com.kidsoncoffee.cheesecakes.Cheesecakes;
+
+@RunWith(Cheesecakes.class)
+public class MyTest {
+  
+  /**
+   * Checks that the first and last name are concatenated correctly.
+   *
+   * <pre>
+   * Where:
+   * 
+   * firstName | lastName || completeName
+   * --------- | -------- || -------------
+   * John      | Doe      || John Doe
+   * Henry     | Rollins  || Henry Rollins
+   * </pre>
+   */
+  @Test
+  public void test(){
+  } 
+}
+```
   
 As you proceed to write the test logic you can declare the method's parameters that will store the values defined in your examples. The name of the parameters must match only one name in the **data-driven table**'s header row.
 
@@ -128,67 +184,3 @@ As you proceed to write the test logic you can declare the method's parameters t
 ## Related
 
 ## License
-
-```Java
-  /**
-   *
-   *
-   * <pre>
-   * WHERE:
-   *
-   * firstValue | secondValue | expectedSum
-   * ---------- | ----------- | -----------
-   * 1          | 2           | 3
-   * 2          | 4           | 6
-   * </pre>
-   */
-  @Test
-  @DataDriven("The scenario....")
-  public void dataDrivenTestCase(
-      @Requisites final int firstValue,
-      @Requisites final int secondValue,
-      @Expectations final int expectedSum) {
-    final int sum;
-
-    when:
-    sum = firstValue + secondValue;
-
-    then:
-    assert sum == expectedSum;
-  }
-```
-
-Tables are usually better to ...
-
-## Quickstart
-
-### Import as a dependency
-
-Add `cheesecakes-all` as a dependency to your project. See the latest release.
-
-### Create a test case class
-
-As you would with regular junit tests, create a test class, but add **Cheesecakes** as a custom runner.
-
-* Introduction to junit
-
-### Create a test case method
-
-Create a test case method as you would with regular junit tests, the difference that it needs to be annotated with `@DataDriven`. This annotation tells the **Cheesecakes** junit runner to parse the method's java doc.
-
-[//]: # (Does it need to be annotated by default?)
-
-### Write the functional specification
-
-On the method's javadoc, as the last piece of information, inside `pre` tags, add the keyword `Where:`. This informs **Cheesecakes** that every line in the javadoc, after the keyword, will be interpreted as a **data-driven table**. The table must contain a header row, a separator row and at least one **example** row. The number of columns in every row must be the same. You can do this step after writing the test logic as well.
-
-### Write the test logic
-
-As you proceed to write the test logic you can declare the method's parameters that will store the values defined in your examples. The name of the parameters must match only one name in the **data-driven table**'s header row.
-
-[//]: # (Do the example need to specifiy @Requisites or @Expectations by default?)
-
-### Run the test
-
-If you are in...
-
