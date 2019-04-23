@@ -56,20 +56,59 @@ _ ADD HERE AN EYE CATCHING FEATURE
 
 ## Quickstart
 
-The following steps goes through all aspects of creating *data-driven* scenarios using **Cheesecakes**. All throughout the instructions are links to more advanced features or in-depth explanation of a particular concept. We assume that you are already familiar with **Junit** (if that's not the case give [this](https://junit.org/junit4/) a reading) but if you never used **Junit parameterized tests**, it is recommended that you follow this quickstart and then go back and customize to fit your needs.
+The following steps goes through all aspects of creating *data-driven* scenarios using **Cheesecakes**. 
+
+All throughout the instructions are links to more advanced features or in-depth explanation of a particular concept. 
+
+We assume that **you are already familiar with Junit** (if that's not the case give [this](https://junit.org/junit4/) a reading) but if you never used **Junit parameterized tests**, it is recommended that you follow this quickstart and then go back and customize to fit your needs.
 
 ### Import `cheesecakes-all` as a dependency
 
 ### Add **Cheesecakes** as the custom runner
 
+```diff
++ import com.kidsoncoffee.cheesecakes.Cheesecakes;
+
++ @RunWith(Cheesecakes.class)
+public class MyTest {
+
+  public void test(){
+  } 
+}
+
+```
+
 ### Write the functional specification
 
 ```diff
-- a
-+ b
+import com.kidsoncoffee.cheesecakes.Cheesecakes;
+
+@RunWith(Cheesecakes.class)
+public class MyTest {
+  
++  /**
++   * Checks that the first and last name are concatenated correctly.
++   *
++   * <pre>
++   * Where:
++   * 
++   * firstName | lastName || completeName
++   * --------- | -------- || -------------
++   * John      | Doe      || John Doe
++   * Henry     | Rollins  || Henry Rollins
++   * </pre>
++   */
+  public void test(){
+  } 
+}
 ```
 
-On the method's javadoc, as the last piece of information, inside `pre` tags, add the keyword `Where:`. This informs **Cheesecakes** that every line in the javadoc, after the keyword, will be interpreted as a **data-driven table**. The table must contain a header row, a separator row and at least one **example** row. The number of columns in every row must be the same. You can do this step after writing the test logic as well.
+On the method's javadoc, as the last piece of information, inside `pre` tags, add the keyword `Where:`. The keyword informs **Cheesecakes** that every line after it in the *Javadoc*, will be interpreted as a **data-driven table**. The table will require:
+* To contain a header row, a separator row and at least one **example** row. 
+* The number of columns in every row must be the same.
+* That all requisites are in the left of a double pipe symbol (`||`) and all expectations are on the right.
+
+You can do this step after writing the test logic as well.
 
 ### Write the test logic
   
