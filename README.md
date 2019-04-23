@@ -40,6 +40,7 @@
   <a href="#key-features">Key features</a> •
   <a href="#quickstart">Quickstart</a> •
   <a href="#deep-dive">Deep dive</a> •
+  <a href="#under-the-hood">Under the hood</a> •
   <a href="#download">Download</a> •
   <a href="#credits">Credits</a> •
   <a href="#related">Related</a> 
@@ -100,7 +101,6 @@ public class MyTest {
   public void test(){
   } 
 }
-
 ```
 
 ### Write the test's scenario examples
@@ -115,7 +115,7 @@ public class MyTest {
 +   * Checks that the first and last name are concatenated correctly.
 +   *
 +   * <pre>
-+   * Where:
++   * Examples:
 +   * 
 +   * firstName | lastName || completeName
 +   * --------- | -------- || --------------
@@ -131,7 +131,7 @@ public class MyTest {
 
 The test's scenario examples is written on the **Javadoc** of the test method. It requires:
 * To be the last piece of information in the **Javadoc**.
-* The keyword `Where:`, which indicates that every line after it, in the same **Javadoc**, will be interpreted as a *data-driven table*, that we call **Scenario Examples**. The table requires:
+* The keyword `Examples:`, which indicates that every line after it, in the same **Javadoc**, will be interpreted as a *data-driven table*, that we call **Scenario Examples**. The table requires:
   * To have a **header row**, a **separator row** and at least one **example row**. 
   * Columns to be separated by a single pipe symbol (`|`).
   * All rows to have the same number of columns.
@@ -153,7 +153,7 @@ public class MyTest {
    * Checks that the first and last name are concatenated correctly.
    *
    * <pre>
-   * Where:
+   * Examples:
    * 
    * firstName | lastName || completeName
    * --------- | -------- || --------------
@@ -187,6 +187,60 @@ Now you should be able to run this test successfully and see that each **scenari
 * [How to run tests in Maven](http://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html)
 
 ## Deep Dive
+
+### Concepts
+
+In general, *Cheesecakes* concepts tries to be close to *[Gherkin](https://cucumber.io/docs/gherkin/reference/)* concepts, but as it needs to translate to *Java* code as well, some simplification needed to happen.
+
+#### Feature
+
+In *Gherkin*: 
+> The purpose of the Feature keyword is to provide a high-level description of a software feature, and to group related scenarios.
+
+In *Cheesecakes*, **a *Feature* is a test class that groups related scenarios.**
+
+For example, a class named *Aggregator*, being the unit under test, has an acompannying class named *AggregatorTest*, which contains all test cases related to that unit. This *AggregatorTest* class is the *Feature*. 
+
+#### Scenario
+
+In *Gherkin*:
+
+> This is a concrete example that illustrates a business rule. It consists of a list of steps.
+> The keyword Scenario is a synonym of the keyword Example.
+
+In *Cheesecakes*, **a *Scenario* is a test method that describe an expected behavior of the unit under test**. It also consists of a list of steps. 
+
+A *Scenario* may be parameterized to indicate requisites and expectation values that are important for the execution of that test case. 
+
+A *Scenario* may be executed more than once but with different input values.
+
+#### Example
+
+In *Gherkin*, a *Scenario* and an *Example* are synonyms but they also have a keyword to describe something more close to an *Example* in *Cheesecakes*. This is how a *Scenario Outline* is described:
+
+> The Scenario Outline keyword can be used to run the same Scenario multiple times, with different combinations of values.
+
+In *Cheesecakes*, **an *Example* is the definition of requisites and expectations values of a *Scenario***.
+
+There are a couple of different ways to create *Examples* for a given *Scenario*:
+* Programmatically with a builder-like syntax
+* Through a data-driven table in the *Scenario* method *Javadoc*.
+
+#### Summary
+
+To help illustrate these concepts, we can consider the example of the *Quickstart* in the following manner:
+
+_ ADD A ILLUSTRATION OF THE QUICKSTART AND CONCEPTS POINTED OUT _
+
+### Creating an *Example* for a *Scenario*
+
+#### Programmatically
+
+#### Data-driven table
+
+## Under the hood
+
+Under the hood, **Cheesecakes** uses annotation processing to generate custom classes based on the test case method. The same classes used to generate the scenarios based on a test case method **Javadoc**, can be used programmatically to define the test cases.
 
 ## Download
 
