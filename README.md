@@ -468,7 +468,26 @@ public class MyTest {
 
 Note that there is no scenario binding information in the *Scenario* method and the *Examples* are passing an *enum* to its `@Scenario` annotation. This is another auto-generated class which lists all *Scenarios* in a *Feature*. This *enum* can be accessed with the pattern `<NAME_OF_THE_FEATURE_CLASS>ScenarioBindings`. For example, looking at the example above for the *Feature* class **MyTest** and the *Scenario* method **test**, a *Scenario Bindings* enum value can be accessed with **MyTestScenarioBindings.TEST**. Note that the *Scenario* method equivalent in the *Scenario Bindings* enum is in *Snake Case*.
 
-### Parameter injection
+### Parameters injection
+
+If you are writing your examples with the *builder-like* syntax you are already writing code to match the types of the parameters in the *Scenario* method. But if you are writing them with data-tables, you will need to convert that *String* value into the appropriate type of the *Scenario* method parameters.
+
+#### Common Java types
+
+For the most common types, **Cheesecakes** provides conversion out-of-the-box.
+
+* `short` and `Short`
+* `byte` and `Byte`
+* `int`and `Integer`
+* `long`and `Long`
+* `float` and `Float`
+* `double` and `Double`
+* `boolean` and `Boolean`
+* `char` and `String`
+* `Class`
+* `enum`
+
+#### Custom types
 
 ## Under the hood
 
