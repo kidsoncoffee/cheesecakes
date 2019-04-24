@@ -234,9 +234,89 @@ _ ADD A ILLUSTRATION OF THE QUICKSTART AND CONCEPTS POINTED OUT _
 
 ### Creating an *Example* for a *Scenario*
 
+#### Data tables
+
+As shown in the *Quickstart*, data tables are probably the most effective way for writing and reading test cases that have similar behavior for different requisites and expectations.
+
+```java
+/**
+ * <pre>                                                    // Pre-formatted text prevents the IDE from formatting
+ * Examples:                                                // Mandatory line with the keyword Examples:
+ *                                                          // Empty lines are ignored
+ * requisiteA | requisiteB || expectationA | expectationB   // The data table header row
+ * ---------- | ---------- || ------------ | ------------   // The data table separator row
+ * 1          | 2          || A            | B              // The first example
+ * 3          | 4          || X            | Y              // The second example
+ * </pre>
+ */                                                         
+```
+
+The example are written on the *Scenario* method *Javadoc*, but needs to follow these guidelines:
+* The data table should be the last thing in the *Javadoc* (beside closing `<pre>`, `@param`, `@return` and other usual tags).
+* Just before the data table the keyword `Examples:` should be present (empty lines are ignored).
+* The data table should contain a *header row*, a *separator row* and at least one *example row*.
+* The data table columns should be separated by:
+  * A single pipe symbol (`|`) for all values, except for the case below.
+  * A double pipe symbol (`||`) for requisites, on the left, and expectations, on the right.
+* The data table should have the same number of columns
+
+Optionally but recommended, wrap all above in `<pre>` tags, so you can control formatting.
+
 #### Programmatically
 
-#### Data-driven table
+During the annotation processing phase in the build, some classes are auto generated based on the *Scenario* method signature. This gives a lot of flexibility to the developer and can be very powerful when generating requisites and expectations values dynamically.
+
+For example, for the *Feature* class in the *Quickstart*, the same *Examples* could be written like this:
+
+```diff
+import com.kidsoncoffee.cheesecakes.Cheesecakes;
++ import static MyTestParameters.Tests.given;
+
+@RunWith(Cheesecakes.class)
+public class MyTest {
+  
++  private static final Example JOHN_DOE_EXAMPLE = given()
++                                                    .firstName("John")
++                                                    .lastName("Doe")
++                                                    .then()
++                                                      .completeName("John Doe");
+                                                                      
++  private static final Example EXENE_CERVENKA_EXAMPLE = given()
++                                                          .firstName("Exene")
++                                                          .lastName("Cervenka")
++                                                          .then()
++                                                            .completeName("Exene Cervenka");
+   
+  /**
+   * Checks that the first and last name are concatenated correctly.
+-   *
+-   * <pre>
+-   * Examples:
+-   * 
+-   * firstName | lastName || completeName
+-   * --------- | -------- || --------------
+-   * John      | Doe      || John Doe
+-   * Exene     | Cervenka || Exene Cervenka
+-   * </pre>
+   */
+  @Test
+  public void test(@Requisites   final String firstName, 
+                   @Requisites   final String lastName, 
+                   @Expectations final String completeName){
+    final String actualCompletaName;
+    
+    when:
+    actualCompleteName = String.format("%s %s", firstName, lastName); 
+    
+    then:
+    assert actualCompleteName.equals(completeName);
+  } 
+}
+```
+
+An auto-generated *Example* class can be instantiated following the pattern: `<NameOfTheFeatureClass>ExampleParameters.NameOfTheScenarioMethod.given()`. For example, looking at the example above, for the *Feature* class **MyTest** and *Scenario* method **test**, an *Example* class is instantiated with **MyTestExampleParameters.Test.given()**. Note that the first letter of the *Scenario* method is in upper-case.
+
+### Parameter injection
 
 ## Under the hood
 
