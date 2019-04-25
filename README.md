@@ -94,52 +94,63 @@ dependencies {
 ### Add the custom runner to your Junit test class
 
 ```diff
-+ import com.kidsoncoffee.cheesecakes.Cheesecakes;
+package examples;
 
++ import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
+import org.junit.Test;
++ import org.junit.runner.RunWith;
+
+/**
+ * @author fernando.chovich
+ * @since 1.0
+ */
 + @RunWith(Cheesecakes.class)
-public class MyTest {
+public class MyDataDrivenTestExample {
 
+  /**
+   * Checks that the first and last name are concatenated correctly.
+   */
   @Test
-  public void test(){
-  } 
+  public void concatenatesSuccessfully() {
+
+  }
 }
 ```
 
 ### Write the test's scenario examples
 
 ```diff
-import com.kidsoncoffee.cheesecakes.Cheesecakes;
+package examples;
 
+import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+/**
+ * @author fernando.chovich
+ * @since 1.0
+ */
 @RunWith(Cheesecakes.class)
-public class MyTest {
-  
-+  /**
-+   * Checks that the first and last name are concatenated correctly.
+public class MyDataDrivenTestExample {
+
+  /**
+   * Checks that the first and last name are concatenated correctly.
 +   *
 +   * <pre>
 +   * Examples:
-+   * 
++   *
 +   * firstName | lastName || completeName
 +   * --------- | -------- || --------------
 +   * John      | Doe      || John Doe
 +   * Exene     | Cervenka || Exene Cervenka
 +   * </pre>
-+   */
+   */
   @Test
-  public void test(){
-  } 
+  public void concatenatesSuccessfully() {
+
+  }
 }
 ```
-
-The test's scenario examples is written on the **Javadoc** of the test method. It requires:
-* To be the last piece of information in the **Javadoc**.
-* The keyword `Examples:`, which indicates that every line after it, in the same **Javadoc**, will be interpreted as a *data-driven table*, that we call **Scenario Examples**. The table requires:
-  * To have a **header row**, a **separator row** and at least one **example row**. 
-  * Columns to be separated by a single pipe symbol (`|`).
-  * All rows to have the same number of columns.
-  * All rows have all requisites in the left of a double pipe symbol (`||`) and all expectations on the right.
-
-Optionally but recommended, it all needs to be inside `<pre>` tags, so you can control formatting.
 
 This step can be done after writing the test logic as well.
 
@@ -164,26 +175,23 @@ public class MyTest {
    * </pre>
    */
   @Test
--  public void test(){
-+  public void test(final String firstName, final String lastName, final String completeName){
-+    final String actualCompletaName;
-+    
+-  public void concatenatesSuccessfully(){
++  public void concatenatesSuccessfully(
++      final String firstName, final String lastName, final String completeName) {
++    final String actualCompleteName;
++
 +    when:
-+    actualCompleteName = String.format("%s %s", firstName, lastName); 
-+    
++    actualCompleteName = String.format("%s %s", firstName, lastName);
++
 +    then:
 +    assert actualCompleteName.equals(completeName);
   } 
 }
 ```
 
-While writing the test case logic you can access the values of a **scenario example** by declaring method parameters. They require:
-* To have the same name as defined in the **scenario examples** header row.
-* The name must match only one of the **scenario examples** header row.
-
 ### Run the tests
 
-Now you should be able to run this test successfully and see that each **scenario example** run independently.
+Now you should be able to run this test successfully and see that each **scenario example** runs independently.
 
 * [How to run tests in Intellij](https://www.jetbrains.com/help/idea/performing-tests.html)
 * [How to run tests in Maven](http://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html)
