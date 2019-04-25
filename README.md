@@ -489,6 +489,60 @@ For the most common types, **Cheesecakes** provides conversion out-of-the-box.
 
 #### Custom types
 
+To register custom type converter is easy:
+
+```java
+import com.kidsoncoffee.cheesecakes.Cheesecakes;
+
+@RunWith(Cheesecakes.class)
+public class MyTest {
+  
+  /**
+   * Checks that the first and last name are concatenated correctly.
+   *
+   * <pre>
+   * Examples:
+   * 
+   * firstName  | lastName || completeName
+   * ---------- | -------- || --------------
++   * JOHN      | DOE      || John Doe
+-   * John      | Doe      || John Doe
+   * Exene      | Cervenka || Exene Cervenka
+   * </pre>
+   */
+  @Test
++  public void test(@Converter(PascalCaseStringConverter.class) final String firstName, 
++                   @Converter(PascalCaseStringConverter.class) final String lastName,
++                   final String completeName){
+    final String actualCompletaName;
+    
+    when:
+    actualCompleteName = String.format("%s %s", firstName, lastName); 
+    
+    then:
+    assert actualCompleteName.equals(completeName);
+  } 
++  
++  class PascalCaseStringConverter implements ParameterConverter {
++    Function<T, R> getConverter() {
++      return parameter -> WordUtils.capitalize(parameters);
++    }
++
++    Class<T> getBaseType() {
++      return String.class;
++    }
++
++    Class<R> getTargetType() {
++      return String.class;
++    }
++  }
+}
+```
+
+Looking at the example above, for a parameter to be specifically converted, is required:
+* The custom converter to implement `ParameterConverter`
+* The parameter to be converted to be annotated with `@Converter` and the class of the custom converter to be passed as the value to the converter.
+
 ## Under the hood
 
 Under the hood, **Cheesecakes** uses annotation processing to generate custom classes based on the test case method. The same classes used to generate the scenarios based on a test case method **Javadoc**, can be used programmatically to define the test cases.
