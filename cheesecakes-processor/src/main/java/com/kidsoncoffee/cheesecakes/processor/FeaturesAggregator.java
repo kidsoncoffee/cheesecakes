@@ -2,14 +2,12 @@ package com.kidsoncoffee.cheesecakes.processor;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.kidsoncoffee.cheesecakes.Parameters;
-import com.kidsoncoffee.cheesecakes.SpecificationStepType;
+import com.kidsoncoffee.cheesecakes.Parameter;
 import com.kidsoncoffee.cheesecakes.processor.domain.Example;
 import com.kidsoncoffee.cheesecakes.processor.domain.Feature;
-import com.kidsoncoffee.cheesecakes.processor.domain.ImmutableFeature;
 import com.kidsoncoffee.cheesecakes.processor.domain.ImmutableParameter;
-import com.kidsoncoffee.cheesecakes.processor.domain.ImmutableScenario;
 import com.kidsoncoffee.cheesecakes.processor.domain.Scenario;
+import org.junit.Test;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -18,9 +16,12 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.kidsoncoffee.cheesecakes.processor.domain.ImmutableFeature.feature;
+import static com.kidsoncoffee.cheesecakes.processor.domain.ImmutableScenario.scenario;
 import static java.util.Collections.emptyList;
 
 /**
@@ -41,10 +42,6 @@ public class FeaturesAggregator {
   public List<Feature> aggregate(final List<Element> elements) {
     final List<Element> annotatedParameters =
         elements.stream()
-            .filter(
-                e ->
-                    isAnnotationPresent(e, Parameters.Requisites.class)
-                        || isAnnotationPresent(e, Parameters.Expectations.class))
             .filter(e -> e.getKind().equals(ElementKind.PARAMETER))
             .collect(Collectors.toList());
 
@@ -58,17 +55,17 @@ public class FeaturesAggregator {
         groupParameters(annotatedParameters);
 
     final List<Feature> features = new ArrayList<>();
-    for (Map.Entry<Element, Map<Element, List<Element>>> featureEntry :
+    for (Entry<Element, Map<Element, List<Element>>> featureEntry :
         indexedElements.rowMap().entrySet()) {
       final Element feature = featureEntry.getKey();
 
       final List<Scenario> scenarios = new ArrayList<>();
-      for (Map.Entry<Element, List<Element>> scenarioEntry : featureEntry.getValue().entrySet()) {
+      for (Entry<Element, List<Element>> scenarioEntry : featureEntry.getValue().entrySet()) {
         final Element scenario = scenarioEntry.getKey();
         final List<Element> parameters = scenarioEntry.getValue();
 
         scenarios.add(
-            ImmutableScenario.builder()
+            scenario()
                 .testMethod(scenario.getSimpleName().toString())
                 .parameters(extractParameters(parameters))
                 .examples(extractExamples(this.commentParser, scenario))
@@ -76,7 +73,7 @@ public class FeaturesAggregator {
       }
 
       features.add(
-          ImmutableFeature.builder()
+          feature()
               .testClassName(feature.getSimpleName().toString())
               .testClassPackage(
                   this.elementUtils.getPackageOf(feature).getQualifiedName().toString())
@@ -91,13 +88,13 @@ public class FeaturesAggregator {
         .mapToObj(
             i -> {
               final Element parameter = parameters.get(i);
-              return ImmutableParameter.builder()
+              return ImmutableParameter.parameter()
                   .name(parameter.getSimpleName().toString())
                   .type(parameter.asType())
                   .stepType(
-                      parameter.getAnnotation(Parameters.Requisites.class) != null
-                          ? SpecificationStepType.REQUISITE
-                          : SpecificationStepType.EXPECTATION)
+                      parameter.getAnnotation(Parameter.Requisite.class) != null
+                          ? com.kidsoncoffee.cheesecakes.Scenario.StepType.REQUISITE
+                          : com.kidsoncoffee.cheesecakes.Scenario.StepType.EXPECTATION)
                   .overallOrder(i)
                   .build();
             })
@@ -106,7 +103,7 @@ public class FeaturesAggregator {
 
   private static List<Example> extractExamples(
       final CommentParser commentParser, final Element scenario) {
-    if (isAnnotationPresent(scenario, Parameters.DataDriven.class)) {
+    if (isAnnotationPresent(scenario, Test.class)) {
       return commentParser.parse(scenario);
     }
     return emptyList();

@@ -9,6 +9,7 @@ import java.util.Map;
  * @since 1.0
  */
 @Value.Immutable
-public interface Example {
+@Value.Style(builder = "example")
+public interface  Example {
   Map<String, String> getValue();
 }

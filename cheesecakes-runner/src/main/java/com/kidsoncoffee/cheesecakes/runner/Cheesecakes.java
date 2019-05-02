@@ -1,25 +1,22 @@
 package com.kidsoncoffee.cheesecakes.runner;
 
-import com.kidsoncoffee.cheesecakes.DataDrivenScenario;
-import com.kidsoncoffee.cheesecakes.Parameters;
-import com.kidsoncoffee.cheesecakes.Specification;
-import com.kidsoncoffee.cheesecakes.SpecificationReference;
-import org.apache.commons.lang3.tuple.Pair;
+import com.kidsoncoffee.cheesecakes.Example;
+import com.kidsoncoffee.cheesecakes.runner.example.DataTableExamplesLoader;
+import com.kidsoncoffee.cheesecakes.runner.example.ExamplesLoader;
+import com.kidsoncoffee.cheesecakes.runner.example.FieldExamplesLoader;
+import com.kidsoncoffee.cheesecakes.runner.parameter.ScenarioParametersConverter;
 import org.junit.runner.Runner;
 import org.junit.runners.Suite;
-import org.junit.runners.model.FrameworkField;
-import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
-import org.reflections.Reflections;
+import org.junit.runners.model.TestClass;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author fernando.chovich
@@ -27,109 +24,63 @@ import java.util.Set;
  */
 public class Cheesecakes extends Suite {
 
-  private final TestCaseInjectablesResolver testBinder;
+  private final ScenarioParametersConverter scenarioParametersConverter;
+
+  private final ExamplesLoader dataTableExamplesLoader;
+
+  private final ExamplesLoader fieldExamplesLoader;
 
   private final List<Runner> runners;
 
   public Cheesecakes(final Class<?> klass) throws InitializationError {
     super(klass, Collections.emptyList());
-    this.testBinder = new TestCaseInjectablesResolver();
+
+    // TODO fchovich USE GUAVA
+    this.scenarioParametersConverter = new ScenarioParametersConverter();
+    this.dataTableExamplesLoader = new DataTableExamplesLoader();
+    this.fieldExamplesLoader = new FieldExamplesLoader();
+
     this.runners = createTestCaseRunners();
   }
 
   private List<Runner> createTestCaseRunners() throws InitializationError {
-    final List<Runner> runners = new ArrayList<>();
+    final Map<String, List<Example.Builder>> examplesByScenario =
+        getExamples(this.getTestClass(), this.dataTableExamplesLoader, this.fieldExamplesLoader);
 
-    // TODO fchovich USE TYPE INSTEAD OF ANNOTATION
-    for (FrameworkField def : this.getTestClass().getAnnotatedFields(Parameters.Scenario.class)) {
-      final List<Specification> specifications = retrieveScenarios(def);
-      final Parameters.ScenarioBinding testMethodBinding =
-          def.getAnnotation(Parameters.ScenarioBinding.class);
-
-      for (final Specification specification : specifications) {
-        final TestCase test =
-            ImmutableTestCase.builder()
-                .name(def.getAnnotation(Parameters.Scenario.class).value())
-                .specification(specification)
-                .binding(Optional.ofNullable(testMethodBinding))
-                .isDataDriven(false)
-                .build();
-
-        runners.add(new TestMethodRunner(getTestClass().getJavaClass(), test, this.testBinder));
+    final List<Runner> scenarioRunners = new ArrayList<>();
+    for (final String scenario : examplesByScenario.keySet()) {
+      final List<Example.Builder> examples = examplesByScenario.get(scenario);
+      final List<ExampleRunner> exampleRunners = new ArrayList<>();
+      for (Example.Builder example : examples) {
+        exampleRunners.add(
+            new ExampleRunner(
+                this.getTestClass().getJavaClass(),
+                example.getScenarioMethodName(),
+                example,
+                this.scenarioParametersConverter));
       }
+      scenarioRunners.add(new ScenarioRunner(this.getTestClass().getJavaClass(), scenario, exampleRunners));
     }
 
-    for (final FrameworkMethod def :
-        this.getTestClass().getAnnotatedMethods(Parameters.DataDriven.class)) {
-      final Pair<Parameters.ScenarioBinding, List<Specification>> specifications =
-          retrieveDataDrivenScenarios(def);
+    /*final List<Runner> runners = new ArrayList<>();
+    for (final Example.Builder example : examplesByScenario) {
+      runners.add(
+          new ExampleRunner(
+              this.getTestClass().getJavaClass(),
+              example.getScenarioMethodName(),
+              example,
+              this.scenarioParametersConverter));
+    }*/
 
-      for (Specification specification : specifications.getRight()) {
-        final ImmutableTestCase test =
-            ImmutableTestCase.builder()
-                .name(def.getAnnotation(Parameters.DataDriven.class).value())
-                .specification(specification)
-                .binding(Optional.of(specifications.getLeft()))
-                // TODO fchovich IS IT NECESSARY?
-                .isDataDriven(true)
-                .build();
-
-        runners.add(new TestMethodRunner(getTestClass().getJavaClass(), test, this.testBinder));
-      }
-    }
-
-    return runners;
+    return Collections.unmodifiableList(scenarioRunners);
   }
 
-  private static Pair<Parameters.ScenarioBinding, List<Specification>> retrieveDataDrivenScenarios(
-      final FrameworkMethod method) {
-    final String testClassPackage = method.getDeclaringClass().getPackage().getName();
-    final Reflections reflections = new Reflections(testClassPackage);
-    final Set<Class<? extends DataDrivenScenario>> dataDrivenScenarios =
-        reflections.getSubTypesOf(DataDrivenScenario.class);
-    final Method bindingMethod =
-        dataDrivenScenarios.stream()
-            .map(Class::getDeclaredMethods)
-            .flatMap(Arrays::stream)
-            .filter(m -> m.isAnnotationPresent(Parameters.ScenarioBinding.class))
-            .filter(
-                m ->
-                    m.getAnnotation(Parameters.ScenarioBinding.class)
-                        .testClass()
-                        .equals(method.getDeclaringClass()))
-            .filter(
-                m ->
-                    m.getAnnotation(Parameters.ScenarioBinding.class)
-                        .testMethod()
-                        .equalsIgnoreCase(method.getName()))
-            .findAny()
-            .orElseThrow(() -> new IllegalArgumentException(""));
-    try {
-      bindingMethod.setAccessible(true);
-      return Pair.of(
-          bindingMethod.getAnnotation(Parameters.ScenarioBinding.class),
-          (List<Specification>) bindingMethod.invoke(null));
-    } catch (IllegalAccessException | InvocationTargetException e) {
-      throw new IllegalStateException("", e);
-    }
-  }
-
-  private static List<Specification> retrieveScenarios(final FrameworkField field) {
-    // TODO fchovich CREATE SUGARY INTERFACES
-    if (!SpecificationReference.class.isAssignableFrom(field.getType())) {
-      throw new IllegalArgumentException(
-          String.format(
-              "Test case definition '%s' of the wrong type '%s'.",
-              field.getName(), field.getType()));
-    }
-    try {
-      field.getField().setAccessible(true);
-      final SpecificationReference references = (SpecificationReference) field.get(null);
-      return references.getSpecificationReferences();
-    } catch (IllegalAccessException e) {
-      throw new IllegalArgumentException(
-          String.format("Unable to retrieve test case definition '%s'.", field.getName()), e);
-    }
+  private static Map<String, List<Example.Builder>> getExamples(
+      final TestClass featureClass, final ExamplesLoader... examplesLoaders) {
+    return Arrays.stream(examplesLoaders)
+        .map(examplesLoader -> examplesLoader.load(featureClass.getJavaClass()))
+        .flatMap(Collection::stream)
+        .collect(Collectors.groupingBy(Example.Builder::getScenarioMethodName));
   }
 
   @Override

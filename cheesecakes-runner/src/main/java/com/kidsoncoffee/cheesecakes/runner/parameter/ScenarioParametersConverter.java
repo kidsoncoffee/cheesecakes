@@ -1,8 +1,8 @@
-package com.kidsoncoffee.cheesecakes.runner;
+package com.kidsoncoffee.cheesecakes.runner.parameter;
 
-import com.kidsoncoffee.cheesecakes.CustomDataDrivenScenarioConverter;
-import com.kidsoncoffee.cheesecakes.DataDrivenScenarioConverter;
-import com.kidsoncoffee.cheesecakes.TestCaseParameterSchema;
+import com.kidsoncoffee.cheesecakes.Example;
+import com.kidsoncoffee.cheesecakes.Parameter;
+import com.kidsoncoffee.cheesecakes.runner.CheesecakesException;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -13,18 +13,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kidsoncoffee.cheesecakes.ImmutableDataDrivenScenarioConverter.of;
+import static com.kidsoncoffee.cheesecakes.ImmutableRegistrableConverter.of;
 
 /**
  * @author fernando.chovich
  * @since 1.0
  */
-public class TestCaseInjectablesResolver {
+public class ScenarioParametersConverter {
 
-  private final List<DataDrivenScenarioConverter> defaultConverters;
+  private final List<Parameter.RegistrableConverter> defaultConverters;
 
-  public TestCaseInjectablesResolver() {
-    // TODO fchovich bETTER NAMING PLEASE
+  public ScenarioParametersConverter() {
+    // TODO fchovich BETTER NAMING PLEASE
     this.defaultConverters =
         Arrays.asList(
             of(String.class, Byte.class, Byte::parseByte),
@@ -41,38 +41,42 @@ public class TestCaseInjectablesResolver {
             of(String.class, double.class, Double::parseDouble),
             of(String.class, Boolean.class, Boolean::parseBoolean),
             of(String.class, boolean.class, Boolean::parseBoolean),
-            of(Byte.class, byte.class, Byte::byteValue),
-            of(Short.class, short.class, Short::shortValue),
-            of(Integer.class, int.class, Integer::intValue),
-            of(Long.class, long.class, Long::longValue),
-            of(Float.class, float.class, Float::floatValue),
-            of(Double.class, double.class, Double::doubleValue),
-            of(Boolean.class, boolean.class, Boolean::booleanValue));
+            of(
+                String.class,
+                Class.class,
+                className -> {
+                  try {
+                    return Class.forName(className);
+                  } catch (ClassNotFoundException e) {
+                    throw new CheesecakesException(
+                        String.format("Error converting String '%s' to Class.", className), e);
+                  }
+                }));
   }
 
-  public Object[] resolve(final TestCase testCase, final Method testMethod) {
-    final List<DataDrivenScenarioConverter> customConverters = extractCustomConverters(testMethod);
+  public Object[] resolve(final Example.Builder example, final Method testMethod) {
+    final List<Parameter.Converter> customConverters = extractCustomConverters(testMethod);
 
-    final Map<String, TestCaseParameterSchema> indexedSchema =
-        testCase.getSpecification().getSchema().stream()
-            .collect(Collectors.toMap(TestCaseParameterSchema::getName, schema -> schema));
-    return testCase.getSpecification().getSchema().stream()
-        .sorted(Comparator.comparingInt(TestCaseParameterSchema::getOverallOrder))
-        .map(TestCaseParameterSchema::getName)
-        .map(fieldName -> resolveValue(indexedSchema, customConverters, testCase, fieldName))
+    final Map<String, Parameter.Schema> indexedSchema =
+        example.getSchema().stream()
+            .collect(Collectors.toMap(Parameter.Schema::getName, schema -> schema));
+    return example.getSchema().stream()
+        .sorted(Comparator.comparingInt(Parameter.Schema::getOverallOrder))
+        .map(Parameter.Schema::getName)
+        .map(fieldName -> resolveValue(indexedSchema, customConverters, example, fieldName))
         .toArray(Object[]::new);
   }
 
-  private List<DataDrivenScenarioConverter> extractCustomConverters(final Method testMethod) {
+  private List<Parameter.Converter> extractCustomConverters(final Method testMethod) {
     return Arrays.stream(testMethod.getDeclaringClass().getDeclaredFields())
-        .filter(f -> f.isAnnotationPresent(CustomDataDrivenScenarioConverter.class))
-        .filter(f -> f.getType().isAssignableFrom(DataDrivenScenarioConverter.class))
+        .filter(f -> f.isAnnotationPresent(Parameter.Conversion.class))
+        .filter(f -> f.getType().isAssignableFrom(Parameter.Converter.class))
         .map(
             f -> {
               f.setAccessible(true);
               // TODO fchovich VALIDATE TYPES AND MANDATORY BLABLABLA
               try {
-                return (DataDrivenScenarioConverter) f.get(null);
+                return (Parameter.Converter) f.get(null);
               } catch (IllegalAccessException e) {
                 throw new IllegalStateException("", e);
               }
@@ -81,13 +85,13 @@ public class TestCaseInjectablesResolver {
   }
 
   private Object resolveValue(
-      final Map<String, TestCaseParameterSchema> indexedSchema,
-      List<DataDrivenScenarioConverter> customConverters,
-      final TestCase testCase,
+      final Map<String, Parameter.Schema> indexedSchema,
+      List<Parameter.Converter> customConverters,
+      final Example.Builder example,
       final String fieldName) {
 
-    final TestCaseParameterSchema schema = indexedSchema.get(fieldName);
-    final Object rawValue = testCase.getSpecification().getValue(fieldName);
+    final Parameter.Schema schema = indexedSchema.get(fieldName);
+    final Object rawValue = example.getValue(fieldName);
 
     if (schema.getType().isInstance(rawValue)) {
       return rawValue;
@@ -108,19 +112,17 @@ public class TestCaseInjectablesResolver {
   }
 
   private Object applyConvertersForValue(
-      final List<DataDrivenScenarioConverter> customConverters,
-      TestCaseParameterSchema schema,
-      Object rawValue) {
+      final List<Parameter.Converter> customConverters, Parameter.Schema schema, Object rawValue) {
     return applyConverters(customConverters, schema, rawValue)
         .orElseGet(
             () ->
                 applyConverters(this.defaultConverters, schema, rawValue)
-                    .orElseThrow(() -> new IllegalStateException("")));
+                    .orElseThrow(() -> new CheesecakesException("")));
   }
 
   private static Optional<Object> applyConverters(
-      final List<DataDrivenScenarioConverter> converters,
-      TestCaseParameterSchema schema,
+      final List<? extends Parameter.Converter> converters,
+      Parameter.Schema schema,
       Object rawValue) {
     return converters.stream()
         .filter(converter -> converter.test(rawValue, schema.getType()))

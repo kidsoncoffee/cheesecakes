@@ -1,13 +1,10 @@
 package com.kidsoncoffee.cheesecakes.processor.generator;
 
-import com.kidsoncoffee.cheesecakes.SchemaGeneration;
-import com.kidsoncoffee.cheesecakes.SpecificationStepType;
-import com.kidsoncoffee.cheesecakes.TestCaseParameterSchema;
-import com.kidsoncoffee.cheesecakes.TestCaseSchemas;
+import com.kidsoncoffee.cheesecakes.Parameter.SchemaSource;
+import com.kidsoncoffee.cheesecakes.Scenario.StepType;
 import com.kidsoncoffee.cheesecakes.processor.domain.Feature;
 import com.kidsoncoffee.cheesecakes.processor.domain.Parameter;
 import com.kidsoncoffee.cheesecakes.processor.domain.Scenario;
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -35,34 +32,37 @@ import static java.util.Arrays.asList;
  * @author fernando.chovich
  * @since 1.0
  */
-public class SchemaGenerator {
+public class ScenarioParametersSchemasGenerator {
 
-  private static final TypeName PARAMETER_TYPE = TypeName.get(TestCaseParameterSchema.class);
+  private static final TypeName PARAMETER_TYPE =
+      TypeName.get(com.kidsoncoffee.cheesecakes.Parameter.Schema.class);
 
   private final Filer filer;
 
-  public SchemaGenerator(final Filer filer) {
+  public ScenarioParametersSchemasGenerator(final Filer filer) {
     this.filer = filer;
   }
 
   public Map<Scenario, ClassName> generate(final Feature feature) {
-    final ClassName featureClassName =
+    final ClassName schemaSourceClassName =
         ClassName.get(
-            feature.getTestClassPackage(), format("%s_Schemas", feature.getTestClassName()));
+            feature.getTestClassPackage(),
+            format("%s_%s", feature.getTestClassName(), SchemaSource.class.getSimpleName()));
 
     final List<TypeSpec> innerClasses = new ArrayList<>();
     final Map<Scenario, ClassName> generatedClassNames = new HashMap<>();
     for (Scenario scenario : feature.getScenarios()) {
-      final AnnotationSpec bindingAnnotation = createSchemaBindingAnnotation(feature, scenario);
+      //      final AnnotationSpec bindingAnnotation = createSchemaBindingAnnotation(feature,
+      // scenario);
       final Pair<ClassName, TypeSpec> schemaEnum =
-          createSchemaEnumConstant(featureClassName, scenario, bindingAnnotation);
+          createSchemaEnumConstant(schemaSourceClassName, scenario);
       innerClasses.add(schemaEnum.getRight());
       generatedClassNames.put(scenario, schemaEnum.getLeft());
     }
 
     final TypeSpec featureClass =
-        TypeSpec.classBuilder(featureClassName)
-            .addSuperinterface(TypeName.get(TestCaseSchemas.class))
+        TypeSpec.classBuilder(schemaSourceClassName)
+            .addSuperinterface(TypeName.get(SchemaSource.class))
             .addTypes(innerClasses)
             .build();
 
@@ -78,17 +78,16 @@ public class SchemaGenerator {
     return generatedClassNames;
   }
 
-  private static AnnotationSpec createSchemaBindingAnnotation(Feature feature, Scenario scenario) {
-    return AnnotationSpec.builder(SchemaGeneration.class)
-        .addMember("testClass", "$N.class", feature.getTestClassName())
-        .addMember("testMethod", "$S", scenario.getTestMethod())
-        .build();
-  }
+  //  private static AnnotationSpec createSchemaBindingAnnotation(Feature feature, Scenario
+  // scenario) {
+  //    return AnnotationSpec.builder(SchemaGeneration.class)
+  //        .addMember("testClass", "$N.class", feature.getTestClassName())
+  //        .addMember("testMethod", "$S", scenario.getTestMethod())
+  //        .build();
+  //  }
 
   private static Pair<ClassName, TypeSpec> createSchemaEnumConstant(
-      final ClassName featureClassName,
-      final Scenario def,
-      final AnnotationSpec bindingAnnotation) {
+      final ClassName featureClassName, final Scenario def) {
     final String scenarioName = WordUtils.capitalize(def.getTestMethod());
 
     final ParameterSpec nameParameter =
@@ -96,14 +95,13 @@ public class SchemaGenerator {
     final ParameterSpec typeParameter =
         ParameterSpec.builder(Class.class, "type", Modifier.FINAL).build();
     final ParameterSpec stepParameter =
-        ParameterSpec.builder(SpecificationStepType.class, "step", Modifier.FINAL).build();
+        ParameterSpec.builder(StepType.class, "step", Modifier.FINAL).build();
     final ParameterSpec overallOrderParameter =
         ParameterSpec.builder(int.class, "overallOrder", Modifier.FINAL).build();
 
     final FieldSpec nameField = FieldSpec.builder(String.class, "name", Modifier.FINAL).build();
     final FieldSpec typeField = FieldSpec.builder(Class.class, "type", Modifier.FINAL).build();
-    final FieldSpec stepField =
-        FieldSpec.builder(SpecificationStepType.class, "step", Modifier.FINAL).build();
+    final FieldSpec stepField = FieldSpec.builder(StepType.class, "step", Modifier.FINAL).build();
     final FieldSpec overallOrderField =
         FieldSpec.builder(int.class, "overallOrder", Modifier.FINAL).build();
 
@@ -111,7 +109,7 @@ public class SchemaGenerator {
         ClassName.get(featureClassName.toString(), format("%sSchema", scenarioName));
     final TypeSpec.Builder enumBuilder =
         TypeSpec.enumBuilder(scenarioClassName)
-            .addAnnotation(bindingAnnotation)
+            //            .addAnnotation(bindingAnnotation)
             .addSuperinterface(PARAMETER_TYPE)
             .addFields(asList(nameField, typeField, stepField, overallOrderField))
             .addMethod(
@@ -142,7 +140,7 @@ public class SchemaGenerator {
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(Override.class)
                     .addStatement("return this.$N", stepField)
-                    .returns(SpecificationStepType.class)
+                    .returns(StepType.class)
                     .build())
             .addMethod(
                 MethodSpec.methodBuilder("getOverallOrder")
@@ -164,7 +162,7 @@ public class SchemaGenerator {
                 "$S, $T.class, $T.$L, $L",
                 r.getName(),
                 r.getType(),
-                SpecificationStepType.class,
+                StepType.class,
                 r.getStepType().name(),
                 r.getOverallOrder())
             .build());

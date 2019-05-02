@@ -1,8 +1,6 @@
-**THIS IS A WORK IN PROGRESS.. CHECK OUT FOR THE FULL BETA RELEASE IN 29/04/2019**
-
 <h1 align="center">
   <br>
-  <img src="https://cdn.pixabay.com/photo/2017/11/28/00/45/cheesecake-2982634_960_720.png" alt="Cheesecakes" width="400">
+  <img src="images/cheesecakes_logo.png" alt="Cheesecakes" width="400">
   <br>
   Cheesecakes
   <br>
@@ -105,7 +103,7 @@ import org.junit.Test;
  * @since 1.0
  */
 + @RunWith(Cheesecakes.class)
-public class MyDataDrivenTestExample {
+public class MyDataDrivenExampleTest {
 
   /**
    * Checks that the first and last name are concatenated correctly.
@@ -131,7 +129,7 @@ import org.junit.runner.RunWith;
  * @since 1.0
  */
 @RunWith(Cheesecakes.class)
-public class MyDataDrivenTestExample {
+public class MyDataDrivenExampleTest {
 
   /**
    * Checks that the first and last name are concatenated correctly.
@@ -157,17 +155,27 @@ This step can be done after writing the test logic as well.
 ### Write the test case logic
 
 ```diff
-import com.kidsoncoffee.cheesecakes.Cheesecakes;
+package examples;
 
++ import com.kidsoncoffee.cheesecakes.Parameter.Expectation;
++ import com.kidsoncoffee.cheesecakes.Parameter.Requisite;
+import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+/**
+ * @author fernando.chovich
+ * @since 1.0
+ */
 @RunWith(Cheesecakes.class)
-public class MyTest {
-  
+public class MyDataDrivenExampleTest {
+
   /**
    * Checks that the first and last name are concatenated correctly.
    *
    * <pre>
    * Examples:
-   * 
+   *
    * firstName | lastName || completeName
    * --------- | -------- || --------------
    * John      | Doe      || John Doe
@@ -175,23 +183,30 @@ public class MyTest {
    * </pre>
    */
   @Test
--  public void concatenatesSuccessfully(){
-+  public void concatenatesSuccessfully(
-+      final String firstName, final String lastName, final String completeName) {
-+    final String actualCompleteName;
+  public void concatenatesSuccessfully() {
++   public void concatenatesSuccessfully(
++       @Requisite final String firstName,
++       @Requisite final String lastName,
++       @Expectation final String completeName) {
++     final String actualCompleteName;
 +
-+    when:
-+    actualCompleteName = String.format("%s %s", firstName, lastName);
-+
-+    then:
-+    assert actualCompleteName.equals(completeName);
-  } 
++     when:
++     actualCompleteName = String.format("%s %s", firstName, lastName);
+
++     then:
++     assert actualCompleteName.equals(completeName);
+  }
 }
+
 ```
 
 ### Run the tests
 
 Now you should be able to run this test successfully and see that each **scenario example** runs independently.
+
+<img src="images/quickstart_intellij_success.png" alt="Successfull on Intellij">
+<br/>
+<img src="images/quickstart_maven_success.png" alt="Successfull on Maven">
 
 * [How to run tests in Intellij](https://www.jetbrains.com/help/idea/performing-tests.html)
 * [How to run tests in Maven](http://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html)
@@ -460,9 +475,9 @@ public class MyTest {
    * Checks that the first and last name are concatenated correctly.
    */
   @Test
-  public void test(@Requisites   final String firstName, 
-                   @Requisites   final String lastName, 
-                   @Expectations final String completeName){
+  public void test(@Requisite   final String firstName,
+                   @Requisite   final String lastName,
+                   @Expectation final String completeName){
     final String actualCompletaName;
     
     when:

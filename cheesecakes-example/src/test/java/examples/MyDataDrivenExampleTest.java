@@ -1,5 +1,7 @@
 package examples;
 
+import com.kidsoncoffee.cheesecakes.Parameter.Expectation;
+import com.kidsoncoffee.cheesecakes.Parameter.Requisite;
 import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,7 +11,8 @@ import org.junit.runner.RunWith;
  * @since 1.0
  */
 @RunWith(Cheesecakes.class)
-public class MyDataDrivenTestExample {
+public class MyDataDrivenExampleTest {
+
   /**
    * Checks that the first and last name are concatenated correctly.
    *
@@ -24,7 +27,9 @@ public class MyDataDrivenTestExample {
    */
   @Test
   public void concatenatesSuccessfully(
-      final String firstName, final String lastName, final String completeName) {
+      @Requisite final String firstName,
+      @Requisite final String lastName,
+      @Expectation final String completeName) {
     final String actualCompleteName;
 
     when:

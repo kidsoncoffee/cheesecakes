@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Elements;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,18 +30,24 @@ public class CommentParser {
   public List<Example> parse(final Element scenario) {
     final String doc = this.elementUtils.getDocComment(scenario);
 
+    if (doc == null) {
+      return Collections.emptyList();
+    }
+
     final AtomicBoolean whereFound = new AtomicBoolean(false);
     final List<String> scenarioLines =
         stream(doc.split(System.lineSeparator()))
             .filter(
                 docLine -> {
-                  if (docLine.trim().equalsIgnoreCase("WHERE:")) {
+                  if (docLine.trim().equalsIgnoreCase("Examples:")) {
                     return whereFound.getAndSet(true);
                   }
                   return whereFound.get();
                 })
             .filter(StringUtils::isNotBlank)
             .filter(docLine -> !docLine.trim().startsWith("---")) // TODO fchovich VALIDATE STATIC
+            .filter(docLine -> !docLine.contains("<pre>"))
+            .filter(docLine -> !docLine.contains("</pre>"))
             .collect(Collectors.toList());
 
     final List<String> header =
@@ -57,6 +64,6 @@ public class CommentParser {
         IntStream.range(0, fields.length)
             .boxed()
             .collect(Collectors.toMap(header::get, i -> fields[i].trim()));
-    return ImmutableExample.builder().putAllValue(values).build();
+    return ImmutableExample.example().putAllValue(values).build();
   }
 }

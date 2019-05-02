@@ -9,6 +9,7 @@ import java.util.List;
  * @since 1.0
  */
 @Value.Immutable
+@Value.Style(builder = "feature")
 public interface Feature {
   String getTestClassName();
 

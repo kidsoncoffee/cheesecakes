@@ -1,14 +1,11 @@
 package com.kidsoncoffee.cheesecakes.processor.generator;
 
-import com.kidsoncoffee.cheesecakes.Parameters;
-import com.kidsoncoffee.cheesecakes.Specification;
+import com.kidsoncoffee.cheesecakes.Example;
 import com.kidsoncoffee.cheesecakes.processor.domain.Feature;
 import com.kidsoncoffee.cheesecakes.processor.domain.Scenario;
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,7 +13,6 @@ import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -30,16 +26,17 @@ import static java.lang.String.format;
  * @author fernando.chovich
  * @since 1.0
  */
-public class DataDrivenScenariosGenerator {
+public class DataTableExampleGenerator {
 
   private final Filer filer;
 
-  public DataDrivenScenariosGenerator(final Filer filer) {
+  public DataTableExampleGenerator(final Filer filer) {
     this.filer = filer;
   }
 
   public void generate(final Feature feature, Map<Scenario, ClassName> generatedSchemas) {
-    final String scenariosClassName = format("%s_DataDrivenScenarios", feature.getTestClassName());
+    final String scenariosClassName =
+        format("%s_%s", feature.getTestClassName(), Example.Source.class.getSimpleName());
     final ClassName scenariosType =
         ClassName.get(feature.getTestClassPackage(), scenariosClassName);
 
@@ -47,9 +44,8 @@ public class DataDrivenScenariosGenerator {
 
     final TypeSpec featureClass =
         TypeSpec.classBuilder(scenariosType)
-            .addSuperinterface(com.kidsoncoffee.cheesecakes.DataDrivenScenario.class)
+            .addSuperinterface(Example.Source.class)
             .addMethods(scenarioSuppliers)
-            // .addTypes(scenariosTypes)
             .build();
 
     try {
@@ -76,50 +72,32 @@ public class DataDrivenScenariosGenerator {
   private static List<MethodSpec> generateSupplier(
       final Feature feature, final Scenario scenario, final ClassName generatedSchema) {
 
-    final ParameterizedTypeName examplesType =
-        ParameterizedTypeName.get(List.class, Specification.class);
-
-    final AnnotationSpec bindingAnnotation =
-        AnnotationSpec.builder(Parameters.ScenarioBinding.class)
-            .addMember("testClass", "$N.class", feature.getTestClassName())
-            .addMember("testMethod", "$S", scenario.getTestMethod())
-            .build();
-
     final List<Pair<String, MethodSpec>> examples =
         IntStream.range(0, scenario.getExamples().size())
-            .mapToObj(i -> createExampleMethod(scenario, generatedSchema, i))
+            .mapToObj(i -> createExampleMethod(feature, scenario, generatedSchema, i))
             .collect(Collectors.toList());
 
-    final String exampleMethods =
-        examples.stream()
-            .map(e -> String.format("%s()", e.getLeft()))
-            .collect(Collectors.joining(","));
-    final MethodSpec.Builder builder =
-        MethodSpec.methodBuilder(scenario.getTestMethod())
-            .addModifiers(Modifier.STATIC, Modifier.FINAL)
-            .addAnnotation(bindingAnnotation)
-            .returns(examplesType)
-            .addStatement("return asList($L)", exampleMethods);
-
-    final MethodSpec examplesSupplier = builder.build();
-    final List<MethodSpec> methods = new ArrayList<>();
-    methods.add(examplesSupplier);
-    methods.addAll(examples.stream().map(Pair::getRight).collect(Collectors.toList()));
-
-    return methods;
+    return examples.stream().map(Pair::getRight).collect(Collectors.toList());
   }
 
   private static Pair<String, MethodSpec> createExampleMethod(
-      final Scenario scenario, final ClassName generatedSchema, final int id) {
+      final Feature feature,
+      final Scenario scenario,
+      final ClassName generatedSchema,
+      final int id) {
     final String methodName = format("%s_%s", scenario.getTestMethod(), id);
     final MethodSpec.Builder method =
         MethodSpec.methodBuilder(methodName)
+            .addAnnotation(Example.Supplier.class)
             .addModifiers(Modifier.STATIC, Modifier.FINAL)
-            .returns(Specification.class)
+            .returns(Example.Builder.class)
             .addStatement(
-                "final $T example = new $T(asList($T.values()))",
-                Specification.class,
-                Specification.class,
+                "final $T example = new $T($L.$L.class, $S, asList($T.values()))",
+                Example.Builder.class,
+                Example.Builder.class,
+                feature.getTestClassPackage(),
+                feature.getTestClassName(),
+                scenario.getTestMethod(),
                 generatedSchema);
     scenario
         .getExamples()

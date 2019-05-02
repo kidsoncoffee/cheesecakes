@@ -1,13 +1,9 @@
 package com.kidsoncoffee.cheesecakes.processor.generator;
 
-import com.kidsoncoffee.cheesecakes.Parameters;
-import com.kidsoncoffee.cheesecakes.Specification;
-import com.kidsoncoffee.cheesecakes.SpecificationBlock;
-import com.kidsoncoffee.cheesecakes.TestCaseParameterSchema;
+import com.kidsoncoffee.cheesecakes.Example;
 import com.kidsoncoffee.cheesecakes.processor.domain.Feature;
 import com.kidsoncoffee.cheesecakes.processor.domain.Parameter;
 import com.kidsoncoffee.cheesecakes.processor.domain.Scenario;
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -35,64 +31,24 @@ import static java.util.Arrays.asList;
  * @author fernando.chovich
  * @since 1.0
  */
-public class ParameterBuilderGenerator {
+public class ExampleBuilderGenerator {
 
-  private static final TypeName SPECIFICATION_TYPE = TypeName.get(Specification.class);
+  private static final TypeName SPECIFICATION_TYPE = TypeName.get(Example.Builder.class);
 
-  private static final TypeName SPECIFICATION_BLOCK_TYPE = TypeName.get(SpecificationBlock.class);
-
-  private static final TypeName PARAMETER_TYPE = TypeName.get(TestCaseParameterSchema.class);
+  private static final TypeName SPECIFICATION_BLOCK_TYPE =
+      TypeName.get(com.kidsoncoffee.cheesecakes.Scenario.StepBlock.class);
 
   private final Filer filer;
 
-  public ParameterBuilderGenerator(final Filer filer) {
+  public ExampleBuilderGenerator(final Filer filer) {
     this.filer = filer;
-  }
-
-  public void generate(final Feature feature, final Map<Scenario, ClassName> generatedSchemas) {
-    final ClassName featureClassName =
-        ClassName.get(
-            feature.getTestClassPackage(), format("%s_Parameters", feature.getTestClassName()));
-
-    final List<TypeSpec> innerClasses = new ArrayList<>();
-    for (final Scenario scenario : feature.getScenarios()) {
-      final AnnotationSpec bindingAnnotation = createBindingAnnotation(feature, scenario);
-      final TypeSpec specificationClass =
-          createScenarioParameterBuilder(
-              featureClassName, scenario, generatedSchemas.get(scenario), bindingAnnotation);
-      innerClasses.add(specificationClass);
-    }
-
-    final TypeSpec featureClass =
-        TypeSpec.classBuilder(featureClassName)
-            .addSuperinterface(TypeName.get(com.kidsoncoffee.cheesecakes.Feature.class))
-            .addTypes(innerClasses)
-            .build();
-
-    try {
-      // TODO fchovich ADD COMMENTS TO GENERATED CLASS
-      JavaFile.builder(feature.getTestClassPackage(), featureClass)
-          .addStaticImport(Arrays.class, "asList")
-          .build()
-          .writeTo(this.filer);
-    } catch (IOException e) {
-      throw new UncheckedIOException(format("Error generating '%s'.", Feature.class), e);
-    }
-  }
-
-  private static AnnotationSpec createBindingAnnotation(
-      final Feature feature, final Scenario scenario) {
-    return AnnotationSpec.builder(Parameters.ScenarioBinding.class)
-        .addMember("testClass", "$N.class", feature.getTestClassName())
-        .addMember("testMethod", "$S", scenario.getTestMethod())
-        .build();
   }
 
   private static TypeSpec createScenarioParameterBuilder(
       final ClassName scenariosType,
+      final Feature feature,
       final Scenario definition,
-      final ClassName generatedSchema,
-      final AnnotationSpec bindingAnnotation) {
+      final ClassName generatedSchema) {
     // DEFINE NAMES
 
     final String scenarioName = WordUtils.capitalize(definition.getTestMethod());
@@ -118,7 +74,12 @@ public class ParameterBuilderGenerator {
 
     final MethodSpec constructor =
         MethodSpec.constructorBuilder()
-            .addStatement("super(asList($T.values()))", generatedSchema)
+            .addStatement(
+                "super($L.$L.class, $S, asList($T.values()))",
+                feature.getTestClassPackage(),
+                feature.getTestClassName(),
+                definition.getTestMethod(),
+                generatedSchema)
             .addStatement("this.$N = new $T(this)", requisitesField, requisitesClassName)
             .addStatement("this.$N = new $T(this)", expectationsField, expectationsClassName)
             .build();
@@ -150,7 +111,6 @@ public class ParameterBuilderGenerator {
 
     return TypeSpec.classBuilder(scenarioName)
         .superclass(SPECIFICATION_TYPE)
-        .addAnnotation(bindingAnnotation)
         .addModifiers(Modifier.STATIC)
         .addFields(asList(requisitesField, expectationsField))
         .addMethods(asList(constructor, givenMethod))
@@ -231,5 +191,36 @@ public class ParameterBuilderGenerator {
             .build();
 
     return setter;
+  }
+
+  public void generate(final Feature feature, final Map<Scenario, ClassName> generatedSchemas) {
+    final ClassName featureClassName =
+        ClassName.get(
+            feature.getTestClassPackage(),
+            format("%s_%s", feature.getTestClassName(), Example.Builder.class.getSimpleName()));
+
+    final List<TypeSpec> innerClasses = new ArrayList<>();
+    for (final Scenario scenario : feature.getScenarios()) {
+      final TypeSpec specificationClass =
+          createScenarioParameterBuilder(
+              featureClassName, feature, scenario, generatedSchemas.get(scenario));
+      innerClasses.add(specificationClass);
+    }
+
+    final TypeSpec featureClass =
+        TypeSpec.classBuilder(featureClassName)
+            .addSuperinterface(TypeName.get(com.kidsoncoffee.cheesecakes.Feature.class))
+            .addTypes(innerClasses)
+            .build();
+
+    try {
+      // TODO fchovich ADD COMMENTS TO GENERATED CLASS
+      JavaFile.builder(feature.getTestClassPackage(), featureClass)
+          .addStaticImport(Arrays.class, "asList")
+          .build()
+          .writeTo(this.filer);
+    } catch (IOException e) {
+      throw new UncheckedIOException(format("Error generating '%s'.", Feature.class), e);
+    }
   }
 }

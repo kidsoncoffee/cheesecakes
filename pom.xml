@@ -12,7 +12,7 @@
     <modules>
         <module>cheesecakes-all</module>
         <module>cheesecakes-api</module>
-        <module>cheesecakes-examples</module>
+        <module>cheesecakes-example</module>
         <module>cheesecakes-processor</module>
         <module>cheesecakes-runner</module>
     </modules>
@@ -24,12 +24,14 @@
         <!-- DEPENDENCIES -->
         <apache.commons-io.version>2.6</apache.commons-io.version>
         <apache.commons-lang3.version>3.5</apache.commons-lang3.version>
+        <assertj.version>3.12.2</assertj.version>
         <autoservice.version>1.0-rc1</autoservice.version>
         <immutables.version>2.7.5</immutables.version>
         <jackson-databind.version>2.9.8</jackson-databind.version>
         <javapoet.version>1.11.1</javapoet.version>
         <junit.version>4.12</junit.version>
         <reflections.version>0.9.9-RC1</reflections.version>
+        <slf4j.version>1.7.26</slf4j.version>
     </properties>
 
     <build>
@@ -109,6 +111,22 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${apache.commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
