@@ -26,16 +26,16 @@ public class MyDataDrivenExampleTest {
    * </pre>
    */
   @Test
-    public void concatenatesSuccessfully(
-                   @Requisite final String firstName,
-          @Requisite final String lastName,
-           @Expectation final String completeName) {
-           final String actualCompleteName;
+  public void concatenatesSuccessfully(
+      @Requisite final String firstName,
+      @Requisite final String lastName,
+      @Expectation final String completeName) {
+    final String actualCompleteName;
 
-                   when:
-           actualCompleteName = String.format("%s %s", firstName, lastName);
+    when:
+    actualCompleteName = String.format("%s %s", firstName, lastName);
 
-           then:
-           assert actualCompleteName.equals(completeName);
-    }
+    then:
+    assert actualCompleteName.equals(completeName);
   }
+}
