@@ -21,13 +21,13 @@
   <a href="https://github.com/kidsoncoffee/cheesecakes/issues">
       <img src="https://img.shields.io/github/issues/kidsoncoffee/cheesecakes.svg"/>
   </a>
-  <a href="#">
-      <img src="https://img.shields.io/badge/contributions-welcome-orange.svg"/>
-  </a>
   <a href="https://opensource.org/licenses/MIT">
       <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
   </a>
   <br/>
+  <a href="#">
+      <img src="https://img.shields.io/badge/contributions-welcome-orange.svg"/>
+  </a>
   <a href="https://gitter.im/cheesecakes-ddt">
     <img src="https://badges.gitter.im/cheesecakes-ddt.svg"/>
   </a>
@@ -183,7 +183,7 @@ public class MyDataDrivenExampleTest {
    * </pre>
    */
   @Test
-  public void concatenatesSuccessfully() {
+-   public void concatenatesSuccessfully() {
 +   public void concatenatesSuccessfully(
 +       @Requisite final String firstName,
 +       @Requisite final String lastName,
