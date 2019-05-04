@@ -1,6 +1,7 @@
-package com.kidsoncoffee.cheesecakes.runner;
+package com.kidsoncoffee.cheesecakes.runner.domain;
 
 import com.kidsoncoffee.cheesecakes.Example;
+import com.kidsoncoffee.cheesecakes.runner.InvokeExampleMethod;
 import com.kidsoncoffee.cheesecakes.runner.parameter.ScenarioParametersConverter;
 import org.junit.After;
 import org.junit.Before;
@@ -22,20 +23,16 @@ import static java.lang.String.format;
  */
 public class ExampleRunner extends BlockJUnit4ClassRunner {
 
-  private final String scenarioMethodName;
   private final Example.Builder example;
   private final ScenarioParametersConverter parametersResolver;
 
-  public ExampleRunner(
-      final Class featureClass,
-      final String scenarioMethodName,
-      final Example.Builder example,
-      final ScenarioParametersConverter parametersResolver)
+  public ExampleRunner(final Class featureClass, final Example.Builder example)
       throws InitializationError {
     super(featureClass);
-    this.scenarioMethodName = scenarioMethodName;
     this.example = example;
-    this.parametersResolver = parametersResolver;
+
+    // TODO fchovich USE GUAVA
+    this.parametersResolver = new ScenarioParametersConverter();
   }
 
   @Override
@@ -47,7 +44,7 @@ public class ExampleRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement methodInvoker(FrameworkMethod method, Object test) {
-    return new InvokeExample(method, test, this.example, this.parametersResolver);
+    return new InvokeExampleMethod(method, test, this.example, this.parametersResolver);
   }
 
   protected void validateInstanceMethods(List<Throwable> errors) {
@@ -61,7 +58,7 @@ public class ExampleRunner extends BlockJUnit4ClassRunner {
   @Override
   protected List<FrameworkMethod> computeTestMethods() {
     return getTestClass().getAnnotatedMethods(Test.class).stream()
-        .filter(t -> t.getName().equals(this.scenarioMethodName))
+        .filter(t -> t.getName().equals(this.example.getScenarioMethodName()))
         .collect(Collectors.toList());
   }
 
@@ -74,5 +71,9 @@ public class ExampleRunner extends BlockJUnit4ClassRunner {
   protected Description describeChild(FrameworkMethod method) {
     return Description.createTestDescription(
         this.getTestClass().getJavaClass().getName(), this.testName(method));
+  }
+
+  public Example.Builder getExample() {
+    return this.example;
   }
 }

@@ -1,4 +1,4 @@
-package com.kidsoncoffee.cheesecakes.runner;
+package com.kidsoncoffee.cheesecakes.runner.domain;
 
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
@@ -7,7 +7,6 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author fernando.chovich
@@ -15,43 +14,45 @@ import java.util.UUID;
  */
 public class ScenarioRunner extends ParentRunner<ExampleRunner> {
 
-  private final String scenarioName;
+  private final String name;
 
   private final List<ExampleRunner> runners;
 
-  public ScenarioRunner(Class<?> testClass, String scenarioName, List<ExampleRunner> runners)
+  public ScenarioRunner(
+      final Class<?> testClass, final String name, final List<ExampleRunner> runners)
       throws InitializationError {
     super(testClass);
-    this.scenarioName = scenarioName;
+    this.name = name;
     this.runners = runners;
   }
 
   @Override
-  protected List<ExampleRunner> getChildren() {
+  public List<ExampleRunner> getChildren() {
     return this.runners;
   }
 
   @Override
-  protected Description describeChild(ExampleRunner child) {
+  protected Description describeChild(final ExampleRunner child) {
     return Description.createTestDescription(
-        this.getTestClass().getJavaClass().getName(),
-        child.getName());
+        this.getTestClass().getJavaClass().getName(), child.getName());
   }
 
   @Override
-  protected void runChild(ExampleRunner child, RunNotifier notifier) {
-    // child.run(notifier);
-    //    childrenInvoker()
+  protected void runChild(final ExampleRunner child, final RunNotifier notifier) {
     child.run(notifier);
   }
 
   @Override
-  protected Statement childrenInvoker(RunNotifier notifier) {
+  protected Statement childrenInvoker(final RunNotifier notifier) {
     return super.childrenInvoker(notifier);
   }
 
   @Override
   protected String getName() {
-    return this.scenarioName;
+    return this.name;
+  }
+
+  public List<ExampleRunner> getRunners() {
+    return this.runners;
   }
 }

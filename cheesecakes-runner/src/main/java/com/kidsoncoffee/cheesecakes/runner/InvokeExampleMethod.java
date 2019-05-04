@@ -9,13 +9,13 @@ import org.junit.runners.model.Statement;
  * @author fernando.chovich
  * @since 1.0
  */
-public class InvokeExample extends Statement {
+public class InvokeExampleMethod extends Statement {
   private final FrameworkMethod testMethod;
   private final Object target;
   private final Example.Builder example;
   private final ScenarioParametersConverter scenarioParametersConverter;
 
-  public InvokeExample(
+  public InvokeExampleMethod(
       final FrameworkMethod testMethod,
       final Object target,
       final Example.Builder example,
