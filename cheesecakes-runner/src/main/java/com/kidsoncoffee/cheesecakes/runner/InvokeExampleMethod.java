@@ -13,23 +13,25 @@ public class InvokeExampleMethod extends Statement {
   private final FrameworkMethod testMethod;
   private final Object target;
   private final Example.Builder example;
-  private final ScenarioParametersConverter scenarioParametersConverter;
+
+  /** The parameter converter. */
+  private final ScenarioParametersConverter parametersConverter;
 
   public InvokeExampleMethod(
+      final ScenarioParametersConverter parametersConverter,
       final FrameworkMethod testMethod,
       final Object target,
-      final Example.Builder example,
-      final ScenarioParametersConverter testBinder) {
+      final Example.Builder example) {
+    this.parametersConverter = parametersConverter;
     this.testMethod = testMethod;
     this.target = target;
     this.example = example;
-    this.scenarioParametersConverter = testBinder;
   }
 
   @Override
   public void evaluate() throws Throwable {
     final Object[] parameters =
-        this.scenarioParametersConverter.resolve(this.example, this.testMethod.getMethod());
+        this.parametersConverter.convert(this.example, this.testMethod.getMethod());
     this.testMethod.invokeExplosively(this.target, parameters);
   }
 }

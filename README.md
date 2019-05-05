@@ -217,16 +217,16 @@ Now you should be able to run this test successfully and see that each **scenari
 
 In general, *Cheesecakes* concepts tries to be close to *[Gherkin](https://cucumber.io/docs/gherkin/reference/)* concepts, but as it needs to translate to *Java* code as well, some simplification needed to happen.
 
-#### Feature
+#### Feature or Feature test class
 
 In *Gherkin*: 
 > The purpose of the Feature keyword is to provide a high-level description of a software feature, and to group related scenarios.
 
 In *Cheesecakes*, **a *Feature* is a test class that groups related scenarios.**
 
-For example, a class named *Aggregator*, being the unit under test, has an acompannying class named *AggregatorTest*, which contains all test cases related to that unit. This *AggregatorTest* class is the *Feature*. 
+For example, a class named *Aggregator*, being the unit under test, has an accompanying class named *AggregatorTest*, which contains all test cases related to that unit. This *AggregatorTest* class is the *Feature test class*.
 
-#### Scenario
+#### Scenario or Scenario method
 
 In *Gherkin*:
 

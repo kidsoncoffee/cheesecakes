@@ -18,21 +18,27 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 /**
+ * Provides a {@link BlockJUnit4ClassRunner}. In this case representing an example.
+ *
  * @author fernando.chovich
  * @since 1.0
  */
 public class ExampleRunner extends BlockJUnit4ClassRunner {
 
+  /** The example. */
   private final Example.Builder example;
-  private final ScenarioParametersConverter parametersResolver;
 
+  /**
+   * Constructs an example runner.
+   *
+   * @param featureClass The target feature class.
+   * @param example The example.
+   * @throws InitializationError If any error occurs while initializing the runner.
+   */
   public ExampleRunner(final Class featureClass, final Example.Builder example)
       throws InitializationError {
     super(featureClass);
     this.example = example;
-
-    // TODO fchovich USE GUAVA
-    this.parametersResolver = new ScenarioParametersConverter();
   }
 
   @Override
@@ -44,7 +50,7 @@ public class ExampleRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement methodInvoker(FrameworkMethod method, Object test) {
-    return new InvokeExampleMethod(method, test, this.example, this.parametersResolver);
+    return new InvokeExampleMethod(new ScenarioParametersConverter(), method, test, this.example);
   }
 
   protected void validateInstanceMethods(List<Throwable> errors) {
@@ -55,6 +61,16 @@ public class ExampleRunner extends BlockJUnit4ClassRunner {
     // TODO fchovich EXPAND VALIDATION
   }
 
+  /**
+   * Returns the methods that run the tests. The method has to:
+   *
+   * <ul>
+   *   <li>Be annotated with @{@link Test}
+   *   <li>Match the name with the {@link Example.Builder#getScenarioMethodName()}
+   * </ul>
+   *
+   * @return All methods matching the criteria above.
+   */
   @Override
   protected List<FrameworkMethod> computeTestMethods() {
     return getTestClass().getAnnotatedMethods(Test.class).stream()
@@ -73,6 +89,11 @@ public class ExampleRunner extends BlockJUnit4ClassRunner {
         this.getTestClass().getJavaClass().getName(), this.testName(method));
   }
 
+  /**
+   * Returns the example.
+   *
+   * @return The example.
+   */
   public Example.Builder getExample() {
     return this.example;
   }

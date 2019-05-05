@@ -24,7 +24,6 @@ public class ScenarioParametersConverter {
   private final List<Parameter.RegistrableConverter> defaultConverters;
 
   public ScenarioParametersConverter() {
-    // TODO fchovich BETTER NAMING PLEASE
     this.defaultConverters =
         Arrays.asList(
             of(String.class, Byte.class, Byte::parseByte),
@@ -54,7 +53,7 @@ public class ScenarioParametersConverter {
                 }));
   }
 
-  public Object[] resolve(final Example.Builder example, final Method testMethod) {
+  public Object[] convert(final Example.Builder example, final Method testMethod) {
     final List<Parameter.Converter> customConverters = extractCustomConverters(testMethod);
 
     final Map<String, Parameter.Schema> indexedSchema =

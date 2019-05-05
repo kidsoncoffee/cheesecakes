@@ -1,14 +1,12 @@
 package com.kidsoncoffee.cheesecakes.runner;
 
 import com.kidsoncoffee.cheesecakes.runner.domain.ScenarioRunner;
-import com.kidsoncoffee.cheesecakes.runner.example.DataTableExamplesLoader;
+import com.kidsoncoffee.cheesecakes.runner.example.ClassExamplesLoader;
 import com.kidsoncoffee.cheesecakes.runner.example.FieldExamplesLoader;
-import com.kidsoncoffee.cheesecakes.runner.parameter.ScenarioParametersConverter;
 import org.junit.runner.Runner;
 import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,8 +17,6 @@ import java.util.stream.Collectors;
  */
 public class Cheesecakes extends Suite {
 
-  private final ScenarioParametersConverter scenarioParametersConverter;
-
   private final ScenarioRunnerCreator scenarioRunnerCreator;
 
   private final List<Runner> runners;
@@ -29,11 +25,10 @@ public class Cheesecakes extends Suite {
     super(klass, Collections.emptyList());
 
     // TODO fchovich USE GUAVA
-    this.scenarioParametersConverter = new ScenarioParametersConverter();
+    final ClassExamplesLoader classExamplesLoader = new ClassExamplesLoader();
+    final FieldExamplesLoader fieldExamplesLoader = new FieldExamplesLoader();
     this.scenarioRunnerCreator =
-        new ScenarioRunnerCreator(
-            Arrays.asList(new DataTableExamplesLoader(), new FieldExamplesLoader()),
-            this.scenarioParametersConverter);
+        new ScenarioRunnerCreator(classExamplesLoader, fieldExamplesLoader);
 
     this.runners =
         createTestCaseRunners().stream().map(Runner.class::cast).collect(Collectors.toList());

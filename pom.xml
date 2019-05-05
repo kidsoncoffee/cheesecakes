@@ -21,6 +21,9 @@
         <java.source>8</java.source>
         <java.target>8</java.target>
 
+        <!-- PLUGINS -->
+        <plugin.maven-jar.version>3.1.1</plugin.maven-jar.version>
+
         <!-- DEPENDENCIES -->
         <apache.commons-io.version>2.6</apache.commons-io.version>
         <apache.commons-lang3.version>3.5</apache.commons-lang3.version>
@@ -44,6 +47,19 @@
                     <source>${java.source}</source>
                     <target>${java.target}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${plugin.maven-jar.version}</version>
+
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -71,6 +87,16 @@
                 <artifactId>cheesecakes-processor</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <!-- PROJECT TEST -->
+            <dependency>
+                <groupId>com.kidsoncoffee.cheesecakes</groupId>
+                <artifactId>cheesecakes-api</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
             <!-- 3rd PARTY -->
 
             <dependency>
