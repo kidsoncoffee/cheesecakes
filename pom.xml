@@ -49,6 +49,25 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${plugin.maven-jar.version}</version>
@@ -63,6 +82,29 @@
             </plugin>
         </plugins>
     </build>
+
+    <scm>
+        <url>https://github.com/kidsoncoffee/cheesecakes</url>
+        <connection>scm:git:https://github.com/kidsoncoffee/cheesecakes.git</connection>
+        <developerConnection>scm:git:git@github.com:kidsoncoffee/cheesecakes.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+    <ciManagement>
+        <system>travis</system>
+        <url>https://travis-ci.org/kidsoncoffee/cheesecakes</url>
+    </ciManagement>
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/kidsoncoffee/cheesecakes/issues</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <dependencyManagement>
         <dependencies>
@@ -98,7 +140,6 @@
             </dependency>
 
             <!-- 3rd PARTY -->
-
             <dependency>
                 <groupId>com.squareup</groupId>
                 <artifactId>javapoet</artifactId>
@@ -140,12 +181,6 @@
                 <version>${apache.commons-io.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertj.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
@@ -154,6 +189,14 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+
+            <!-- 3rd PARTY TEST -->
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
