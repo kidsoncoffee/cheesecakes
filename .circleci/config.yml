@@ -1,0 +1,20 @@
+version: 2.1
+
+jobs:
+  build:
+    steps:
+      - checkout
+      - run: mvn clean install -DskipTests
+
+  test:
+    requires:
+      - build
+    steps:
+      - checkout
+      - run: mvn test
+
+workflows:
+  build_and_test:
+    jobs:
+      - build
+      - test

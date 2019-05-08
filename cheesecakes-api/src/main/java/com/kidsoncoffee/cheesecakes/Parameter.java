@@ -7,6 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author fernando.chovich
@@ -36,36 +37,35 @@ public interface Parameter {
 
   @Value.Immutable
   @Value.Style(builder = "converter")
-  interface Converter<T, R> {
-    @Value.Parameter(order = 2)
-    Function<T, R> getConverter();
+  interface Converter<R> extends Predicate<Class> {
+    @Value.Parameter(order = 1)
+    Function<String, R> getConverter();
 
     @Value.Parameter(order = 0)
-    Class<T> getBaseType();
-
-    @Value.Parameter(order = 1)
     Class<R> getTargetType();
 
     @Value.Auxiliary
-    default R convert(final T input) {
+    default R convert(final String input) {
       return this.getConverter().apply(input);
     }
 
     @Value.Auxiliary
-    default boolean test(final Object input, final Class outputClass) {
+    default boolean test(final Class outputClass) {
       return true;
     }
   }
 
   @Value.Immutable
   @Value.Style(builder = "registrableConverter")
-  interface RegistrableConverter<T, R> extends Converter<T, R> {
+  interface RegistrableConverter<R> extends Converter<R> {
     @Value.Auxiliary
-    default boolean test(final Object input, final Class outputClass) {
-      return getBaseType().isInstance(input) && getTargetType().isAssignableFrom(outputClass);
+    default boolean test(final Class outputClass) {
+      return getTargetType().isAssignableFrom(outputClass);
     }
   }
 
+  @Value.Immutable
+  @Value.Style(builder = "schema")
   interface Schema {
     // TODO fchovich SHOULD THIS BE OPEN TO USER
     String getName();

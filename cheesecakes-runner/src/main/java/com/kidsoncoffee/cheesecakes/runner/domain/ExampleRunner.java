@@ -2,7 +2,10 @@ package com.kidsoncoffee.cheesecakes.runner.domain;
 
 import com.kidsoncoffee.cheesecakes.Example;
 import com.kidsoncoffee.cheesecakes.runner.InvokeExampleMethod;
-import com.kidsoncoffee.cheesecakes.runner.parameter.ScenarioParametersConverter;
+import com.kidsoncoffee.cheesecakes.runner.parameter.CustomConverterExtractor;
+import com.kidsoncoffee.cheesecakes.runner.parameter.DefaultConverterExtractor;
+import com.kidsoncoffee.cheesecakes.runner.parameter.DefaultParameterConverters;
+import com.kidsoncoffee.cheesecakes.runner.parameter.ExampleParametersResolver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +15,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +54,17 @@ public class ExampleRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement methodInvoker(FrameworkMethod method, Object test) {
-    return new InvokeExampleMethod(new ScenarioParametersConverter(), method, test, this.example);
+    final CustomConverterExtractor customConverterExtractor = new CustomConverterExtractor();
+    final DefaultConverterExtractor defaultConverterExtractor =
+        new DefaultConverterExtractor(
+            Arrays.stream(DefaultParameterConverters.values())
+                .map(DefaultParameterConverters::getConverter)
+                .collect(Collectors.toList()));
+
+    final ExampleParametersResolver parametersResolver =
+        new ExampleParametersResolver(customConverterExtractor, defaultConverterExtractor);
+
+    return new InvokeExampleMethod(parametersResolver, method, test, this.example);
   }
 
   protected void validateInstanceMethods(List<Throwable> errors) {
