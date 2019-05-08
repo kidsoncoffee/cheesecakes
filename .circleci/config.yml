@@ -7,8 +7,6 @@ jobs:
       - run: mvn clean install -DskipTests
 
   test:
-    requires:
-      - build
     steps:
       - checkout
       - run: mvn test
