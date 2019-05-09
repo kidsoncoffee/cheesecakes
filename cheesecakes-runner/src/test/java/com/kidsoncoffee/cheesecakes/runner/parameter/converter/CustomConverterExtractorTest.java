@@ -1,6 +1,7 @@
-package com.kidsoncoffee.cheesecakes.runner.parameter;
+package com.kidsoncoffee.cheesecakes.runner.parameter.converter;
 
 import com.kidsoncoffee.cheesecakes.Parameter;
+import com.kidsoncoffee.cheesecakes.runner.parameter.converter.CustomConverterExtractor;
 import com.kidsoncoffee.cheesecakes.runner.parameter.converter.ParameterConverterMethodsProvider;
 import com.kidsoncoffee.cheesecakes.runner.parameter.converter.ParameterConverterMethodsProvider.DummyConverter;
 import org.junit.Before;
@@ -91,6 +92,45 @@ public class CustomConverterExtractorTest {
         .hasSize(2)
         .as("The parameters without converters should be empty.")
         .containsExactly(Optional.empty(), Optional.of(new DummyConverter()));
+  }
+
+  /** Checks that the extractor returns empty for parameter with invalid constructors. */
+  @Test
+  public void invalidConstructor() {
+    final Method method;
+    final Optional<Parameter.Converter>[] converters;
+
+    given:
+    method = retrieveMethod("invalidModifierConstructor");
+
+    when:
+    converters = this.extractor.extract(method);
+
+    then:
+    assertThat(converters)
+        .as("An array with the respective number of empties should be returned.")
+        .hasSize(2)
+        .as("Converters with invalid constructors should return empty.")
+        .containsExactly(Optional.empty(), Optional.empty());
+  }
+
+  @Test
+  public void explodingConstructor() {
+    final Method method;
+    final Optional<Parameter.Converter>[] converters;
+
+    given:
+    method = retrieveMethod("explodingConstructor");
+
+    when:
+    converters = this.extractor.extract(method);
+
+    then:
+    assertThat(converters)
+            .as("An array with the respective number of empties should be returned.")
+            .hasSize(1)
+            .as("Any exception during the instantiation of a converter should return empty.")
+            .containsExactly(Optional.empty());
   }
 
   /**

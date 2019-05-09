@@ -5,13 +5,11 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.function.Function;
 
 /**
  * Provider of methods for the {@link
- * com.kidsoncoffee.cheesecakes.runner.parameter.CustomConverterExtractorTest}.
+ * CustomConverterExtractorTest}.
  *
  * @author fernando.chovich
  * @since 1.0
@@ -41,6 +39,15 @@ public class ParameterConverterMethodsProvider {
       final String parameterWithoutAnnotation,
       @Parameter.Conversion(DummyConverter.class) final String parameterWithAnnotation) {}
 
+  public void invalidModifierConstructor(
+      @Parameter.Conversion(InvalidModifierConstructorConverter.class)
+          final String notPublicConverter,
+      @Parameter.Conversion(InvalidParametersConstructorConverter.class)
+          final String parameterizedConstructor) {}
+
+  public void explodingConstructor(
+      @Parameter.Conversion(ExplodingConstructorConverter.class) final String explodes) {}
+
   /** Dummy converter. */
   public static class DummyConverter implements Parameter.Converter<String> {
     @Override
@@ -66,6 +73,24 @@ public class ParameterConverterMethodsProvider {
     @Override
     public String toString() {
       return ToStringBuilder.reflectionToString(this);
+    }
+  }
+
+  public static class InvalidModifierConstructorConverter extends DummyConverter {
+    private InvalidModifierConstructorConverter() {
+      // this should be public
+    }
+  }
+
+  public static class InvalidParametersConstructorConverter extends DummyConverter {
+    public InvalidParametersConstructorConverter(final String parameter) {
+      // this should not have any parameters
+    }
+  }
+
+  public static class ExplodingConstructorConverter extends DummyConverter {
+    public ExplodingConstructorConverter() {
+      throw new UnsupportedOperationException("KA BO OM !");
     }
   }
 }

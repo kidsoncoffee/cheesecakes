@@ -69,5 +69,9 @@ public @interface Example {
     public void setValue(final String parameter, final Object value) {
       this.values.put(parameter, value);
     }
+
+    public void setValue(final Parameter.Schema parameter, final Object value) {
+      this.setValue(parameter.getName(), value);
+    }
   }
 }

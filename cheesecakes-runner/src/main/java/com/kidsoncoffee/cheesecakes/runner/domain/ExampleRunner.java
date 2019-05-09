@@ -2,10 +2,11 @@ package com.kidsoncoffee.cheesecakes.runner.domain;
 
 import com.kidsoncoffee.cheesecakes.Example;
 import com.kidsoncoffee.cheesecakes.runner.InvokeExampleMethod;
-import com.kidsoncoffee.cheesecakes.runner.parameter.CustomConverterExtractor;
-import com.kidsoncoffee.cheesecakes.runner.parameter.DefaultConverterExtractor;
 import com.kidsoncoffee.cheesecakes.runner.parameter.DefaultParameterConverters;
 import com.kidsoncoffee.cheesecakes.runner.parameter.ExampleParametersResolver;
+import com.kidsoncoffee.cheesecakes.runner.parameter.converter.CustomConverterExtractor;
+import com.kidsoncoffee.cheesecakes.runner.parameter.converter.DefaultConverterExtractor;
+import com.kidsoncoffee.cheesecakes.runner.parameter.converter.ParameterConverterResolver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,8 +62,11 @@ public class ExampleRunner extends BlockJUnit4ClassRunner {
                 .map(DefaultParameterConverters::getConverter)
                 .collect(Collectors.toList()));
 
+    final ParameterConverterResolver parameterConverterResolver =
+        new ParameterConverterResolver(customConverterExtractor, defaultConverterExtractor);
+
     final ExampleParametersResolver parametersResolver =
-        new ExampleParametersResolver(customConverterExtractor, defaultConverterExtractor);
+        new ExampleParametersResolver(parameterConverterResolver);
 
     return new InvokeExampleMethod(parametersResolver, method, test, this.example);
   }

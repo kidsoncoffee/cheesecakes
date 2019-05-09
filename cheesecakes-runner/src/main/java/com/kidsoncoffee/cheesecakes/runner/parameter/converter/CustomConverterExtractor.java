@@ -1,4 +1,4 @@
-package com.kidsoncoffee.cheesecakes.runner.parameter;
+package com.kidsoncoffee.cheesecakes.runner.parameter.converter;
 
 import com.kidsoncoffee.cheesecakes.Parameter;
 import org.slf4j.Logger;
@@ -68,7 +68,7 @@ public class CustomConverterExtractor implements ParameterConverterExtractor<Met
 
       try {
         return Optional.of(converter.newInstance());
-      } catch (InstantiationException | IllegalAccessException e) {
+      } catch (Throwable e) {
         LOGGER.error(
             "Error instantiating the custom converter '{}' for '{}'.",
             converter,

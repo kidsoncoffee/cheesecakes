@@ -1,80 +1,180 @@
 package com.kidsoncoffee.cheesecakes.runner.parameter;
 
 import com.kidsoncoffee.cheesecakes.Example;
+import com.kidsoncoffee.cheesecakes.ImmutableSchema;
 import com.kidsoncoffee.cheesecakes.Parameter;
+import com.kidsoncoffee.cheesecakes.Scenario;
 import com.kidsoncoffee.cheesecakes.runner.parameter.converter.ParameterConverterMethodsProvider;
+import com.kidsoncoffee.cheesecakes.runner.parameter.converter.ParameterConverterResolver;
 import org.assertj.core.api.Assertions;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
+ * Unit tests for {@link ExampleParametersResolver}.
+ *
  * @author fernando.chovich
  * @since 1.0
  */
 public class ExampleParametersResolverTest {
-  private ParameterConverterExtractor<Method> customConverterExtractor;
-  private ParameterConverterExtractor<List<Parameter.Schema>> defaultConverterExtractor;
+
+  /** The resolver of parameter converters. */
+  private ParameterConverterResolver parameterConverterResolver;
+
+  /** The unit under test. */
   private ExampleParametersResolver resolver;
 
+  /** Sets up the unit under test and its dependencies. */
   @Before
   public void setUp() {
-    this.customConverterExtractor = Mockito.mock(ParameterConverterExtractor.class, "custom");
-    this.defaultConverterExtractor = Mockito.mock(ParameterConverterExtractor.class, "default");
+    this.parameterConverterResolver = mock(ParameterConverterResolver.class);
+    this.resolver = new ExampleParametersResolver(this.parameterConverterResolver);
+  }
 
-    this.resolver =
-        new ExampleParametersResolver(
-            this.customConverterExtractor, this.defaultConverterExtractor);
+  /** Verify that mocks interactions are all accounted for. */
+  @After
+  public void verifyMockInteractions() {
+    verifyNoMoreInteractions(this.parameterConverterResolver);
   }
 
   @Test
-  public void convertersDifferentSize() {
+  public void noConvertersFound() {
     final Optional<Object[]> conversions;
-
     final Example.Builder example;
     final Method testMethod;
-    final Optional<Parameter.Converter>[] defaultConverters;
-    final Optional<Parameter.Converter>[] customConverters;
 
     given:
-    //TODO fchovich feature class and scenario name are unnecessary here
+    // TODO fchovich feature class and scenario name are unnecessary here
     example = new Example.Builder(ExampleParametersResolverTest.class, "", Collections.emptyList());
-    testMethod = retrieveMethod("differentSize");
-
-    defaultConverters = new Optional[] {Optional.empty()};
-    customConverters = new Optional[] {Optional.empty(), Optional.empty()};
+    testMethod = retrieveMethod("withoutParameters");
 
     orchestrate:
-    when(this.defaultConverterExtractor.extract(example.getSchema())).thenReturn(defaultConverters);
-    when(this.customConverterExtractor.extract(testMethod)).thenReturn(customConverters);
+    when(this.parameterConverterResolver.resolveConverters(testMethod, example))
+        .thenReturn(Optional.empty());
 
     when:
     conversions = this.resolver.resolve(testMethod, example);
 
     then:
     Assertions.assertThat(conversions)
-        .as(
-            "Should not be successful because the default and custom converter does not match sizes.")
+        .as("Should not be successful because the no converters were found.")
         .isNotPresent();
 
     verification:
-    verify(this.defaultConverterExtractor, times(1)).extract(example.getSchema());
-    verify(this.customConverterExtractor, times(1)).extract(testMethod);
-    verifyNoMoreInteractions(this.customConverterExtractor, defaultConverterExtractor);
+    verify(this.parameterConverterResolver, times(1)).resolveConverters(testMethod, example);
   }
 
-  public void differentSize() {}
+  @Test
+  public void noParametersFound() {
+    final Optional<Object[]> conversions;
+    final Example.Builder example;
+    final Method testMethod;
+
+    given:
+    // TODO fchovich feature class and scenario name are unnecessary here
+    example = new Example.Builder(ExampleParametersResolverTest.class, "", Collections.emptyList());
+    testMethod = retrieveMethod("withoutParameters");
+
+    orchestrate:
+    when(this.parameterConverterResolver.resolveConverters(testMethod, example))
+        .thenReturn(
+            Optional.of(
+                new Parameter.Converter[] {
+                  new ParameterConverterMethodsProvider.DummyConverter()
+                }));
+
+    when:
+    conversions = this.resolver.resolve(testMethod, example);
+
+    then:
+    Assertions.assertThat(conversions)
+        .as("Should not be successful because the no parameters were found.")
+        .isNotPresent();
+
+    verification:
+    verify(this.parameterConverterResolver, times(1)).resolveConverters(testMethod, example);
+  }
+
+  @Test
+  public void resolveParameters() {
+    final Parameter.Converter firstConverter;
+    final Parameter.Converter secondConverter;
+    final Optional<Object[]> conversions;
+    final Example.Builder example;
+    final Method testMethod;
+
+    given:
+    // TODO fchovich feature class and scenario name are unnecessary here
+    example =
+        new Example.Builder(
+            ExampleParametersResolverTest.class,
+            "",
+            // TODO fchovich SIMPLIFY EXAMPLE BUILDER -> separate parts
+            Arrays.asList(
+                ImmutableSchema.schema()
+                    .name("firstConverter")
+                    .overallOrder(0)
+                    .type(String.class)
+                    .step(Scenario.StepType.REQUISITE)
+                    .build(),
+                ImmutableSchema.schema()
+                    .name("secondConverter")
+                    .overallOrder(1)
+                    .type(String.class)
+                    .step(Scenario.StepType.REQUISITE)
+                    .build()));
+    example.setValue("firstConverter", "A");
+    example.setValue("secondConverter", "B");
+    testMethod = retrieveMethod("withParameters");
+
+    firstConverter = mock(Parameter.Converter.class, "firstConverter");
+    secondConverter = mock(Parameter.Converter.class, "secondConverter");
+
+    orchestrate:
+    when(this.parameterConverterResolver.resolveConverters(testMethod, example))
+        .thenReturn(
+            Optional.of(
+                new Parameter.Converter[] {
+                  firstConverter, secondConverter,
+                }));
+
+    when(firstConverter.convert("A")).thenReturn("1");
+    when(secondConverter.convert("B")).thenReturn("2");
+
+    when:
+    conversions = this.resolver.resolve(testMethod, example);
+
+    then:
+    Assertions.assertThat(conversions)
+        .as("Both parameter values should have been converted.")
+        .isPresent();
+
+    Assertions.assertThat(conversions.get())
+        .as("The converted parameter values matches the expected.")
+        .containsExactly("1", "2");
+
+    verification:
+    verify(this.parameterConverterResolver, times(1)).resolveConverters(testMethod, example);
+    verify(firstConverter, times(1)).convert("A");
+    verify(secondConverter, times(1)).convert("B");
+    verifyNoMoreInteractions(firstConverter, secondConverter);
+  }
+
+  public void withoutParameters() {}
+
+  public void withParameters(final String first, final String second) {}
 
   /**
    * Returns a method with the given name from {@link ParameterConverterMethodsProvider}.
