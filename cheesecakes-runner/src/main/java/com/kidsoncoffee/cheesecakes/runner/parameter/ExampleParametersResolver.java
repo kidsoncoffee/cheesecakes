@@ -25,19 +25,21 @@ public class ExampleParametersResolver {
   }
 
   public Optional<Object[]> resolve(final Method testMethod, final Example.Builder example) {
-    final Optional<Parameter.Converter[]> converters = this.parameterConverterResolver.resolveConverters(testMethod, example);
+    return this.parameterConverterResolver
+        .resolveConverters(testMethod, example)
+        .flatMap(c -> this.resolveParameters(testMethod, example, c));
+  }
 
-    if (!converters.isPresent()) {
-      return Optional.empty();
-    }
-
-    final Optional<String[]> parameters =
-        this.retrieveParameters(example, testMethod, converters.get());
+  private Optional<Object[]> resolveParameters(
+      final Method testMethod,
+      final Example.Builder example,
+      final Parameter.Converter[] converters) {
+    final Optional<String[]> parameters = this.retrieveParameters(example, testMethod, converters);
 
     return parameters.map(
         strings ->
-            IntStream.range(0, converters.get().length)
-                .mapToObj(i -> converters.get()[i].convert(strings[i]))
+            IntStream.range(0, converters.length)
+                .mapToObj(i -> converters[i].convert(strings[i]))
                 .toArray(Object[]::new));
   }
 

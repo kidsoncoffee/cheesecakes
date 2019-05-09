@@ -1,4 +1,4 @@
-package com.kidsoncoffee.cheesecakes.runner.parameter;
+package com.kidsoncoffee.cheesecakes.runner.parameter.converter;
 
 import com.kidsoncoffee.cheesecakes.Parameter;
 import com.kidsoncoffee.cheesecakes.runner.CheesecakesException;
@@ -56,7 +56,7 @@ public enum DefaultParameterConverters {
   BOOLEAN(of(Boolean.class, Boolean::parseBoolean)),
 
   /** Primitive boolean converter. */
-  BOOLEAN_CONVERTER(of(boolean.class, Boolean::parseBoolean)),
+  BOOLEAN_PRIMITIVE(of(boolean.class, Boolean::parseBoolean)),
 
   /** Class converter. */
   CLASS(

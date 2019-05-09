@@ -2,7 +2,7 @@ package com.kidsoncoffee.cheesecakes.runner.domain;
 
 import com.kidsoncoffee.cheesecakes.Example;
 import com.kidsoncoffee.cheesecakes.runner.InvokeExampleMethod;
-import com.kidsoncoffee.cheesecakes.runner.parameter.DefaultParameterConverters;
+import com.kidsoncoffee.cheesecakes.runner.parameter.converter.DefaultParameterConverters;
 import com.kidsoncoffee.cheesecakes.runner.parameter.ExampleParametersResolver;
 import com.kidsoncoffee.cheesecakes.runner.parameter.converter.CustomConverterExtractor;
 import com.kidsoncoffee.cheesecakes.runner.parameter.converter.DefaultConverterExtractor;
