@@ -43,9 +43,9 @@ commands:
         default: ~/reporter.jar
       jacoco_file:
         type: string
-        default: target/site/jacoco/jacoco.xml
+        default: cheesecakes-runner/target/site/jacoco/jacoco.xml
     steps:
-      - run: java -jar << parameters.reporter_jar >> report -l Java -r << parameters.jacoco_file >>
+      - run: pwd && java -jar << parameters.reporter_jar >> report -l Java -r << parameters.jacoco_file >>
 
 jobs:
   build:
