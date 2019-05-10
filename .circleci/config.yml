@@ -13,10 +13,7 @@ jobs:
       - image: circleci/jdk8:0.1.1
     steps:
       - checkout
-      - run: |
-        apt-get update &&
-        apt-get install maven &&
-        mvn test
+      - run: apt-get update && apt-get install maven && mvn test
 
 workflows:
   build_and_test:
