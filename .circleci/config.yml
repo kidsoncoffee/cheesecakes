@@ -24,7 +24,7 @@ commands:
   install_codacy_coverage_reporter_dependencies:
     description: "Download Codacy coverage reporter dependencies"
     steps:
-      - run: apt-get -y install curl jq
+      - run: apt-get -y update && apt-get -y install curl jq
 
   download_codacy_coverage_reporter:
     description: "Download Codacy coverage reporter"
