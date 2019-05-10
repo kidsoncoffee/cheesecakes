@@ -9,6 +9,8 @@ jobs:
       - run: mvn clean install -DskipTests
 
   test:
+    docker:
+      - image: circleci/jdk8:0.1.1
     steps:
       - checkout
       - run: mvn test
