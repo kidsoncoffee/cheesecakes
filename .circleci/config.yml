@@ -21,6 +21,11 @@ commands:
     steps:
       - run: mvn test
 
+  install_codacy_coverage_reporter_dependencies:
+    description: "Download Codacy coverage reporter dependencies"
+    steps:
+      - run: apt-get -y install curl jq
+
   download_codacy_coverage_reporter:
     description: "Download Codacy coverage reporter"
     parameters:
@@ -54,6 +59,7 @@ jobs:
     executor: simple
     steps:
       - checkout
+      - install_codacy_coverage_reporter_dependencies
       - download_codacy_coverage_reporter
       - test
       - report_coverage_to_codacy
