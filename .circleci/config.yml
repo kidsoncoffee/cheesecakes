@@ -51,7 +51,7 @@ jobs:
       - download_codacy_coverage_reporter:
         reporter_jar: "~/reporter.jar"
       - test
-      - report_coverage
+      - report_coverage:
         reporter_jar: "~/reporter.jar"
         jacoco_file: "target/site/jacoco/jacoco.xml"
 
