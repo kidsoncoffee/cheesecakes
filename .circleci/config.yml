@@ -32,7 +32,9 @@ commands:
       jacoco_file:
         type: string
     steps:
-      - run: java -jar << parameters.reporter_jar >> report -l Java -r << parameters.jacoco.file >>
+      - run:
+        name: Invoke Codacy jar to report jacoco file
+        command: java -jar << parameters.reporter_jar >> report -l Java -r << parameters.jacoco.file >>
 
 jobs:
   build:
