@@ -6,7 +6,7 @@ jobs:
       - image: circleci/jdk8:0.1.1
     steps:
       - checkout
-      - run: mvn clean install -DskipTests
+      - run: apt-get update && apt-get install maven && mvn clean install -DskipTests
 
   test:
     docker:
