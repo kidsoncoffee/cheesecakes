@@ -24,7 +24,7 @@ commands:
     steps:
       - run: wget -O << parameters.reporter_jar >> $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[0].browser_download_url')
 
-  report_coverage:
+  report_coverage_to_codacy:
     description: "Report coverage to Codacy"
     parameters:
       reporter_jar:
@@ -51,7 +51,7 @@ jobs:
       - download_codacy_coverage_reporter:
         reporter_jar: "~/reporter.jar"
       - test
-      - report_coverage:
+      - report_coverage_to_codacy:
         reporter_jar: "~/reporter.jar"
         jacoco_file: "target/site/jacoco/jacoco.xml"
 
