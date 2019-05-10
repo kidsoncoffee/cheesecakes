@@ -1,5 +1,10 @@
 version: 2.1
 
+executors:
+  simple:
+    docker:
+      - image: circleci/jdk8:0.1.1
+
 commands:
   install_maven:
     description: "Install Maven"
@@ -21,43 +26,37 @@ commands:
     parameters:
       reporter_jar:
         type: string
+        default: ~/reporter.jar
     steps:
-      - run:
-        name: Download Codacy jar and store it
-        command: "wget -O << parameters.reporter_jar >> $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[0].browser_download_url')"
+      - run: wget -O << parameters.reporter_jar >> $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[0].browser_download_url')
 
   report_coverage_to_codacy:
     description: "Report coverage to Codacy"
     parameters:
       reporter_jar:
         type: string
+        default: ~/reporter.jar
       jacoco_file:
         type: string
+        default: target/site/jacoco/jacoco.xml
     steps:
-      - run:
-        name: Invoke Codacy jar to report jacoco file
-        command: "java -jar << parameters.reporter_jar >> report -l Java -r << parameters.jacoco.file >>"
+      - run: java -jar << parameters.reporter_jar >> report -l Java -r << parameters.jacoco_file >>
 
 jobs:
   build:
-    docker:
-      - image: circleci/jdk8:0.1.1
+    executor: simple
     steps:
       - checkout
       - install_maven
       - compile
 
   report_coverage:
-    docker:
-      - image: circleci/jdk8:0.1.1
+    executor: simple
     steps:
       - checkout
-      - download_codacy_coverage_reporter:
-        reporter_jar: "~/reporter.jar"
+      - download_codacy_coverage_reporter
       - test
-      - report_coverage_to_codacy:
-        reporter_jar: "~/reporter.jar"
-        jacoco_file: "target/site/jacoco/jacoco.xml"
+      - report_coverage_to_codacy
 
 workflows:
   full:
