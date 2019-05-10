@@ -14,8 +14,8 @@ jobs:
     steps:
       - checkout
       - run: |
-        apt-get update |
-        apt-get install maven |
+        apt-get update &&
+        apt-get install maven &&
         mvn test
 
 workflows:
