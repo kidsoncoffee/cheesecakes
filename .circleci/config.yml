@@ -7,13 +7,16 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Build
+        name: Setup maven
         command:
           apt-get -y update
           apt-get -y install maven
+      - run:
+        name: Build
+        command:
           mvn clean install -DskipTests
 
-  test:
+  report_coverage:
     docker:
       - image: circleci/jdk8:0.1.1
     steps:
@@ -21,14 +24,14 @@ jobs:
       - run:
         name: Run tests
         command:
-          apt-get -y update
-          apt-get -y install maven
-          mvn test
+          mvn site
           wget -O ~/codacy-coverage-reporter-assembly-latest.jar $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[0].browser_download_url')
-          java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r target/jacoco/report/jacoco.xml
+          java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r target/site/jacoco/jacoco.xml
 
 workflows:
-  build_and_test:
+  full:
     jobs:
       - build
-      - test
+      - report_coverage:
+          requires:
+            - build
