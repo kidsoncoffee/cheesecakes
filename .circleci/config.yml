@@ -1,32 +1,56 @@
 version: 2.1
 
+commands:
+  install_maven:
+    description: "Install Maven"
+    steps:
+      - run: apt-get -y update && apt-get -y install maven
+
+  compile:
+    description: "Invoke maven compile"
+    steps:
+      - run: mvn compile
+
+  test:
+    description: "Invoke maven unit tests"
+    steps:
+      - run: mvn test
+
+  download_codacy_coverage_reporter:
+    description: "Download Codacy coverage reporter"
+    parameters:
+      target_jar:
+        type: string
+    steps:
+      - run: wget -O << parameters.target_jar >> $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[0].browser_download_url')
+
+  report_coverage:
+    description: "Report coverage to Codacy"
+    parameters:
+      target_jar:
+        type: string
+      jacoco_file:
+        type: string
+    steps:
+      - run: java -jar << parameters.target_jar >> report -l Java -r << parameters.jacoco.file >>
+
 jobs:
   build:
     docker:
       - image: circleci/jdk8:0.1.1
     steps:
       - checkout
-      - run:
-        name: Setup maven
-        command: |
-          apt-get -y update
-          apt-get -y install maven
-      - run:
-        name: Build
-        command: |
-          mvn clean install -DskipTests
+      - install_maven
+      - compile
 
   report_coverage:
     docker:
       - image: circleci/jdk8:0.1.1
     steps:
       - checkout
-      - run:
-        name: Run tests
-        command: |
-          mvn site
-          wget -O ~/codacy-coverage-reporter-assembly-latest.jar $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[0].browser_download_url')
-          java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r target/site/jacoco/jacoco.xml
+      - download_codacy_coverage_reporter
+      - test
+      - report_coverage
 
 workflows:
   full:
@@ -35,3 +59,4 @@ workflows:
       - report_coverage:
           requires:
             - build
+            - report_coverage
