@@ -61,6 +61,7 @@ jobs:
       - checkout
       - install_codacy_coverage_reporter_dependencies
       - download_codacy_coverage_reporter
+      - install_maven
       - test
       - report_coverage_to_codacy
 
