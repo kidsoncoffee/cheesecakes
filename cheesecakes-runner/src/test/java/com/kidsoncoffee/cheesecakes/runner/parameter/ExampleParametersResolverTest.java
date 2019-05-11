@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-import static com.kidsoncoffee.cheesecakes.ImmutableConvertableParameter.convertableParameter;
+import static com.kidsoncoffee.cheesecakes.ImmutableConvertible.convertableParameter;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,22 +37,22 @@ public class ExampleParametersResolverTest {
   /** The unit under test. */
   private ExampleParametersResolver resolver;
 
-  private ConvertableParametersCreator convertableParametersCreator;
+  private ParameterConvertibleCreator parameterConvertibleCreator;
 
   /** Sets up the unit under test and its dependencies. */
   @Before
   public void setUp() {
     this.parameterConverterResolver = mock(ParameterConverterResolver.class);
-    this.convertableParametersCreator = mock(ConvertableParametersCreator.class);
+    this.parameterConvertibleCreator = mock(ParameterConvertibleCreator.class);
     this.resolver =
         new ExampleParametersResolver(
-            this.parameterConverterResolver, this.convertableParametersCreator);
+            this.parameterConverterResolver, this.parameterConvertibleCreator);
   }
 
   /** Verify that mocks interactions are all accounted for. */
   @After
   public void verifyMockInteractions() {
-    verifyNoMoreInteractions(this.parameterConverterResolver, this.convertableParametersCreator);
+    verifyNoMoreInteractions(this.parameterConverterResolver, this.parameterConvertibleCreator);
   }
 
   /** Checks that an empty optional is returned if no converters are found. */
@@ -104,8 +104,8 @@ public class ExampleParametersResolverTest {
                 new Parameter.Converter[] {
                   new ParameterConverterMethodsProvider.DummyConverter()
                 }));
-    when(this.convertableParametersCreator.create(testMethod, example))
-        .thenReturn(new Parameter.ConvertableParameter[] {});
+    when(this.parameterConvertibleCreator.create(testMethod, example))
+        .thenReturn(new Parameter.Convertible[] {});
 
     when:
     conversions = this.resolver.resolve(testMethod, example);
@@ -117,14 +117,14 @@ public class ExampleParametersResolverTest {
 
     verification:
     verify(this.parameterConverterResolver, times(1)).resolveConverters(testMethod, example);
-    verify(this.convertableParametersCreator, times(1)).create(testMethod, example);
+    verify(this.parameterConvertibleCreator, times(1)).create(testMethod, example);
   }
 
   /** Checks that the resolver is able to resolve the parameter values for the example. */
   @Test
   public void resolveParameters() {
     final String firstParameterValue, secondParameterValue;
-    final Parameter.ConvertableParameter firstParameter, secondParameter;
+    final Parameter.Convertible firstParameter, secondParameter;
     final Parameter.Converter firstConverter;
     final Parameter.Converter secondConverter;
     final Optional<Object[]> conversions;
@@ -185,9 +185,9 @@ public class ExampleParametersResolverTest {
 
     when(firstConverter.convert(firstParameter)).thenReturn("1");
     when(secondConverter.convert(secondParameter)).thenReturn("2");
-    when(this.convertableParametersCreator.create(testMethod, example))
+    when(this.parameterConvertibleCreator.create(testMethod, example))
         .thenReturn(
-            new Parameter.ConvertableParameter[] {
+            new Parameter.Convertible[] {
               convertableParameter()
                   .method(anyMethod())
                   .schema(anySchema())
@@ -216,7 +216,7 @@ public class ExampleParametersResolverTest {
     verify(this.parameterConverterResolver, times(1)).resolveConverters(testMethod, example);
     verify(firstConverter, times(1)).convert(firstParameter);
     verify(secondConverter, times(1)).convert(secondParameter);
-    verify(this.convertableParametersCreator, times(1)).create(testMethod, example);
+    verify(this.parameterConvertibleCreator, times(1)).create(testMethod, example);
 
     verifyNoMoreInteractions(firstConverter, secondConverter);
   }

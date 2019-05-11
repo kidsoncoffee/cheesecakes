@@ -6,14 +6,14 @@ import com.kidsoncoffee.cheesecakes.Parameter;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 
-import static com.kidsoncoffee.cheesecakes.ImmutableConvertableParameter.convertableParameter;
+import static com.kidsoncoffee.cheesecakes.ImmutableConvertible.convertableParameter;
 
 /**
  * @author fernando.chovich
  * @since 1.0
  */
-public class ConvertableParametersCreator {
-  public Parameter.ConvertableParameter[] create(
+public class ParameterConvertibleCreator {
+  public Parameter.Convertible[] create(
       final Method method, final Example.Builder example) {
     return example.getSchema().stream()
         .sorted(Comparator.comparingInt(Parameter.Schema::getOverallOrder))
@@ -28,6 +28,6 @@ public class ConvertableParametersCreator {
                             .toString()) // IN THIS CASE IS EXPECTED THE PARAMETER VALUE TO BE A
                                          // STRING
                     .build())
-        .toArray(Parameter.ConvertableParameter[]::new);
+        .toArray(Parameter.Convertible[]::new);
   }
 }

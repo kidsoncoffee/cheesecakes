@@ -17,7 +17,7 @@ import static com.kidsoncoffee.cheesecakes.ImmutableRegistrableConverter.of;
 public enum DefaultParameterConverters {
 
   /** String converter. */
-  STRING(of(String.class, Parameter.ConvertableParameter::getValue)),
+  STRING(of(String.class, Parameter.Convertible::getValue)),
 
   /** Byte converter. */
   BYTE(Byte.class, Byte::parseByte),

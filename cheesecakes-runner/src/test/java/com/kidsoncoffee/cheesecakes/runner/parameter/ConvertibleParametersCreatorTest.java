@@ -14,27 +14,27 @@ import java.util.Collections;
 import static com.kidsoncoffee.cheesecakes.ImmutableSchema.schema;
 
 /**
- * Unit tests of {@link ConvertableParametersCreator}.
+ * Unit tests of {@link ParameterConvertibleCreator}.
  *
  * @author fernando.chovich
  * @since 1.0
  */
-public class ConvertableParametersCreatorTest {
+public class ConvertibleParametersCreatorTest {
 
   /** Checks that the creator returns an empty array when there are no parameter schemas. */
   @Test
   public void withoutSchemaParameters() {
     final Example.Builder example;
     final Method testMethod;
-    final ConvertableParametersCreator creator;
-    final Parameter.ConvertableParameter[] parameters;
+    final ParameterConvertibleCreator creator;
+    final Parameter.Convertible[] parameters;
 
     given:
-    creator = new ConvertableParametersCreator();
+    creator = new ParameterConvertibleCreator();
 
     // TODO fchovich SHOULD THIS RECEIVE THE SCHEMA LIST ONLY?
     example =
-        new Example.Builder(ConvertableParametersCreatorTest.class, "", Collections.emptyList());
+        new Example.Builder(ConvertibleParametersCreatorTest.class, "", Collections.emptyList());
     testMethod = retrieveMethod("methodReference");
 
     when:
@@ -49,13 +49,13 @@ public class ConvertableParametersCreatorTest {
   public void withSchemaParameters() {
     final Example.Builder example;
     final Method testMethod;
-    final ConvertableParametersCreator creator;
+    final ParameterConvertibleCreator creator;
     final Parameter.Schema firstParameterSchema, secondParameterSchema;
-    final Parameter.ConvertableParameter[] parameters;
+    final Parameter.Convertible[] parameters;
     final Object firstValue, secondValue;
 
     given:
-    creator = new ConvertableParametersCreator();
+    creator = new ParameterConvertibleCreator();
 
     firstParameterSchema =
         schema()
@@ -77,7 +77,7 @@ public class ConvertableParametersCreatorTest {
 
     example =
         new Example.Builder(
-            ConvertableParametersCreatorTest.class,
+            ConvertibleParametersCreatorTest.class,
             "",
             Arrays.asList(firstParameterSchema, secondParameterSchema));
     example.setValue(firstParameterSchema, firstValue);
@@ -108,7 +108,7 @@ public class ConvertableParametersCreatorTest {
    * @return The method that matches the name.
    */
   private static Method retrieveMethod(final String methodName) {
-    return Arrays.stream(ConvertableParametersCreatorTest.class.getDeclaredMethods())
+    return Arrays.stream(ConvertibleParametersCreatorTest.class.getDeclaredMethods())
         .filter(m -> m.getName().equals(methodName))
         .findFirst()
         .orElseThrow(

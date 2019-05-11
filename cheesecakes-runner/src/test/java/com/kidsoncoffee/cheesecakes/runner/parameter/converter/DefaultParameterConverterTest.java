@@ -1,6 +1,6 @@
 package com.kidsoncoffee.cheesecakes.runner.parameter.converter;
 
-import com.kidsoncoffee.cheesecakes.ImmutableConvertableParameter;
+import com.kidsoncoffee.cheesecakes.ImmutableConvertible;
 import com.kidsoncoffee.cheesecakes.ImmutableSchema;
 import com.kidsoncoffee.cheesecakes.Parameter;
 import com.kidsoncoffee.cheesecakes.Scenario;
@@ -27,7 +27,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void stringConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<String> converter;
     final String converted;
 
@@ -35,7 +35,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.STRING.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("A")
             .schema(anySchema())
@@ -50,7 +50,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void byteConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Byte> converter;
     final Byte converted;
 
@@ -58,7 +58,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.BYTE.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value(Byte.toString(MIN_VALUE))
             .schema(anySchema())
@@ -73,7 +73,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveByteConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Byte> converter;
     final byte converted;
 
@@ -81,7 +81,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.BYTE_PRIMITIVE.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value(Byte.toString(MIN_VALUE))
             .schema(anySchema())
@@ -96,7 +96,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void shortConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Short> converter;
     final Short converted;
 
@@ -104,7 +104,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.SHORT.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123")
             .schema(anySchema())
@@ -119,7 +119,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveShortConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Short> converter;
     final short converted;
 
@@ -127,7 +127,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.SHORT_PRIMITIVE.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123")
             .schema(anySchema())
@@ -142,7 +142,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void integerConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Integer> converter;
     final Integer converted;
 
@@ -150,7 +150,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.INTEGER.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123")
             .schema(anySchema())
@@ -165,7 +165,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveIntegerConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Integer> converter;
     final int converted;
 
@@ -173,7 +173,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.INTEGER_PRIMITIVE.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123")
             .schema(anySchema())
@@ -188,7 +188,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void longConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Long> converter;
     final Long converted;
 
@@ -196,7 +196,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.LONG.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123")
             .schema(anySchema())
@@ -211,7 +211,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveLongConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Long> converter;
     final long converted;
 
@@ -219,7 +219,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.LONG_PRIMITIVE.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123")
             .schema(anySchema())
@@ -234,7 +234,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void floatConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Float> converter;
     final Float converted;
 
@@ -242,7 +242,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.FLOAT.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123.45")
             .schema(anySchema())
@@ -257,7 +257,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveFloatConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Float> converter;
     final float converted;
 
@@ -265,7 +265,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.FLOAT_PRIMITIVE.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123.45")
             .schema(anySchema())
@@ -280,7 +280,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void doubleConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Double> converter;
     final Double converted;
 
@@ -288,7 +288,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.DOUBLE.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123.45")
             .schema(anySchema())
@@ -303,7 +303,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveDoubleConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Double> converter;
     final double converted;
 
@@ -311,7 +311,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.DOUBLE_PRIMITIVE.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("123.45")
             .schema(anySchema())
@@ -326,7 +326,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void booleanConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Boolean> converter;
     final Boolean converted;
 
@@ -334,7 +334,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.BOOLEAN.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("true")
             .schema(anySchema())
@@ -349,7 +349,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveBooleanConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Boolean> converter;
     final boolean converted;
 
@@ -357,7 +357,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.BOOLEAN_PRIMITIVE.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("false")
             .schema(anySchema())
@@ -372,7 +372,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void classConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Class> converter;
     final Class converted;
 
@@ -380,7 +380,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.CLASS.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("java.lang.String")
             .schema(anySchema())
@@ -395,7 +395,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void classConverterException() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Class> converter;
     final AbstractThrowableAssert<?, ? extends Throwable> expectedException;
 
@@ -403,7 +403,7 @@ public class DefaultParameterConverterTest {
     converter = DefaultParameterConverters.CLASS.getConverter();
 
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .method(anyMethod())
             .value("java.lang.Stringer")
             .schema(anySchema())
@@ -420,7 +420,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void simpleEnumConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Enum> converter;
     final Enum converted;
 
@@ -429,7 +429,7 @@ public class DefaultParameterConverterTest {
 
     // TODO fchovich CREATE MOO
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .schema(
                 ImmutableSchema.schema()
                     .name("name")
@@ -450,7 +450,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void toStringEnumConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Enum> converter;
     final Enum converted;
 
@@ -459,7 +459,7 @@ public class DefaultParameterConverterTest {
 
     // TODO fchovich CREATE MOO
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .schema(
                 ImmutableSchema.schema()
                     .name(TO_STRING_REPRESENTATION)
@@ -480,7 +480,7 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void enumExceptionConverter() {
-    final Parameter.ConvertableParameter parameter;
+    final Parameter.Convertible parameter;
     final Parameter.RegistrableConverter<Enum> converter;
     final AbstractThrowableAssert<?, ? extends Throwable> exception;
 
@@ -489,7 +489,7 @@ public class DefaultParameterConverterTest {
 
     // TODO fchovich CREATE MOO
     parameter =
-        ImmutableConvertableParameter.convertableParameter()
+        ImmutableConvertible.convertableParameter()
             .schema(
                 ImmutableSchema.schema()
                     .name("")

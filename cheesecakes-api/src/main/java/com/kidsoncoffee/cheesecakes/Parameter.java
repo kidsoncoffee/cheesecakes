@@ -44,10 +44,10 @@ public @interface Parameter {
     Class<R> getTargetType();
 
     @Value.Parameter(order = 1)
-    Function<ConvertableParameter, R> getConverter();
+    Function<Convertible, R> getConverter();
 
     @Value.Auxiliary
-    default R convert(final ConvertableParameter input) {
+    default R convert(final Convertible input) {
       return this.getConverter().apply(input);
     }
 
@@ -69,7 +69,7 @@ public @interface Parameter {
 
   @Value.Immutable
   @Value.Style(builder = "convertableParameter")
-  interface ConvertableParameter {
+  interface Convertible {
     Method getMethod();
 
     Parameter.Schema getSchema();

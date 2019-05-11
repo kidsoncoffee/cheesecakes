@@ -61,8 +61,8 @@ public class ParameterConverterMethodsProvider {
   /** Dummy converter. */
   public static class DummyConverter implements Parameter.Converter<String> {
     @Override
-    public Function<Parameter.ConvertableParameter, String> getConverter() {
-      return Parameter.ConvertableParameter::getValue;
+    public Function<Parameter.Convertible, String> getConverter() {
+      return Parameter.Convertible::getValue;
     }
 
     @Override
