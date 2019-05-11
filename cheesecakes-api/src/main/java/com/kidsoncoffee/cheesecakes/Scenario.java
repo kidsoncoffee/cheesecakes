@@ -4,7 +4,7 @@ package com.kidsoncoffee.cheesecakes;
  * @author fernando.chovich
  * @since 1.0
  */
-public interface Scenario {
+public @interface Scenario {
   enum StepType {
     REQUISITE,
     EXPECTATION;

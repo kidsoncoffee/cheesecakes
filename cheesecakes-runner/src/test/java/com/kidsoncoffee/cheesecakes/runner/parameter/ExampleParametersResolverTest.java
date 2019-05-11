@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.kidsoncoffee.cheesecakes.ImmutableConvertableParameter.convertableParameter;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -36,17 +37,22 @@ public class ExampleParametersResolverTest {
   /** The unit under test. */
   private ExampleParametersResolver resolver;
 
+  private ConvertableParametersCreator convertableParametersCreator;
+
   /** Sets up the unit under test and its dependencies. */
   @Before
   public void setUp() {
     this.parameterConverterResolver = mock(ParameterConverterResolver.class);
-    this.resolver = new ExampleParametersResolver(this.parameterConverterResolver);
+    this.convertableParametersCreator = mock(ConvertableParametersCreator.class);
+    this.resolver =
+        new ExampleParametersResolver(
+            this.parameterConverterResolver, this.convertableParametersCreator);
   }
 
   /** Verify that mocks interactions are all accounted for. */
   @After
   public void verifyMockInteractions() {
-    verifyNoMoreInteractions(this.parameterConverterResolver);
+    verifyNoMoreInteractions(this.parameterConverterResolver, this.convertableParametersCreator);
   }
 
   @Test
@@ -94,6 +100,8 @@ public class ExampleParametersResolverTest {
                 new Parameter.Converter[] {
                   new ParameterConverterMethodsProvider.DummyConverter()
                 }));
+    when(this.convertableParametersCreator.create(testMethod, example))
+        .thenReturn(new Parameter.ConvertableParameter[] {});
 
     when:
     conversions = this.resolver.resolve(testMethod, example);
@@ -105,10 +113,13 @@ public class ExampleParametersResolverTest {
 
     verification:
     verify(this.parameterConverterResolver, times(1)).resolveConverters(testMethod, example);
+    verify(this.convertableParametersCreator, times(1)).create(testMethod, example);
   }
 
   @Test
   public void resolveParameters() {
+    final String firstParameterValue, secondParameterValue;
+    final Parameter.ConvertableParameter firstParameter, secondParameter;
     final Parameter.Converter firstConverter;
     final Parameter.Converter secondConverter;
     final Optional<Object[]> conversions;
@@ -135,12 +146,29 @@ public class ExampleParametersResolverTest {
                     .type(String.class)
                     .step(Scenario.StepType.REQUISITE)
                     .build()));
-    example.setValue("firstConverter", "A");
-    example.setValue("secondConverter", "B");
+
+    firstParameterValue = "A";
+    secondParameterValue = "B";
+
+    example.setValue("firstConverter", firstParameterValue);
+    example.setValue("secondConverter", secondParameterValue);
     testMethod = retrieveMethod("withParameters");
 
     firstConverter = mock(Parameter.Converter.class, "firstConverter");
     secondConverter = mock(Parameter.Converter.class, "secondConverter");
+
+    firstParameter =
+        convertableParameter()
+            .method(anyMethod())
+            .schema(anySchema())
+            .value(firstParameterValue)
+            .build();
+    secondParameter =
+        convertableParameter()
+            .method(anyMethod())
+            .schema(anySchema())
+            .value(secondParameterValue)
+            .build();
 
     orchestrate:
     when(this.parameterConverterResolver.resolveConverters(testMethod, example))
@@ -150,8 +178,22 @@ public class ExampleParametersResolverTest {
                   firstConverter, secondConverter,
                 }));
 
-    when(firstConverter.convert("A")).thenReturn("1");
-    when(secondConverter.convert("B")).thenReturn("2");
+    when(firstConverter.convert(firstParameter)).thenReturn("1");
+    when(secondConverter.convert(secondParameter)).thenReturn("2");
+    when(this.convertableParametersCreator.create(testMethod, example))
+        .thenReturn(
+            new Parameter.ConvertableParameter[] {
+              convertableParameter()
+                  .method(anyMethod())
+                  .schema(anySchema())
+                  .value(firstParameterValue)
+                  .build(),
+              convertableParameter()
+                  .method(anyMethod())
+                  .schema(anySchema())
+                  .value(secondParameterValue)
+                  .build(),
+            });
 
     when:
     conversions = this.resolver.resolve(testMethod, example);
@@ -167,8 +209,10 @@ public class ExampleParametersResolverTest {
 
     verification:
     verify(this.parameterConverterResolver, times(1)).resolveConverters(testMethod, example);
-    verify(firstConverter, times(1)).convert("A");
-    verify(secondConverter, times(1)).convert("B");
+    verify(firstConverter, times(1)).convert(firstParameter);
+    verify(secondConverter, times(1)).convert(secondParameter);
+    verify(this.convertableParametersCreator, times(1)).create(testMethod, example);
+
     verifyNoMoreInteractions(firstConverter, secondConverter);
   }
 
@@ -190,5 +234,18 @@ public class ExampleParametersResolverTest {
             () ->
                 new IllegalStateException(
                     "The setup for this test is incorrect. Method not found."));
+  }
+
+  private static Method anyMethod() {
+    return retrieveMethod("withoutParameters");
+  }
+
+  private static Parameter.Schema anySchema() {
+    return ImmutableSchema.schema()
+        .name("")
+        .step(Scenario.StepType.REQUISITE)
+        .type(String.class)
+        .overallOrder(0)
+        .build();
   }
 }

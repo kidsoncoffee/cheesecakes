@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -19,9 +18,13 @@ public class ExampleParametersResolver {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleParametersResolver.class);
   private final ParameterConverterResolver parameterConverterResolver;
+  private final ConvertableParametersCreator convertableParametersCreator;
 
-  public ExampleParametersResolver(final ParameterConverterResolver parameterConverterResolver) {
+  public ExampleParametersResolver(
+      final ParameterConverterResolver parameterConverterResolver,
+      final ConvertableParametersCreator convertableParametersCreator) {
     this.parameterConverterResolver = parameterConverterResolver;
+    this.convertableParametersCreator = convertableParametersCreator;
   }
 
   public Optional<Object[]> resolve(final Method testMethod, final Example.Builder example) {
@@ -34,24 +37,8 @@ public class ExampleParametersResolver {
       final Method testMethod,
       final Example.Builder example,
       final Parameter.Converter[] converters) {
-    final Optional<String[]> parameters = this.retrieveParameters(example, testMethod, converters);
-
-    return parameters.map(
-        strings ->
-            IntStream.range(0, converters.length)
-                .mapToObj(i -> converters[i].convert(strings[i]))
-                .toArray(Object[]::new));
-  }
-
-  private Optional<String[]> retrieveParameters(
-      final Example.Builder example,
-      final Method testMethod,
-      final Parameter.Converter[] converters) {
-    final String[] parameters =
-        example.getSchema().stream()
-            .sorted(Comparator.comparingInt(Parameter.Schema::getOverallOrder))
-            .map(schema -> example.getValue(schema).toString())
-            .toArray(String[]::new);
+    final Parameter.ConvertableParameter[] parameters =
+        this.convertableParametersCreator.create(testMethod, example);
 
     if (converters.length != parameters.length) {
       LOGGER.error(
@@ -62,6 +49,10 @@ public class ExampleParametersResolver {
           testMethod.getDeclaringClass());
       return Optional.empty();
     }
-    return Optional.of(parameters);
+
+    return Optional.of(
+        IntStream.range(0, converters.length)
+            .mapToObj(i -> converters[i].convert(parameters[i]))
+            .toArray(Object[]::new));
   }
 }

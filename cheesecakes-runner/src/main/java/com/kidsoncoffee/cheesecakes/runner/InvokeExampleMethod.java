@@ -41,7 +41,7 @@ public class InvokeExampleMethod extends Statement {
     } else {
       throw new CheesecakesException(
           String.format(
-              "Unable to invoke test. Wrong parameters for '%s' in '%s'.",
+              "Unable to invoke test. Incorrect parameters for '%s' in '%s'.",
               this.testMethod.getName(), this.testMethod.getDeclaringClass()));
     }
   }

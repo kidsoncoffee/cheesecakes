@@ -8,8 +8,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.function.Function;
 
 /**
- * Provider of methods for the {@link
- * CustomConverterExtractorTest}.
+ * Provider of methods for the {@link CustomConverterExtractorTest}.
  *
  * @author fernando.chovich
  * @since 1.0
@@ -51,8 +50,8 @@ public class ParameterConverterMethodsProvider {
   /** Dummy converter. */
   public static class DummyConverter implements Parameter.Converter<String> {
     @Override
-    public Function<String, String> getConverter() {
-      return (string) -> string;
+    public Function<Parameter.ConvertableParameter, String> getConverter() {
+      return Parameter.ConvertableParameter::getValue;
     }
 
     @Override

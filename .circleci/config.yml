@@ -35,17 +35,25 @@ commands:
     steps:
       - run: wget -O << parameters.reporter_jar >> $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[0].browser_download_url')
 
-  report_coverage_to_codacy:
-    description: "Report coverage to Codacy"
+  report_module_coverage_to_codacy:
+    description: "Report coverage of a module to Codacy"
     parameters:
       reporter_jar:
         type: string
         default: ~/reporter.jar
       jacoco_file:
         type: string
-        default: cheesecakes-runner/target/site/jacoco/jacoco.xml
     steps:
-      - run: pwd && java -jar << parameters.reporter_jar >> report -l Java -r << parameters.jacoco_file >>
+      - run: java -jar << parameters.reporter_jar >> report -l Java -r << parameters.jacoco_file >> --partial
+
+  report_project_coverage_to_codacy:
+    description: "Report coverage of project to Codacy"
+    parameters:
+      reporter_jar:
+        type: string
+        default: ~/reporter.jar
+    steps:
+      - run: java -jar << parameters.reporter_jar >> final
 
 jobs:
   build:
@@ -63,7 +71,9 @@ jobs:
       - download_codacy_coverage_reporter
       - install_maven
       - test
-      - report_coverage_to_codacy
+      - report_module_coverage_to_codacy:
+          jacoco_file: "cheesecakes-runner/target/site/jacoco/jacoco.xml"
+      - report_project_coverage_to_codacy
 
 workflows:
   full:

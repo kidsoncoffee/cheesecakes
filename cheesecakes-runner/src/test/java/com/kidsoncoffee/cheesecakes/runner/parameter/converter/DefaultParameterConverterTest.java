@@ -1,10 +1,16 @@
 package com.kidsoncoffee.cheesecakes.runner.parameter.converter;
 
+import com.kidsoncoffee.cheesecakes.ImmutableConvertableParameter;
+import com.kidsoncoffee.cheesecakes.ImmutableSchema;
 import com.kidsoncoffee.cheesecakes.Parameter;
+import com.kidsoncoffee.cheesecakes.Scenario;
 import com.kidsoncoffee.cheesecakes.runner.CheesecakesException;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import static java.lang.Byte.MIN_VALUE;
 
@@ -14,16 +20,26 @@ import static java.lang.Byte.MIN_VALUE;
  */
 public class DefaultParameterConverterTest {
 
+  public static final String TO_STRING_REPRESENTATION = "TO STRING REPRESENTATION";
+
   @Test
   public void stringConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<String> converter;
     final String converted;
 
     given:
     converter = DefaultParameterConverters.STRING.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("A")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("A");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo("A");
@@ -31,14 +47,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void byteConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Byte> converter;
     final Byte converted;
 
     given:
     converter = DefaultParameterConverters.BYTE.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value(Byte.toString(MIN_VALUE))
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert(Byte.toString(MIN_VALUE));
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(MIN_VALUE);
@@ -46,14 +70,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveByteConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Byte> converter;
     final byte converted;
 
     given:
     converter = DefaultParameterConverters.BYTE_PRIMITIVE.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value(Byte.toString(MIN_VALUE))
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert(Byte.toString(MIN_VALUE));
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(MIN_VALUE);
@@ -61,14 +93,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void shortConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Short> converter;
     final Short converted;
 
     given:
     converter = DefaultParameterConverters.SHORT.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(new Short("123"));
@@ -76,14 +116,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveShortConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Short> converter;
     final short converted;
 
     given:
     converter = DefaultParameterConverters.SHORT_PRIMITIVE.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(new Short("123"));
@@ -91,14 +139,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void integerConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Integer> converter;
     final Integer converted;
 
     given:
     converter = DefaultParameterConverters.INTEGER.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(123);
@@ -106,14 +162,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveIntegerConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Integer> converter;
     final int converted;
 
     given:
     converter = DefaultParameterConverters.INTEGER_PRIMITIVE.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(123);
@@ -121,14 +185,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void longConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Long> converter;
     final Long converted;
 
     given:
     converter = DefaultParameterConverters.LONG.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(123L);
@@ -136,14 +208,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveLongConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Long> converter;
     final long converted;
 
     given:
     converter = DefaultParameterConverters.LONG_PRIMITIVE.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(123L);
@@ -151,74 +231,114 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void floatConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Float> converter;
     final Float converted;
 
     given:
     converter = DefaultParameterConverters.FLOAT.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123.45")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
-    Assertions.assertThat(converted).isEqualTo(123F);
+    Assertions.assertThat(converted).isEqualTo(123.45F);
   }
 
   @Test
   public void primitiveFloatConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Float> converter;
     final float converted;
 
     given:
     converter = DefaultParameterConverters.FLOAT_PRIMITIVE.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123.45")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
-    Assertions.assertThat(converted).isEqualTo(123F);
+    Assertions.assertThat(converted).isEqualTo(123.45F);
   }
 
   @Test
   public void doubleConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Double> converter;
     final Double converted;
 
     given:
     converter = DefaultParameterConverters.DOUBLE.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123.45")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
-    Assertions.assertThat(converted).isEqualTo(123D);
+    Assertions.assertThat(converted).isEqualTo(123.45D);
   }
 
   @Test
   public void primitiveDoubleConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Double> converter;
     final double converted;
 
     given:
     converter = DefaultParameterConverters.DOUBLE_PRIMITIVE.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("123.45")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("123");
+    converted = converter.convert(parameter);
 
     then:
-    Assertions.assertThat(converted).isEqualTo(123D);
+    Assertions.assertThat(converted).isEqualTo(123.45D);
   }
 
   @Test
   public void booleanConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Boolean> converter;
     final Boolean converted;
 
     given:
     converter = DefaultParameterConverters.BOOLEAN.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("true")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("true");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(new Boolean("true"));
@@ -226,14 +346,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void primitiveBooleanConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Boolean> converter;
     final boolean converted;
 
     given:
     converter = DefaultParameterConverters.BOOLEAN_PRIMITIVE.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("false")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("false");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(false);
@@ -241,14 +369,22 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void classConverter() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Class> converter;
     final Class converted;
 
     given:
     converter = DefaultParameterConverters.CLASS.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("java.lang.String")
+            .schema(anySchema())
+            .build();
+
     when:
-    converted = converter.convert("java.lang.String");
+    converted = converter.convert(parameter);
 
     then:
     Assertions.assertThat(converted).isEqualTo(String.class);
@@ -256,19 +392,168 @@ public class DefaultParameterConverterTest {
 
   @Test
   public void classConverterException() {
+    final Parameter.ConvertableParameter parameter;
     final Parameter.RegistrableConverter<Class> converter;
     final AbstractThrowableAssert<?, ? extends Throwable> expectedException;
 
     given:
     converter = DefaultParameterConverters.CLASS.getConverter();
 
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .method(anyMethod())
+            .value("java.lang.Stringer")
+            .schema(anySchema())
+            .build();
+
     when:
-    expectedException =
-        Assertions.assertThatThrownBy(() -> converter.convert("java.lang.Stringer"));
+    expectedException = Assertions.assertThatThrownBy(() -> converter.convert(parameter));
 
     then:
     expectedException
         .isInstanceOf(CheesecakesException.class)
         .hasMessage("Error converting String 'java.lang.Stringer' to Class.");
+  }
+
+  @Test
+  public void simpleEnumConverter() {
+    final Parameter.ConvertableParameter parameter;
+    final Parameter.RegistrableConverter<Enum> converter;
+    final Enum converted;
+
+    given:
+    converter = DefaultParameterConverters.ENUM.getConverter();
+
+    // TODO fchovich CREATE MOO
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .schema(
+                ImmutableSchema.schema()
+                    .name("name")
+                    .step(Scenario.StepType.REQUISITE)
+                    .overallOrder(0)
+                    .type(SimpleEnum.class)
+                    .build())
+            .value("A")
+            .method(anyMethod())
+            .build();
+
+    when:
+    converted = converter.convert(parameter);
+
+    then:
+    Assertions.assertThat(converted).isEqualTo(SimpleEnum.A);
+  }
+
+  @Test
+  public void toStringEnumConverter() {
+    final Parameter.ConvertableParameter parameter;
+    final Parameter.RegistrableConverter<Enum> converter;
+    final Enum converted;
+
+    given:
+    converter = DefaultParameterConverters.ENUM.getConverter();
+
+    // TODO fchovich CREATE MOO
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .schema(
+                ImmutableSchema.schema()
+                    .name(TO_STRING_REPRESENTATION)
+                    .step(Scenario.StepType.REQUISITE)
+                    .overallOrder(0)
+                    .type(SimpleEnum.class)
+                    .build())
+            .value("A")
+            .method(anyMethod())
+            .build();
+
+    when:
+    converted = converter.convert(parameter);
+
+    then:
+    Assertions.assertThat(converted).isEqualTo(SimpleEnum.A);
+  }
+
+  @Test
+  public void enumExceptionConverter() {
+    final Parameter.ConvertableParameter parameter;
+    final Parameter.RegistrableConverter<Enum> converter;
+    final AbstractThrowableAssert<?, ? extends Throwable> exception;
+
+    given:
+    converter = DefaultParameterConverters.ENUM.getConverter();
+
+    // TODO fchovich CREATE MOO
+    parameter =
+        ImmutableConvertableParameter.convertableParameter()
+            .schema(
+                ImmutableSchema.schema()
+                    .name("")
+                    .step(Scenario.StepType.REQUISITE)
+                    .overallOrder(0)
+                    .type(SimpleEnum.class)
+                    .build())
+            .value("INVALID VALUE")
+            .method(anyMethod())
+            .build();
+
+    when:
+    exception = Assertions.assertThatThrownBy(() -> converter.convert(parameter));
+
+    then:
+    exception
+        .isInstanceOf(CheesecakesException.class)
+        .hasMessage(
+            "Error converting Enum constant 'INVALID VALUE' to 'class com.kidsoncoffee.cheesecakes.runner.parameter.converter.DefaultParameterConverterTest$SimpleEnum'.");
+  }
+
+  enum SimpleEnum {
+    A
+  }
+
+  enum ToStringEnum {
+    A(TO_STRING_REPRESENTATION);
+
+    private final String name;
+
+    ToStringEnum(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public String toString() {
+      return this.name;
+    }
+  }
+
+  /**
+   * Returns a method with the given name from {@link ParameterConverterMethodsProvider}.
+   *
+   * @param methodName The name of the method to retrieve.
+   * @return The method that matches the name.
+   */
+  private static Method retrieveMethod(final String methodName) {
+    return Arrays.stream(ParameterConverterMethodsProvider.class.getDeclaredMethods())
+        .filter(m -> m.getName().equals(methodName))
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new IllegalStateException(
+                    "The setup for this test is incorrect. Method not found."));
+  }
+
+  // TODO fchovich CREATE BETTER OBJECTS AND REMOVE THIS
+  private static Method anyMethod() {
+    return retrieveMethod("methodWithoutParameters");
+  }
+
+  private static Parameter.Schema anySchema() {
+    return ImmutableSchema.schema()
+        .name("")
+        .step(Scenario.StepType.REQUISITE)
+        .type(String.class)
+        .overallOrder(0)
+        .build();
   }
 }
