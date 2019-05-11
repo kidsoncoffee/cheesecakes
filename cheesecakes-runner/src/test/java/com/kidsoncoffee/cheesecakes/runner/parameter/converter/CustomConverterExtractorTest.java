@@ -1,8 +1,6 @@
 package com.kidsoncoffee.cheesecakes.runner.parameter.converter;
 
 import com.kidsoncoffee.cheesecakes.Parameter;
-import com.kidsoncoffee.cheesecakes.runner.parameter.converter.CustomConverterExtractor;
-import com.kidsoncoffee.cheesecakes.runner.parameter.converter.ParameterConverterMethodsProvider;
 import com.kidsoncoffee.cheesecakes.runner.parameter.converter.ParameterConverterMethodsProvider.DummyConverter;
 import org.junit.Before;
 import org.junit.Test;

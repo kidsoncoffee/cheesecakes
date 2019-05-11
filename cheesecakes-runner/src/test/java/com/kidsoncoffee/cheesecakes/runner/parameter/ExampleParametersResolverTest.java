@@ -55,6 +55,7 @@ public class ExampleParametersResolverTest {
     verifyNoMoreInteractions(this.parameterConverterResolver, this.convertableParametersCreator);
   }
 
+  /** Checks that an empty optional is returned if no converters are found. */
   @Test
   public void noConvertersFound() {
     final Optional<Object[]> conversions;
@@ -82,6 +83,9 @@ public class ExampleParametersResolverTest {
     verify(this.parameterConverterResolver, times(1)).resolveConverters(testMethod, example);
   }
 
+  /**
+   * Checks that an empty optional is returned if no parameters are found in the scenario method.
+   */
   @Test
   public void noParametersFound() {
     final Optional<Object[]> conversions;
@@ -116,6 +120,7 @@ public class ExampleParametersResolverTest {
     verify(this.convertableParametersCreator, times(1)).create(testMethod, example);
   }
 
+  /** Checks that the resolver is able to resolve the parameter values for the example. */
   @Test
   public void resolveParameters() {
     final String firstParameterValue, secondParameterValue;
@@ -216,8 +221,15 @@ public class ExampleParametersResolverTest {
     verifyNoMoreInteractions(firstConverter, secondConverter);
   }
 
+  /** Method without parameters. */
   public void withoutParameters() {}
 
+  /**
+   * Method with parameters.
+   *
+   * @param first The first parameter.
+   * @param second The second parameter.
+   */
   public void withParameters(final String first, final String second) {}
 
   /**
@@ -236,10 +248,24 @@ public class ExampleParametersResolverTest {
                     "The setup for this test is incorrect. Method not found."));
   }
 
+  /**
+   * Creates any method.
+   *
+   * @return Any method.
+   * @deprecated Use a MOO/data generator pattern
+   */
+  @Deprecated
   private static Method anyMethod() {
     return retrieveMethod("withoutParameters");
   }
 
+  /**
+   * Creates any schema.
+   *
+   * @return Any schema.
+   * @deprecated Use a MOO/data generator pattern
+   */
+  @Deprecated
   private static Parameter.Schema anySchema() {
     return ImmutableSchema.schema()
         .name("")

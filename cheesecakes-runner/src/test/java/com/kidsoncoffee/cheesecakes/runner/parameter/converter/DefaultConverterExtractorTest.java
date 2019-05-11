@@ -2,7 +2,6 @@ package com.kidsoncoffee.cheesecakes.runner.parameter.converter;
 
 import com.kidsoncoffee.cheesecakes.Parameter;
 import com.kidsoncoffee.cheesecakes.Scenario;
-import com.kidsoncoffee.cheesecakes.runner.parameter.converter.DefaultConverterExtractor;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.mockito.Mockito;

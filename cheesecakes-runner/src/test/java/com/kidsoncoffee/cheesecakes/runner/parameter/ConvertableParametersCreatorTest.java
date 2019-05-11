@@ -14,10 +14,14 @@ import java.util.Collections;
 import static com.kidsoncoffee.cheesecakes.ImmutableSchema.schema;
 
 /**
+ * Unit tests of {@link ConvertableParametersCreator}.
+ *
  * @author fernando.chovich
  * @since 1.0
  */
 public class ConvertableParametersCreatorTest {
+
+  /** Checks that the creator returns an empty array when there are no parameter schemas. */
   @Test
   public void withoutSchemaParameters() {
     final Example.Builder example;
@@ -28,6 +32,7 @@ public class ConvertableParametersCreatorTest {
     given:
     creator = new ConvertableParametersCreator();
 
+    // TODO fchovich SHOULD THIS RECEIVE THE SCHEMA LIST ONLY?
     example =
         new Example.Builder(ConvertableParametersCreatorTest.class, "", Collections.emptyList());
     testMethod = retrieveMethod("methodReference");
@@ -39,6 +44,7 @@ public class ConvertableParametersCreatorTest {
     Assertions.assertThat(parameters).isEmpty();
   }
 
+  /** Checks that the resolver returns an array in order of the schema list. */
   @Test
   public void withSchemaParameters() {
     final Example.Builder example;
@@ -89,6 +95,7 @@ public class ConvertableParametersCreatorTest {
 
     Assertions.assertThat(parameters[1].getSchema()).isEqualTo(secondParameterSchema);
     Assertions.assertThat(parameters[1].getMethod()).isEqualTo(testMethod);
+    // TODO fchovich TOO MUCH VALIDATION. VALIDATE THE TO STRING MECHANISM SOMEWHERE ELSE.
     Assertions.assertThat(parameters[1].getValue()).isEqualTo(secondValue.toString());
   }
 

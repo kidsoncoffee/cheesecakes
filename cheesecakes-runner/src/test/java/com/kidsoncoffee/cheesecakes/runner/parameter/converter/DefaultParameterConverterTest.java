@@ -15,12 +15,15 @@ import java.util.Arrays;
 import static java.lang.Byte.MIN_VALUE;
 
 /**
+ * Unit tests for {@link DefaultParameterConverters}.
+ *
  * @author fernando.chovich
  * @since 1.0
  */
 public class DefaultParameterConverterTest {
 
-  public static final String TO_STRING_REPRESENTATION = "TO STRING REPRESENTATION";
+  /** The string representation of an enum. */
+  private static final String TO_STRING_REPRESENTATION = "TO STRING REPRESENTATION";
 
   @Test
   public void stringConverter() {

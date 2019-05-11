@@ -182,6 +182,10 @@ public class ParameterConverterResolverTest {
     verify(this.customConverterExtractor, times(1)).extract(testMethod);
   }
 
+  /**
+   * Checks that the resolver ignores parameter which could not match any custom or default
+   * converter.
+   */
   @Test
   public void ignoresParametersWithoutCustomNorDefaultConverters() {
     final Optional<Parameter.Converter[]> converters;

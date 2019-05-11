@@ -5,6 +5,7 @@ import com.kidsoncoffee.cheesecakes.runner.parameter.ExampleParametersResolver;
 import com.kidsoncoffee.cheesecakes.runner.parameter.converter.ParameterConverterMethodsProvider;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
 import org.mockito.Mockito;
@@ -15,15 +16,25 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * Unit tests of {@link InvokeExampleMethod}.
+ *
  * @author fernando.chovich
  * @since 1.0
  */
 public class InvokeExampleMethodTest {
 
+  /** Indicates if the method {@link #methodReference(String, int)} was invoked. */
   private final AtomicBoolean methodInvoked = new AtomicBoolean(false);
 
+  /** Reset if the method was invoked. See {@link #methodReference(String, int)}. */
+  @Before
+  public void resetMethodInvoked() {
+    this.methodInvoked.set(false);
+  }
+
+  /** Checks that an exception is thrown when no parameters are resolved. */
   @Test
-  public void noParametersResolved() throws Throwable {
+  public void noParametersResolved() {
     final Example.Builder example = new Example.Builder(null, null, null);
     final Method testMethod = retrieveMethod("methodReference");
     final ExampleParametersResolver exampleParametersResolver =
@@ -45,6 +56,12 @@ public class InvokeExampleMethodTest {
             "Unable to invoke test. Incorrect parameters for 'methodReference' in 'class com.kidsoncoffee.cheesecakes.runner.InvokeExampleMethodTest'.");
   }
 
+  /**
+   * Checks that the scenario method is invoked when parameters of the same size and type are
+   * resolved.
+   *
+   * @throws Throwable If any error occurs.
+   */
   @Test
   public void parametersResolved() throws Throwable {
     final Example.Builder example = new Example.Builder(null, null, null);
@@ -64,6 +81,12 @@ public class InvokeExampleMethodTest {
     Assertions.assertThat(this.methodInvoked).isTrue();
   }
 
+  /**
+   * The scenario method used by tests to simulate invocation.
+   *
+   * @param a The first parameter.
+   * @param b The second parameter.
+   */
   public void methodReference(final String a, final int b) {
     this.methodInvoked.set(true);
   }

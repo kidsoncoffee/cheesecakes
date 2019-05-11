@@ -38,12 +38,23 @@ public class ParameterConverterMethodsProvider {
       final String parameterWithoutAnnotation,
       @Parameter.Conversion(DummyConverter.class) final String parameterWithAnnotation) {}
 
+  /**
+   * Method with annotated converters with invalid constructors.
+   *
+   * @param notPublicConverter Parameter with converter with not public constructor.
+   * @param parameterizedConstructor Parameter with converter with converter with parameters.
+   */
   public void invalidModifierConstructor(
       @Parameter.Conversion(InvalidModifierConstructorConverter.class)
           final String notPublicConverter,
       @Parameter.Conversion(InvalidParametersConstructorConverter.class)
           final String parameterizedConstructor) {}
 
+  /**
+   * Method with annotated converters which throws an exception in runtime.
+   *
+   * @param explodes Parameter with converter with constructor that throws an exception.
+   */
   public void explodingConstructor(
       @Parameter.Conversion(ExplodingConstructorConverter.class) final String explodes) {}
 
@@ -75,19 +86,32 @@ public class ParameterConverterMethodsProvider {
     }
   }
 
+  /** Converter with private constructor. */
   public static class InvalidModifierConstructorConverter extends DummyConverter {
+
+    /** Private constructor. */
     private InvalidModifierConstructorConverter() {
       // this should be public
     }
   }
 
+  /** Converter with constructor with parameters. */
   public static class InvalidParametersConstructorConverter extends DummyConverter {
+
+    /**
+     * Constructor with parameter.
+     *
+     * @param parameter The parameter.
+     */
     public InvalidParametersConstructorConverter(final String parameter) {
       // this should not have any parameters
     }
   }
 
+  /** Converter with constructor that throws an exception. */
   public static class ExplodingConstructorConverter extends DummyConverter {
+
+    /** Constructor that throws an exception. */
     public ExplodingConstructorConverter() {
       throw new UnsupportedOperationException("KA BO OM !");
     }
