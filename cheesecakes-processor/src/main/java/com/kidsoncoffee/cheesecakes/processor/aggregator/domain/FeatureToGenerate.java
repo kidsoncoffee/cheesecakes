@@ -1,4 +1,4 @@
-package com.kidsoncoffee.cheesecakes.processor.domain;
+package com.kidsoncoffee.cheesecakes.processor.aggregator.domain;
 
 import org.immutables.value.Value;
 
@@ -9,11 +9,10 @@ import java.util.List;
  * @since 1.0
  */
 @Value.Immutable
-@Value.Style(builder = "feature")
-public interface Feature {
+public interface FeatureToGenerate {
   String getTestClassName();
 
   String getTestClassPackage();
 
-  List<Scenario> getScenarios();
+  List<ScenarioToGenerate> getScenarios();
 }

@@ -1,4 +1,4 @@
-package com.kidsoncoffee.cheesecakes.processor.domain;
+package com.kidsoncoffee.cheesecakes.processor.aggregator.domain;
 
 import org.immutables.value.Value;
 
@@ -9,7 +9,6 @@ import java.util.Map;
  * @since 1.0
  */
 @Value.Immutable
-@Value.Style(builder = "example")
-public interface  Example {
+public interface ExampleToGenerate {
   Map<String, String> getValue();
 }

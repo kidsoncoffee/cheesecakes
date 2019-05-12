@@ -1,11 +1,19 @@
 package com.kidsoncoffee.cheesecakes.processor;
 
 import com.google.auto.service.AutoService;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.kidsoncoffee.cheesecakes.Parameter;
-import com.kidsoncoffee.cheesecakes.processor.domain.Feature;
-import com.kidsoncoffee.cheesecakes.processor.domain.Scenario;
-import com.kidsoncoffee.cheesecakes.processor.generator.ExampleBuilderGenerator;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.FeaturesAggregator;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.FeatureToGenerate;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.ScenarioToGenerate;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.example.ExamplesExtractor;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.example.JavadocParser;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.example.JavadocRetriever;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.example.JavadocValidator;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.group.ParameterGrouping;
 import com.kidsoncoffee.cheesecakes.processor.generator.DataTableExampleGenerator;
+import com.kidsoncoffee.cheesecakes.processor.generator.ExampleBuilderGenerator;
 import com.kidsoncoffee.cheesecakes.processor.generator.ScenarioParametersSchemasGenerator;
 import com.squareup.javapoet.ClassName;
 
@@ -35,27 +43,21 @@ import static javax.lang.model.SourceVersion.RELEASE_8;
 @SupportedSourceVersion(RELEASE_8)
 public class CheesecakesProcessor extends AbstractProcessor {
 
-  private FeaturesAggregator featuresAggregator;
+  @Inject private Types typeUtils;
+  @Inject private Elements elementUtils;
 
-  private ScenarioParametersSchemasGenerator scenarioParametersSchemasGenerator;
-  private ExampleBuilderGenerator exampleBuilderGenerator;
-  private DataTableExampleGenerator dataTableExampleGenerator;
-  private Types typeUtils;
-  private Elements elementUtils;
+  @Inject private FeaturesAggregator featuresAggregator;
+
+  @Inject private ScenarioParametersSchemasGenerator scenarioParametersSchemasGenerator;
+  @Inject private ExampleBuilderGenerator exampleBuilderGenerator;
+  @Inject private DataTableExampleGenerator dataTableExampleGenerator;
+
 
   @Override
-  public synchronized void init(ProcessingEnvironment processingEnv) {
+  public synchronized void init(final ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
 
-    typeUtils = processingEnv.getTypeUtils();
-    elementUtils = processingEnv.getElementUtils();
-
-    // TODO fchovich USE GUAVA
-    this.featuresAggregator = new FeaturesAggregator(processingEnv.getElementUtils());
-    this.scenarioParametersSchemasGenerator =
-        new ScenarioParametersSchemasGenerator(processingEnv.getFiler());
-    this.exampleBuilderGenerator = new ExampleBuilderGenerator(processingEnv.getFiler());
-    this.dataTableExampleGenerator = new DataTableExampleGenerator(processingEnv.getFiler());
+    Guice.createInjector(new CheesecakesProcessorModule(processingEnv)).injectMembers(this);
   }
 
   @Override
@@ -77,10 +79,10 @@ public class CheesecakesProcessor extends AbstractProcessor {
       return false;
     }
 
-    final List<Feature> features = this.featuresAggregator.aggregate(elements);
+    final List<FeatureToGenerate> features = this.featuresAggregator.aggregate(elements);
 
-    for (final Feature feature : features) {
-      final Map<Scenario, ClassName> generatedSchemas =
+    for (final FeatureToGenerate feature : features) {
+      final Map<ScenarioToGenerate, ClassName> generatedSchemas =
           this.scenarioParametersSchemasGenerator.generate(feature);
       this.exampleBuilderGenerator.generate(feature, generatedSchemas);
       this.dataTableExampleGenerator.generate(feature, generatedSchemas);

@@ -1,10 +1,12 @@
 package com.kidsoncoffee.cheesecakes.processor.generator;
 
+import com.google.inject.Inject;
+import com.kidsoncoffee.cheesecakes.Parameter;
 import com.kidsoncoffee.cheesecakes.Parameter.SchemaSource;
 import com.kidsoncoffee.cheesecakes.Scenario.StepType;
-import com.kidsoncoffee.cheesecakes.processor.domain.Feature;
-import com.kidsoncoffee.cheesecakes.processor.domain.Parameter;
-import com.kidsoncoffee.cheesecakes.processor.domain.Scenario;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.FeatureToGenerate;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.ParameterToGenerate;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.ScenarioToGenerate;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -39,19 +41,20 @@ public class ScenarioParametersSchemasGenerator {
 
   private final Filer filer;
 
+  @Inject
   public ScenarioParametersSchemasGenerator(final Filer filer) {
     this.filer = filer;
   }
 
-  public Map<Scenario, ClassName> generate(final Feature feature) {
+  public Map<ScenarioToGenerate, ClassName> generate(final FeatureToGenerate feature) {
     final ClassName schemaSourceClassName =
         ClassName.get(
             feature.getTestClassPackage(),
             format("%s_%s", feature.getTestClassName(), SchemaSource.class.getSimpleName()));
 
     final List<TypeSpec> innerClasses = new ArrayList<>();
-    final Map<Scenario, ClassName> generatedClassNames = new HashMap<>();
-    for (Scenario scenario : feature.getScenarios()) {
+    final Map<ScenarioToGenerate, ClassName> generatedClassNames = new HashMap<>();
+    for (ScenarioToGenerate scenario : feature.getScenarios()) {
       //      final AnnotationSpec bindingAnnotation = createSchemaBindingAnnotation(feature,
       // scenario);
       final Pair<ClassName, TypeSpec> schemaEnum =
@@ -60,7 +63,7 @@ public class ScenarioParametersSchemasGenerator {
       generatedClassNames.put(scenario, schemaEnum.getLeft());
     }
 
-    final TypeSpec featureClass =
+    final TypeSpec schemaSourceClass =
         TypeSpec.classBuilder(schemaSourceClassName)
             .addSuperinterface(TypeName.get(SchemaSource.class))
             .addTypes(innerClasses)
@@ -68,12 +71,13 @@ public class ScenarioParametersSchemasGenerator {
 
     try {
       // TODO fchovich ADD COMMENTS TO GENERATED CLASS
-      JavaFile.builder(feature.getTestClassPackage(), featureClass)
+      JavaFile.builder(feature.getTestClassPackage(), schemaSourceClass)
           .addStaticImport(Arrays.class, "asList")
           .build()
           .writeTo(this.filer);
     } catch (IOException e) {
-      throw new UncheckedIOException(format("Error generating '%s'.", Feature.class), e);
+      throw new UncheckedIOException(
+          format("Error generating '%s'.", Parameter.SchemaSource.class), e);
     }
     return generatedClassNames;
   }
@@ -87,7 +91,7 @@ public class ScenarioParametersSchemasGenerator {
   //  }
 
   private static Pair<ClassName, TypeSpec> createSchemaEnumConstant(
-      final ClassName featureClassName, final Scenario def) {
+      final ClassName featureClassName, final ScenarioToGenerate def) {
     final String scenarioName = WordUtils.capitalize(def.getTestMethod());
 
     final ParameterSpec nameParameter =
@@ -155,7 +159,7 @@ public class ScenarioParametersSchemasGenerator {
   }
 
   private static TypeSpec.Builder createParameterSchemaConstant(
-      final TypeSpec.Builder enumBuilder, final Parameter r) {
+      final TypeSpec.Builder enumBuilder, final ParameterToGenerate r) {
     return enumBuilder.addEnumConstant(
         r.getName().toUpperCase(),
         TypeSpec.anonymousClassBuilder(

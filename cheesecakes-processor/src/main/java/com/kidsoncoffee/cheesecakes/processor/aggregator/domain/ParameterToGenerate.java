@@ -1,4 +1,4 @@
-package com.kidsoncoffee.cheesecakes.processor.domain;
+package com.kidsoncoffee.cheesecakes.processor.aggregator.domain;
 
 import com.kidsoncoffee.cheesecakes.Scenario.StepType;
 import org.immutables.value.Value;
@@ -10,8 +10,7 @@ import javax.lang.model.type.TypeMirror;
  * @since 1.0
  */
 @Value.Immutable
-@Value.Style(builder = "parameter")
-public interface Parameter {
+public interface ParameterToGenerate {
   String getName();
 
   TypeMirror getType();

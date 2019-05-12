@@ -19,10 +19,10 @@ public class MyDataDrivenExampleTest {
    * <pre>
    * Examples:
    *
-   * firstName | lastName || completeName
-   * --------- | -------- || --------------
-   * John      | Doe      || John Doe
-   * Exene     | Cervenka || Exene Cervenka
+   * firstName | lastName | completeName
+   * --------- | -------- | --------------
+   * John      | Doe      | John Doe
+   * Exene     | Cervenka | Exene Cervenka
    * </pre>
    */
   @Test

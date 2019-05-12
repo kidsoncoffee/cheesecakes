@@ -1,8 +1,10 @@
 package com.kidsoncoffee.cheesecakes.processor.generator;
 
+import com.google.inject.Inject;
 import com.kidsoncoffee.cheesecakes.Example;
-import com.kidsoncoffee.cheesecakes.processor.domain.Feature;
-import com.kidsoncoffee.cheesecakes.processor.domain.Scenario;
+import com.kidsoncoffee.cheesecakes.Feature;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.FeatureToGenerate;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.ScenarioToGenerate;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -30,11 +32,13 @@ public class DataTableExampleGenerator {
 
   private final Filer filer;
 
+  @Inject
   public DataTableExampleGenerator(final Filer filer) {
     this.filer = filer;
   }
 
-  public void generate(final Feature feature, Map<Scenario, ClassName> generatedSchemas) {
+  public void generate(
+      final FeatureToGenerate feature, Map<ScenarioToGenerate, ClassName> generatedSchemas) {
     final String scenariosClassName =
         format("%s_%s", feature.getTestClassName(), Example.Source.class.getSimpleName());
     final ClassName scenariosType =
@@ -61,7 +65,7 @@ public class DataTableExampleGenerator {
   }
 
   private static List<MethodSpec> generateSuppliers(
-      final Feature feature, final Map<Scenario, ClassName> generatedSchemas) {
+      final FeatureToGenerate feature, final Map<ScenarioToGenerate, ClassName> generatedSchemas) {
     return feature.getScenarios().stream()
         .filter(scenario -> !scenario.getExamples().isEmpty())
         .map(scenario -> generateSupplier(feature, scenario, generatedSchemas.get(scenario)))
@@ -70,7 +74,9 @@ public class DataTableExampleGenerator {
   }
 
   private static List<MethodSpec> generateSupplier(
-      final Feature feature, final Scenario scenario, final ClassName generatedSchema) {
+      final FeatureToGenerate feature,
+      final ScenarioToGenerate scenario,
+      final ClassName generatedSchema) {
 
     final List<Pair<String, MethodSpec>> examples =
         IntStream.range(0, scenario.getExamples().size())
@@ -81,8 +87,8 @@ public class DataTableExampleGenerator {
   }
 
   private static Pair<String, MethodSpec> createExampleMethod(
-      final Feature feature,
-      final Scenario scenario,
+      final FeatureToGenerate feature,
+      final ScenarioToGenerate scenario,
       final ClassName generatedSchema,
       final int id) {
     final String methodName = format("%s_%s", scenario.getTestMethod(), id);

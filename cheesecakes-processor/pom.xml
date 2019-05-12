@@ -6,7 +6,7 @@
 
     <groupId>com.kidsoncoffee.cheesecakes</groupId>
     <artifactId>cheesecakes-processor</artifactId>
-    
+
     <parent>
         <artifactId>cheesecakes</artifactId>
         <groupId>com.kidsoncoffee</groupId>
@@ -40,6 +40,22 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
     </dependencies>
 </project>

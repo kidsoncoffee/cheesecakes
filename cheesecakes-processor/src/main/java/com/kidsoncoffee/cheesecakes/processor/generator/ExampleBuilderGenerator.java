@@ -1,9 +1,11 @@
 package com.kidsoncoffee.cheesecakes.processor.generator;
 
+import com.google.inject.Inject;
 import com.kidsoncoffee.cheesecakes.Example;
-import com.kidsoncoffee.cheesecakes.processor.domain.Feature;
-import com.kidsoncoffee.cheesecakes.processor.domain.Parameter;
-import com.kidsoncoffee.cheesecakes.processor.domain.Scenario;
+import com.kidsoncoffee.cheesecakes.Feature;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.FeatureToGenerate;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.ParameterToGenerate;
+import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.ScenarioToGenerate;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -40,14 +42,15 @@ public class ExampleBuilderGenerator {
 
   private final Filer filer;
 
+  @Inject
   public ExampleBuilderGenerator(final Filer filer) {
     this.filer = filer;
   }
 
   private static TypeSpec createScenarioParameterBuilder(
       final ClassName scenariosType,
-      final Feature feature,
-      final Scenario definition,
+      final FeatureToGenerate feature,
+      final ScenarioToGenerate definition,
       final ClassName generatedSchema) {
     // DEFINE NAMES
 
@@ -123,7 +126,7 @@ public class ExampleBuilderGenerator {
       final ClassName scenarioClassName,
       final ClassName expectationsClassName,
       final FieldSpec expectationsField,
-      final List<Parameter> parameters) {
+      final List<ParameterToGenerate> parameters) {
     final TypeSpec.Builder requisites =
         createScenarioBlockType(scenarioClassName, blockClassName, parameters);
 
@@ -137,13 +140,17 @@ public class ExampleBuilderGenerator {
   }
 
   private static TypeSpec createExpectationsType(
-      final ClassName scenarioType, final ClassName stepType, final List<Parameter> parameters) {
+      final ClassName scenarioType,
+      final ClassName stepType,
+      final List<ParameterToGenerate> parameters) {
     final TypeSpec.Builder requisites = createScenarioBlockType(scenarioType, stepType, parameters);
     return requisites.build();
   }
 
   private static TypeSpec.Builder createScenarioBlockType(
-      final ClassName scenarioType, final ClassName stepType, final List<Parameter> parameters) {
+      final ClassName scenarioType,
+      final ClassName stepType,
+      final List<ParameterToGenerate> parameters) {
     final List<FieldSpec> fields = new ArrayList<>();
 
     final List<MethodSpec> parameterSetters =
@@ -193,34 +200,35 @@ public class ExampleBuilderGenerator {
     return setter;
   }
 
-  public void generate(final Feature feature, final Map<Scenario, ClassName> generatedSchemas) {
-    final ClassName featureClassName =
+  public void generate(
+      final FeatureToGenerate feature, final Map<ScenarioToGenerate, ClassName> generatedSchemas) {
+    final ClassName exampleClassName =
         ClassName.get(
             feature.getTestClassPackage(),
             format("%s_%s", feature.getTestClassName(), Example.Builder.class.getSimpleName()));
 
     final List<TypeSpec> innerClasses = new ArrayList<>();
-    for (final Scenario scenario : feature.getScenarios()) {
+    for (final ScenarioToGenerate scenario : feature.getScenarios()) {
       final TypeSpec specificationClass =
           createScenarioParameterBuilder(
-              featureClassName, feature, scenario, generatedSchemas.get(scenario));
+              exampleClassName, feature, scenario, generatedSchemas.get(scenario));
       innerClasses.add(specificationClass);
     }
 
-    final TypeSpec featureClass =
-        TypeSpec.classBuilder(featureClassName)
-            .addSuperinterface(TypeName.get(com.kidsoncoffee.cheesecakes.Feature.class))
+    final TypeSpec exampleClass =
+        TypeSpec.classBuilder(exampleClassName)
+            .addSuperinterface(TypeName.get(Feature.class))
             .addTypes(innerClasses)
             .build();
 
     try {
       // TODO fchovich ADD COMMENTS TO GENERATED CLASS
-      JavaFile.builder(feature.getTestClassPackage(), featureClass)
+      JavaFile.builder(feature.getTestClassPackage(), exampleClass)
           .addStaticImport(Arrays.class, "asList")
           .build()
           .writeTo(this.filer);
     } catch (IOException e) {
-      throw new UncheckedIOException(format("Error generating '%s'.", Feature.class), e);
+      throw new UncheckedIOException(format("Error generating '%s'.", Example.Builder.class), e);
     }
   }
 }

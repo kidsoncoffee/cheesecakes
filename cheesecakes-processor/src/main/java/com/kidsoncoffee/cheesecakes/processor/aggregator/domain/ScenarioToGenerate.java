@@ -1,4 +1,4 @@
-package com.kidsoncoffee.cheesecakes.processor.domain;
+package com.kidsoncoffee.cheesecakes.processor.aggregator.domain;
 
 import org.immutables.value.Value;
 
@@ -10,26 +10,25 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @Value.Immutable
-@Value.Style(builder = "scenario")
-public interface Scenario {
+public interface ScenarioToGenerate {
   String getTestMethod();
 
-  List<Parameter> getParameters();
+  List<ParameterToGenerate> getParameters();
 
-  List<Example> getExamples();
+  List<ExampleToGenerate> getExamples();
 
   @Value.Default
-  default List<Parameter> getRequisites() {
+  default List<ParameterToGenerate> getRequisites() {
     return this.getParameters(com.kidsoncoffee.cheesecakes.Scenario.StepType.REQUISITE);
   }
 
   @Value.Default
-  default List<Parameter> getExpectations() {
+  default List<ParameterToGenerate> getExpectations() {
     return this.getParameters(com.kidsoncoffee.cheesecakes.Scenario.StepType.EXPECTATION);
   }
 
   @Value.Default
-  default List<Parameter> getParameters(
+  default List<ParameterToGenerate> getParameters(
       final com.kidsoncoffee.cheesecakes.Scenario.StepType stepType) {
     return this.getParameters().stream()
         .filter(p -> p.getStepType().equals(stepType))
