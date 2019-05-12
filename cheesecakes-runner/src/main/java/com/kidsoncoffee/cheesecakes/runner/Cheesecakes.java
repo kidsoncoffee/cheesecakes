@@ -1,15 +1,16 @@
 package com.kidsoncoffee.cheesecakes.runner;
 
+import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.kidsoncoffee.cheesecakes.runner.domain.ScenarioRunner;
-import com.kidsoncoffee.cheesecakes.runner.example.ClassExamplesLoader;
-import com.kidsoncoffee.cheesecakes.runner.example.FieldExamplesLoader;
 import org.junit.runner.Runner;
 import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author fernando.chovich
@@ -17,24 +18,19 @@ import java.util.stream.Collectors;
  */
 public class Cheesecakes extends Suite {
 
-  private final ScenarioRunnerCreator scenarioRunnerCreator;
+  @Inject private ScenarioRunnerCreator scenarioRunnerCreator;
 
   private final List<Runner> runners;
 
   public Cheesecakes(final Class<?> klass) throws InitializationError {
     super(klass, Collections.emptyList());
 
-    // TODO fchovich USE GUAVA
-    final ClassExamplesLoader classExamplesLoader = new ClassExamplesLoader();
-    final FieldExamplesLoader fieldExamplesLoader = new FieldExamplesLoader();
-    this.scenarioRunnerCreator =
-        new ScenarioRunnerCreator(classExamplesLoader, fieldExamplesLoader);
+    Guice.createInjector(new CheesecakesRunnerModule()).injectMembers(this);
 
-    this.runners =
-        createTestCaseRunners().stream().map(Runner.class::cast).collect(Collectors.toList());
+    this.runners = this.createRunner().stream().map(Runner.class::cast).collect(toList());
   }
 
-  private List<ScenarioRunner> createTestCaseRunners() throws InitializationError {
+  private List<ScenarioRunner> createRunner() throws InitializationError {
     return this.scenarioRunnerCreator.create(this.getTestClass());
   }
 

@@ -12,6 +12,7 @@ import static java.util.Collections.emptyList;
  * @author fernando.chovich
  * @since 1.0
  */
+@SuppressWarnings("PMD.UnusedPrivateMethod")
 public class ExampleFieldsProvider {
 
   /** Invalid example field (Missing static modifier). */
