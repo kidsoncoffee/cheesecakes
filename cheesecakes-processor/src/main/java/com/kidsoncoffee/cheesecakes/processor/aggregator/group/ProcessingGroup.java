@@ -29,22 +29,26 @@ public class ProcessingGroup {
 
   public List<FeatureElements> getFeatures() {
     return this.group.rowMap().entrySet().stream()
-        .map(ProcessingGroup::convertToFeatureElements)
+        .map(ProcessingGroup::createFeatureElements)
         .collect(Collectors.toList());
   }
 
-  private static FeatureElements convertToFeatureElements(
+  private static FeatureElements createFeatureElements(
       final Map.Entry<Element, Map<Element, List<Element>>> featureGroup) {
     return featureElements()
         .feature(featureGroup.getKey())
-        .scenarios(
-            featureGroup.getValue().entrySet().stream()
-                .map(ProcessingGroup::convertToScenarioElements)
-                .collect(Collectors.toList()))
+        .scenarios(createScenarioElements(featureGroup.getValue()))
         .build();
   }
 
-  private static ScenarioElements convertToScenarioElements(
+  private static List<ScenarioElements> createScenarioElements(
+      final Map<Element, List<Element>> featureGroup) {
+    return featureGroup.entrySet().stream()
+        .map(ProcessingGroup::createScenarioElements)
+        .collect(Collectors.toList());
+  }
+
+  private static ScenarioElements createScenarioElements(
       final Map.Entry<Element, List<Element>> scenarioGroup) {
     return scenarioElements()
         .scenario(scenarioGroup.getKey())

@@ -7,11 +7,6 @@ import com.kidsoncoffee.cheesecakes.Parameter;
 import com.kidsoncoffee.cheesecakes.processor.aggregator.FeaturesAggregator;
 import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.FeatureToGenerate;
 import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.ScenarioToGenerate;
-import com.kidsoncoffee.cheesecakes.processor.aggregator.example.ExamplesExtractor;
-import com.kidsoncoffee.cheesecakes.processor.aggregator.example.JavadocParser;
-import com.kidsoncoffee.cheesecakes.processor.aggregator.example.JavadocRetriever;
-import com.kidsoncoffee.cheesecakes.processor.aggregator.example.JavadocValidator;
-import com.kidsoncoffee.cheesecakes.processor.aggregator.group.ParameterGrouping;
 import com.kidsoncoffee.cheesecakes.processor.generator.DataTableExampleGenerator;
 import com.kidsoncoffee.cheesecakes.processor.generator.ExampleBuilderGenerator;
 import com.kidsoncoffee.cheesecakes.processor.generator.ScenarioParametersSchemasGenerator;
@@ -51,7 +46,6 @@ public class CheesecakesProcessor extends AbstractProcessor {
   @Inject private ScenarioParametersSchemasGenerator scenarioParametersSchemasGenerator;
   @Inject private ExampleBuilderGenerator exampleBuilderGenerator;
   @Inject private DataTableExampleGenerator dataTableExampleGenerator;
-
 
   @Override
   public synchronized void init(final ProcessingEnvironment processingEnv) {

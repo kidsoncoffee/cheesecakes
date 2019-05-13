@@ -204,8 +204,7 @@ public class ExampleBuilderGenerator {
       final FeatureToGenerate feature, final Map<ScenarioToGenerate, ClassName> generatedSchemas) {
     final ClassName exampleClassName =
         ClassName.get(
-            feature.getTestClassPackage(),
-            format("%s_%s", feature.getTestClassName(), Example.Builder.class.getSimpleName()));
+            feature.getTestClassPackage(), format("%s_ExampleBuilder", feature.getTestClassName()));
 
     final List<TypeSpec> innerClasses = new ArrayList<>();
     for (final ScenarioToGenerate scenario : feature.getScenarios()) {

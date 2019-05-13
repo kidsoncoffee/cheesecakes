@@ -50,7 +50,7 @@ public class ScenarioParametersSchemasGenerator {
     final ClassName schemaSourceClassName =
         ClassName.get(
             feature.getTestClassPackage(),
-            format("%s_%s", feature.getTestClassName(), SchemaSource.class.getSimpleName()));
+            format("%s_ParameterSchemaSource", feature.getTestClassName()));
 
     final List<TypeSpec> innerClasses = new ArrayList<>();
     final Map<ScenarioToGenerate, ClassName> generatedClassNames = new HashMap<>();

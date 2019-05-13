@@ -60,12 +60,14 @@ public class JavadocValidator {
     return Arrays.stream(StringUtils.split(scenarioJavadocLines.get(0), "|"))
         .map(String::trim)
         .filter(p -> !parameterNames.contains(p))
-        .map(
-            name ->
-                format(
-                    "The data table column '%s' does not match any scenario method parameter. Available: %s.",
-                    name, parameterNames))
+        .map(name -> createHeaderValidationException(parameterNames, name))
         .findFirst();
+  }
+
+  private static String createHeaderValidationException(List<String> parameterNames, String name) {
+    return format(
+        "The data table column '%s' does not match any scenario method parameter. Available: %s.",
+        name, parameterNames);
   }
 
   private static String validateNumberOfParameters(

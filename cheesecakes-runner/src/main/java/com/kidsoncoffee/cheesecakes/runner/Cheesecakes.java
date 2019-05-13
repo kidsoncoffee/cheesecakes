@@ -6,10 +6,12 @@ import com.kidsoncoffee.cheesecakes.runner.domain.ScenarioRunner;
 import org.junit.runner.Runner;
 import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
+import org.junit.validator.TestClassValidator;
 
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -19,6 +21,8 @@ import static java.util.stream.Collectors.toList;
 public class Cheesecakes extends Suite {
 
   @Inject private ScenarioRunnerCreator scenarioRunnerCreator;
+
+  @Inject private List<TestClassValidator> validators;
 
   private final List<Runner> runners;
 
@@ -37,5 +41,15 @@ public class Cheesecakes extends Suite {
   @Override
   protected List<Runner> getChildren() {
     return this.runners;
+  }
+
+  @Override
+  protected void collectInitializationErrors(final List<Throwable> errors) {
+    super.collectInitializationErrors(errors);
+
+    this.validators.stream()
+        .map(validator -> validator.validateTestClass(this.getTestClass()))
+        .map(Throwable.class::cast)
+        .collect(toCollection(() -> errors));
   }
 }

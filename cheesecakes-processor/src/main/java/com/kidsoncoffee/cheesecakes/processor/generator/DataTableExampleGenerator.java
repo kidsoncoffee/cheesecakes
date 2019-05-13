@@ -39,8 +39,7 @@ public class DataTableExampleGenerator {
 
   public void generate(
       final FeatureToGenerate feature, Map<ScenarioToGenerate, ClassName> generatedSchemas) {
-    final String scenariosClassName =
-        format("%s_%s", feature.getTestClassName(), Example.Source.class.getSimpleName());
+    final String scenariosClassName = format("%s_ExampleSource", feature.getTestClassName());
     final ClassName scenariosType =
         ClassName.get(feature.getTestClassPackage(), scenariosClassName);
 
