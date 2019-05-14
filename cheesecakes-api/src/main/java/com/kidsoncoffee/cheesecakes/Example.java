@@ -27,7 +27,6 @@ public @interface Example {
     private final Class featureClass;
     private final String scenarioMethodName;
     private final List<Parameter.Schema> schema;
-
     private final Map<String, Object> values;
 
     public Builder(

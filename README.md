@@ -268,10 +268,10 @@ As shown in the *Quickstart*, data tables are probably the most effective way fo
  * <pre>                                                    // Pre-formatted text prevents the IDE from formatting
  * Examples:                                                // Mandatory line with the keyword Examples:
  *                                                          // Empty lines are ignored
- * requisiteA | requisiteB || expectationA | expectationB   // The data table header row
- * ---------- | ---------- || ------------ | ------------   // The data table separator row
- * 1          | 2          || A            | B              // The first example
- * 3          | 4          || X            | Y              // The second example
+ * requisiteA | requisiteB | expectationA | expectationB   // The data table header row
+ * ---------- | ---------- | ------------ | ------------   // The data table separator row
+ * 1          | 2          | A            | B              // The first example
+ * 3          | 4          | X            | Y              // The second example
  * </pre>
  */                                                         
 ```
@@ -282,7 +282,6 @@ The example are written on the *Scenario* method *Javadoc*, but needs to follow 
 * The data table should contain a *header row*, a *separator row* and at least one *example row*.
 * The data table columns should be separated by:
   * A single pipe symbol (`|`) for all values, except for the case below.
-  * A double pipe symbol (`||`) for requisites, on the left, and expectations, on the right.
 * The data table should have the same number of columns
 
 Optionally but recommended, wrap all above in `<pre>` tags, so you can control formatting.
@@ -295,53 +294,57 @@ During the annotation processing phase in the build, some classes are auto gener
 
 For example, for the *Feature* class in the *Quickstart*, the same *Examples* could be written like this:
 
-```diff
-import com.kidsoncoffee.cheesecakes.Cheesecakes;
-+ import static MyTestExampleParameters.Tests.given;
+```java
+package examples;
 
+import com.kidsoncoffee.cheesecakes.Example;
+import com.kidsoncoffee.cheesecakes.Parameter.Expectation;
+import com.kidsoncoffee.cheesecakes.Parameter.Requisite;
+import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
+import examples.MyProgrammaticallyExampleTest_ExampleBuilder.ConcatenatesSuccessfully;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+/**
+ * @author fernando.chovich
+ * @since 1.0
+ */
 @RunWith(Cheesecakes.class)
-public class MyTest {
-  
-+  private static final Example JOHN_DOE_EXAMPLE = given()
-+                                                    .firstName("John")
-+                                                    .lastName("Doe")
-+                                                    .then()
-+                                                      .completeName("John Doe");
-                                                                      
-+  private static final Example EXENE_CERVENKA_EXAMPLE = given()
-+                                                          .firstName("Exene")
-+                                                          .lastName("Cervenka")
-+                                                          .then()
-+                                                            .completeName("Exene Cervenka");
-   
-  /**
-   * Checks that the first and last name are concatenated correctly.
--   *
--   * <pre>
--   * Examples:
--   * 
--   * firstName | lastName || completeName
--   * --------- | -------- || --------------
--   * John      | Doe      || John Doe
--   * Exene     | Cervenka || Exene Cervenka
--   * </pre>
-   */
+public class MyProgrammaticallyExampleTest {
+
+  private static Example.Builder JOHN_DOE_EXAMPLE =
+      ConcatenatesSuccessfully.given()
+          .firstName("John")
+          .lastName("Doe")
+          .then()
+          .completeName("John Doe")
+          .getExample();
+
+  private static Example.Builder EXENE_CERVENKA_EXAMPLE =
+      ConcatenatesSuccessfully.given()
+          .firstName("Exene")
+          .lastName("Cervenka")
+          .then()
+          .completeName("Exene Cervenka")
+          .getExample();
+
   @Test
-  public void test(@Requisites   final String firstName, 
-                   @Requisites   final String lastName, 
-                   @Expectations final String completeName){
-    final String actualCompletaName;
-    
+  public void concatenatesSuccessfully(
+      @Requisite final String firstName,
+      @Requisite final String lastName,
+      @Expectation final String completeName) {
+    final String actualCompleteName;
+
     when:
-    actualCompleteName = String.format("%s %s", firstName, lastName); 
-    
+    actualCompleteName = String.format("%s %s", firstName, lastName);
+
     then:
     assert actualCompleteName.equals(completeName);
-  } 
+  }
 }
 ```
 
-An auto-generated *Example* class can be instantiated following the pattern: `<NAME_OF_THE_FEATURE_CLASS>ExampleParameters.<NAME_OF_THE_SCENARIO_METHOD>.given()`. For example, looking at the example above, for the *Feature* class **MyTest** and *Scenario* method **test**, an *Example* class is instantiated with **MyTestExampleParameters.Test.given()**. Note that the *Scenario* method equivalent in the *Example* class is in *Pascal Case*.
+An auto-generated *Example* class can be instantiated following the pattern: `<NAME_OF_THE_FEATURE_CLASS>_ExampleBuilder.<NAME_OF_THE_SCENARIO_METHOD>.given()`. For example, looking at the example above, for the *Feature* class **MyTest** and *Scenario* method **test**, an *Example* class is instantiated with **MyProgrammaticallyExampleTest_ExampleBuilder.ConcatenatesSuccessfully.given()**. Note that the *Scenario* method equivalent in the *Example* class is in *Pascal Case*.
 
 It is required that the *Example* field in the *Feature* class is declared as **static**.
 
@@ -399,97 +402,6 @@ public class MyTest {
 ```
 
 You can also use the `Examples.examples` aggregator to have only one *Example* static field declared. Even though that may turn into identation hell in some cases, it might help legibility in others.
-
-##### Binding *Examples* to *Scenarios*
-
-It is possible to have more than one *Scenario* method in a *Feature* class, but if you are defining your *Examples* programmatically you'll need to add a binding annotation to both the *Example* and *Scenario*.
-
-###### Binding by *String* identification
-
-```diff
-import com.kidsoncoffee.cheesecakes.Cheesecakes;
-import static MyTestExampleParameters.Tests.given;
-
-@RunWith(Cheesecakes.class)
-public class MyTest {
-  
-+  @Scenario(binding="successfulConcatenation")
-  private static final Example JOHN_DOE_EXAMPLE = given()
-                                                    .firstName("John")
-                                                    .lastName("Doe")
-                                                    .then()
-                                                      .completeName("John Doe");
-        
-+  @Scenario(binding="successfulConcatenation")
-  private static final Example EXENE_CERVENKA_EXAMPLE = given()
-                                                          .firstName("Exene")
-                                                          .lastName("Cervenka")
-                                                          .then()
-                                                            .completeName("Exene Cervenka");
-   
-  /**
-   * Checks that the first and last name are concatenated correctly.
-   */
-  @Test
-+  @Scenario(binding="successfulConcatenation")
-  public void test(@Requisites   final String firstName, 
-                   @Requisites   final String lastName, 
-                   @Expectations final String completeName){
-    final String actualCompletaName;
-    
-    when:
-    actualCompleteName = String.format("%s %s", firstName, lastName); 
-    
-    then:
-    assert actualCompleteName.equals(completeName);
-  } 
-}
-```
-
-This solution may add too much configuration boilerplate, which may become messy as the *Feature* class evolve.
-
-###### Binding by *enum*
-
-```diff
-import com.kidsoncoffee.cheesecakes.Cheesecakes;
-import static MyTestExampleParameters.Tests.given;
-
-@RunWith(Cheesecakes.class)
-public class MyTest {
-  
-+  @Scenario(bindingScenario=MyTestScenarioBindings.TEST)
-  private static final Example JOHN_DOE_EXAMPLE = given()
-                                                    .firstName("John")
-                                                    .lastName("Doe")
-                                                    .then()
-                                                      .completeName("John Doe");
-        
-+  @Scenario(bindingScenario=MyTestScenarioBindings.TEST)
-  private static final Example EXENE_CERVENKA_EXAMPLE = given()
-                                                          .firstName("Exene")
-                                                          .lastName("Cervenka")
-                                                          .then()
-                                                            .completeName("Exene Cervenka");
-   
-  /**
-   * Checks that the first and last name are concatenated correctly.
-   */
-  @Test
-  public void test(@Requisite   final String firstName,
-                   @Requisite   final String lastName,
-                   @Expectation final String completeName){
-    final String actualCompletaName;
-    
-    when:
-    actualCompleteName = String.format("%s %s", firstName, lastName); 
-    
-    then:
-    assert actualCompleteName.equals(completeName);
-  } 
-}
-```
-
-Note that there is no scenario binding information in the *Scenario* method and the *Examples* are passing an *enum* to its `@Scenario` annotation. This is another auto-generated class which lists all *Scenarios* in a *Feature*. This *enum* can be accessed with the pattern `<NAME_OF_THE_FEATURE_CLASS>ScenarioBindings`. For example, looking at the example above for the *Feature* class **MyTest** and the *Scenario* method **test**, a *Scenario Bindings* enum value can be accessed with **MyTestScenarioBindings.TEST**. Note that the *Scenario* method equivalent in the *Scenario Bindings* enum is in *Snake Case*.
 
 ### Parameters injection
 

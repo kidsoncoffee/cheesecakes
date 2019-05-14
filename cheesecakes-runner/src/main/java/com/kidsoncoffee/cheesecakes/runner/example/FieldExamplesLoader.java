@@ -46,6 +46,7 @@ public class FieldExamplesLoader implements ExamplesLoader {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .filter(example -> example.getFeatureClass().equals(featureClass))
+        // TODO fchovich ADD LOGGER INFO
         .collect(Collectors.toList());
   }
 

@@ -31,7 +31,7 @@ public class JavadocValidator {
       return Optional.of("Empty data table for the scenario.");
     }
 
-    if (scenarioJavadocLines.size() <= 3) {
+    if (scenarioJavadocLines.size() <= 2) {
       return Optional.of(
           "The data table should contain a header row, a separator row and at least one example row.");
     }

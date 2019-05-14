@@ -4,11 +4,10 @@ import com.kidsoncoffee.cheesecakes.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Optional;
-
-import static java.lang.reflect.Modifier.isPublic;
 
 /**
  * Provides an implementation of {@link ParameterConverterExtractor} that extracts {@link
@@ -55,19 +54,20 @@ public class CustomConverterExtractor implements ParameterConverterExtractor<Met
           parameter.getAnnotation(Parameter.Conversion.class).value();
 
       final boolean publicNoParameters =
-          Arrays.stream(converter.getDeclaredConstructors())
-              .anyMatch(c -> isPublic(c.getModifiers()) && c.getParameterCount() == 0);
+          Arrays.stream(converter.getConstructors()).anyMatch(c -> c.getParameterCount() == 0);
 
       if (!publicNoParameters) {
         LOGGER.error(
-            "The custom converter '{}' for '{}' must have one public constructor with zero parameters.",
+            "The custom converter '{}' for '{}' must have one constructor with zero parameters.",
             converter,
             parameter.getDeclaringExecutable().getName());
         return Optional.empty();
       }
 
       try {
-        return Optional.of(converter.newInstance());
+        final Constructor<? extends Parameter.Converter> constructor = converter.getConstructor();
+        constructor.setAccessible(true);
+        return Optional.of(constructor.newInstance());
       } catch (Throwable e) {
         LOGGER.error(
             "Error instantiating the custom converter '{}' for '{}'.",
