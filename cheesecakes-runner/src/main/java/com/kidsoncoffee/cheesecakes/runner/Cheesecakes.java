@@ -8,10 +8,11 @@ import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 import org.junit.validator.TestClassValidator;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -22,7 +23,7 @@ public class Cheesecakes extends Suite {
 
   @Inject private ScenarioRunnerCreator scenarioRunnerCreator;
 
-  @Inject private List<TestClassValidator> validators;
+  @Inject private Set<TestClassValidator> validators;
 
   private final List<Runner> runners;
 
@@ -31,7 +32,21 @@ public class Cheesecakes extends Suite {
 
     Guice.createInjector(new CheesecakesRunnerModule()).injectMembers(this);
 
+    this.validateTestClass();
+
     this.runners = this.createRunner().stream().map(Runner.class::cast).collect(toList());
+  }
+
+  private final void validateTestClass() throws InitializationError {
+    final List<Throwable> errors =
+        this.validators.stream()
+            .map(validator -> validator.validateTestClass(this.getTestClass()))
+            .flatMap(Collection::stream)
+            .map(Throwable.class::cast)
+            .collect(toList());
+    if (!errors.isEmpty()) {
+      throw new InitializationError(errors);
+    }
   }
 
   private List<ScenarioRunner> createRunner() throws InitializationError {
@@ -41,15 +56,5 @@ public class Cheesecakes extends Suite {
   @Override
   protected List<Runner> getChildren() {
     return this.runners;
-  }
-
-  @Override
-  protected void collectInitializationErrors(final List<Throwable> errors) {
-    super.collectInitializationErrors(errors);
-
-    this.validators.stream()
-        .map(validator -> validator.validateTestClass(this.getTestClass()))
-        .map(Throwable.class::cast)
-        .collect(toCollection(() -> errors));
   }
 }

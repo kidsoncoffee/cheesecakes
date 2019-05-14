@@ -2,10 +2,11 @@ package com.kidsoncoffee.cheesecakes.runner;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import com.kidsoncoffee.cheesecakes.runner.example.ClassExamplesLoader;
+import com.kidsoncoffee.cheesecakes.runner.example.ExamplesLoader;
+import com.kidsoncoffee.cheesecakes.runner.example.FieldExamplesLoader;
 import com.kidsoncoffee.cheesecakes.runner.validator.AllParametersAreAnnotatedValidator;
 import org.junit.validator.TestClassValidator;
-
-import static com.google.inject.multibindings.Multibinder.newSetBinder;
 
 /**
  * @author fernando.chovich
@@ -17,8 +18,13 @@ public class CheesecakesRunnerModule extends AbstractModule {
   protected void configure() {
     super.configure();
 
-    final Multibinder<TestClassValidator> testClassValidators =
-        newSetBinder(binder(), TestClassValidator.class);
-    testClassValidators.addBinding().to(AllParametersAreAnnotatedValidator.class);
+    final Multibinder<ExamplesLoader> examplesLoaderMultibinder =
+        Multibinder.newSetBinder(binder(), ExamplesLoader.class);
+    examplesLoaderMultibinder.addBinding().to(FieldExamplesLoader.class);
+    examplesLoaderMultibinder.addBinding().to(ClassExamplesLoader.class);
+
+    final Multibinder<TestClassValidator> testClassValidatorMultibinder =
+        Multibinder.newSetBinder(binder(), TestClassValidator.class);
+    testClassValidatorMultibinder.addBinding().to(AllParametersAreAnnotatedValidator.class);
   }
 }

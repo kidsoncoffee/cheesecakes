@@ -1,5 +1,6 @@
 package com.kidsoncoffee.cheesecakes.runner;
 
+import com.google.inject.Inject;
 import com.kidsoncoffee.cheesecakes.Example;
 import com.kidsoncoffee.cheesecakes.runner.domain.ExampleRunner;
 import com.kidsoncoffee.cheesecakes.runner.domain.ScenarioRunner;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -24,14 +26,15 @@ import java.util.stream.Collectors;
 public class ScenarioRunnerCreator {
 
   /** The example loaders. */
-  private final ExamplesLoader[] exampleLoaders;
+  private final Set<ExamplesLoader> exampleLoaders;
 
   /**
    * Constructs a {@link ScenarioRunnerCreator} with the parameters.
    *
    * @param exampleLoaders The example loaders.
    */
-  public ScenarioRunnerCreator(final ExamplesLoader... exampleLoaders) {
+  @Inject
+  public ScenarioRunnerCreator(final Set<ExamplesLoader> exampleLoaders) {
     this.exampleLoaders = exampleLoaders;
   }
 
@@ -48,7 +51,7 @@ public class ScenarioRunnerCreator {
    */
   public List<ScenarioRunner> create(final TestClass testClass) throws InitializationError {
     final Map<String, List<Example.Builder>> examplesByScenario =
-        Arrays.stream(this.exampleLoaders)
+        this.exampleLoaders.stream()
             .map(examplesLoader -> examplesLoader.load(testClass.getJavaClass()))
             .flatMap(Collection::stream)
             .collect(Collectors.groupingBy(Example.Builder::getScenarioMethodName));

@@ -1,5 +1,6 @@
 package com.kidsoncoffee.cheesecakes.runner;
 
+import com.google.common.collect.Sets;
 import com.kidsoncoffee.cheesecakes.Example;
 import com.kidsoncoffee.cheesecakes.runner.domain.ScenarioRunner;
 import com.kidsoncoffee.cheesecakes.runner.domain.ScenarioRunnerAssert;
@@ -49,7 +50,7 @@ public class ScenarioRunnerCreatorTest {
   public void setup() {
     this.firstLoader = mock(ExamplesLoader.class, "firstLoader");
     this.secondLoader = mock(ExamplesLoader.class, "secondLoader");
-    this.creator = new ScenarioRunnerCreator(this.firstLoader, this.secondLoader);
+    this.creator = new ScenarioRunnerCreator(Sets.newHashSet(this.firstLoader, this.secondLoader));
   }
 
   /** Verify that all mocks interactions were accounted for. */
