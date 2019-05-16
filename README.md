@@ -137,10 +137,10 @@ public class MyDataDrivenExampleTest {
 +   * <pre>
 +   * Examples:
 +   *
-+   * firstName | lastName || completeName
-+   * --------- | -------- || --------------
-+   * John      | Doe      || John Doe
-+   * Exene     | Cervenka || Exene Cervenka
++   * firstName | lastName | completeName
++   * --------- | -------- | --------------
++   * John      | Doe      | John Doe
++   * Exene     | Cervenka | Exene Cervenka
 +   * </pre>
    */
   @Test
@@ -176,10 +176,10 @@ public class MyDataDrivenExampleTest {
    * <pre>
    * Examples:
    *
-   * firstName | lastName || completeName
-   * --------- | -------- || --------------
-   * John      | Doe      || John Doe
-   * Exene     | Cervenka || Exene Cervenka
+   * firstName | lastName | completeName
+   * --------- | -------- | --------------
+   * John      | Doe      | John Doe
+   * Exene     | Cervenka | Exene Cervenka
    * </pre>
    */
   @Test
@@ -265,9 +265,9 @@ As shown in the *Quickstart*, data tables are probably the most effective way fo
 
 ```java
 /**
- * <pre>                                                    // Pre-formatted text prevents the IDE from formatting
- * Examples:                                                // Mandatory line with the keyword Examples:
- *                                                          // Empty lines are ignored
+ * <pre>                                                   // Pre-formatted text prevents the IDE from formatting
+ * Examples:                                               // Mandatory line with the keyword Examples:
+ *                                                         // Empty lines are ignored
  * requisiteA | requisiteB | expectationA | expectationB   // The data table header row
  * ---------- | ---------- | ------------ | ------------   // The data table separator row
  * 1          | 2          | A            | B              // The first example
@@ -350,62 +350,64 @@ It is required that the *Example* field in the *Feature* class is declared as **
 
 ##### Multiple *Examples* by field
 
-```diff
-import com.kidsoncoffee.cheesecakes.Cheesecakes;
-import static MyTestExampleParameters.Tests.given;
-import static ...
+```java
+package examples;
 
+import com.kidsoncoffee.cheesecakes.Example;
+import com.kidsoncoffee.cheesecakes.Parameter;
+import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
+import examples.MyProgrammaticallyMultipleExamplesTest_ExampleBuilder.ConcatenatesSuccessfully;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static com.kidsoncoffee.cheesecakes.Example.multiple;
+
+/**
+ * @author fernando.chovich
+ * @since 1.0
+ */
 @RunWith(Cheesecakes.class)
-public class MyTest {
+public class MyProgrammaticallyMultipleExamplesTest {
 
-+ private static final Examples CONCATENATION_EXAMPLES = examples(
-+                                                          given()
-+                                                            .firstName("John")
-+                                                            .lastName("Doe")
-+                                                            .then()
-+                                                              .completeName("John Doe"),
-+                                                          given()
-+                                                            .firstName("Exene")
-+                                                            .lastName("Cervenka")
-+                                                            .then()
-+                                                              .completeName("Exene Cervenka")
-+                                                        );
-+ 
--  private static final Example JOHN_DOE_EXAMPLE = given()
--                                                    .firstName("John")
--                                                    .lastName("Doe")
--                                                    .then()
--                                                      .completeName("John Doe");
--        
--  private static final Example EXENE_CERVENKA_EXAMPLE = given()
--                                                          .firstName("Exene")
--                                                          .lastName("Cervenka")
--                                                          .then()
--                                                            .completeName("Exene Cervenka");
-   
-  /**
-   * Checks that the first and last name are concatenated correctly.
-   */
+  private static Example.Multiple SUCCESS_EXAMPLES =
+      multiple(
+          ConcatenatesSuccessfully.given()
+              .firstName("John")
+              .lastName("Doe")
+              .then()
+              .completeName("John Doe")
+              .getExample(),
+          ConcatenatesSuccessfully.given()
+              .firstName("Exene")
+              .lastName("Cervenka")
+              .then()
+              .completeName("Exene Cervenka")
+              .getExample());
+
   @Test
-  public void test(@Requisites   final String firstName, 
-                   @Requisites   final String lastName, 
-                   @Expectations final String completeName){
-    final String actualCompletaName;
-    
+  public void concatenatesSuccessfully(
+      @Parameter.Requisite final String firstName,
+      @Parameter.Requisite final String lastName,
+      @Parameter.Expectation final String completeName) {
+    final String actualCompleteName;
+
     when:
-    actualCompleteName = String.format("%s %s", firstName, lastName); 
-    
+    actualCompleteName = String.format("%s %s", firstName, lastName);
+
     then:
     assert actualCompleteName.equals(completeName);
-  } 
+  }
 }
+
 ```
 
-You can also use the `Examples.examples` aggregator to have only one *Example* static field declared. Even though that may turn into identation hell in some cases, it might help legibility in others.
+You can also use the `Example.multiple` aggregator to have only one *Example* static field declared. Even though that may turn into identation hell in some cases, it might help legibility in others.
+
+This can be used to generate test cases dynamically as well.
 
 ### Parameters injection
 
-If you are writing your examples with the *builder-like* syntax you are already writing code to match the types of the parameters in the *Scenario* method. But if you are writing them with data-tables, you will need to convert that *String* value into the appropriate type of the *Scenario* method parameters.
+If you are writing your examples with the *builder-like* syntax you are already writing code to match the types of the parameters in the *Scenario* method. But if you are writing them with data tables, you will need to convert that *String* value into the appropriate type of the *Scenario* method parameters.
 
 #### Common Java types
 
@@ -427,60 +429,81 @@ For the most common types, **Cheesecakes** provides conversion out-of-the-box.
 To register custom type converter is easy:
 
 ```java
-import com.kidsoncoffee.cheesecakes.Cheesecakes;
+package examples;
 
+import com.kidsoncoffee.cheesecakes.Parameter;
+import com.kidsoncoffee.cheesecakes.Parameter.Conversion;
+import com.kidsoncoffee.cheesecakes.Parameter.Expectation;
+import com.kidsoncoffee.cheesecakes.Parameter.Requisite;
+import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
+import org.apache.commons.lang3.text.WordUtils;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.function.Function;
+
+/**
+ * @author fernando.chovich
+ * @since 1.0
+ */
 @RunWith(Cheesecakes.class)
-public class MyTest {
-  
+public class MyCustomConverterExampleTest {
+
   /**
    * Checks that the first and last name are concatenated correctly.
    *
    * <pre>
    * Examples:
-   * 
-   * firstName  | lastName || completeName
-   * ---------- | -------- || --------------
-+   * JOHN      | DOE      || John Doe
--   * John      | Doe      || John Doe
-   * Exene      | Cervenka || Exene Cervenka
+   *
+   * firstName | lastName | completeName
+   * --------- | -------- | --------------
+   * JOHN      | DOE      | John Doe
    * </pre>
    */
   @Test
-+  public void test(@Converter(PascalCaseStringConverter.class) final String firstName, 
-+                   @Converter(PascalCaseStringConverter.class) final String lastName,
-+                   final String completeName){
-    final String actualCompletaName;
-    
+  public void concatenatesSuccessfully(
+      @Requisite @Conversion(PascalCaseConverter.class) final String firstName,
+      @Requisite @Conversion(PascalCaseConverter.class) final String lastName,
+      @Expectation final String completeName) {
+    final String actualCompleteName;
+
     when:
-    actualCompleteName = String.format("%s %s", firstName, lastName); 
-    
+    actualCompleteName = String.format("%s %s", firstName, lastName);
+
     then:
     assert actualCompleteName.equals(completeName);
-  } 
-+  
-+  class PascalCaseStringConverter implements ParameterConverter {
-+    Function<T, R> getConverter() {
-+      return parameter -> WordUtils.capitalize(parameters);
-+    }
-+
-+    Class<T> getBaseType() {
-+      return String.class;
-+    }
-+
-+    Class<R> getTargetType() {
-+      return String.class;
-+    }
-+  }
+  }
+
+  private class PascalCaseConverter implements Parameter.Converter<String> {
+
+    @Override
+    public Class<String> getTargetType() {
+      return String.class;
+    }
+
+    @Override
+    public Function<Parameter.Convertible, String> getConverter() {
+      return raw -> WordUtils.capitalize(raw.getValue());
+    }
+  }
 }
 ```
 
 Looking at the example above, for a parameter to be specifically converted, is required:
-* The custom converter to implement `ParameterConverter`
-* The parameter to be converted to be annotated with `@Converter` and the class of the custom converter to be passed as the value to the converter.
+* The custom converter to implement `Parameter.Converter`
+* The parameter to be converted to be annotated with `@Parameter.Conversion` and the class of the custom converter to be passed as the value to the converter.
 
 ## Under the hood
 
-Under the hood, **Cheesecakes** uses annotation processing to generate custom classes based on the test case method. The same classes used to generate the scenarios based on a test case method **Javadoc**, can be used programmatically to define the test cases.
+Under the hood, **Cheesecakes** uses annotation processing to generate custom classes based on the scenario method. The same classes used to generate the scenarios based on a test case method **Javadoc**, can be used programmatically to define the test cases.
+
+### Parameter Schema Source
+
+For each *feature class* an equivalent class is created with the suffix **_ParameterSchemaSource**. This class extends `Parameter.SchemaSource` and serves as a *namespace* for *scenario parameter schemas enum* for the *scenario methods* within the *feature class**. The *enum* extends `Parameter.Schema`.
+
+### Example Builder
+
+### Example Source
 
 ## Download
 

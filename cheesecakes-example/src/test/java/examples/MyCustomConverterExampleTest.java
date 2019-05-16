@@ -43,7 +43,7 @@ public class MyCustomConverterExampleTest {
     assert actualCompleteName.equals(completeName);
   }
 
-  private class PascalCaseConverter implements Parameter.Converter<String> {
+  private class PascalCaseConverter extends Parameter.Converter<String> {
 
     @Override
     public Class<String> getTargetType() {

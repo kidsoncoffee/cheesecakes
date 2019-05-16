@@ -59,7 +59,7 @@ public class ParameterConverterMethodsProvider {
       @Parameter.Conversion(ExplodingConstructorConverter.class) final String explodes) {}
 
   /** Dummy converter. */
-  public static class DummyConverter implements Parameter.Converter<String> {
+  public static class DummyConverter extends Parameter.Converter<String> {
     @Override
     public Function<Parameter.Convertible, String> getConverter() {
       return Parameter.Convertible::getValue;

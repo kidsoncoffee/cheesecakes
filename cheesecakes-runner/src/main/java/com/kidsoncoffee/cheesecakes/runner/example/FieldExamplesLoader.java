@@ -7,9 +7,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.singletonList;
 
 /**
  * Loads examples from fields in the feature class.
@@ -41,13 +44,19 @@ public class FieldExamplesLoader implements ExamplesLoader {
    */
   public List<Example.Builder> load(final Class featureClass) {
     return Arrays.stream(featureClass.getDeclaredFields())
-        .filter(field -> field.getType().isAssignableFrom(Example.Builder.class))
+        .filter(FieldExamplesLoader::providesExamples)
         .map(FieldExamplesLoader::retrieveExample)
         .filter(Optional::isPresent)
         .map(Optional::get)
+        .flatMap(Collection::stream)
         .filter(example -> example.getFeatureClass().equals(featureClass))
         // TODO fchovich ADD LOGGER INFO
         .collect(Collectors.toList());
+  }
+
+  private static boolean providesExamples(Field field) {
+    return field.getType().isAssignableFrom(Example.Builder.class)
+        || field.getType().isAssignableFrom(Example.Multiple.class);
   }
 
   /**
@@ -57,7 +66,7 @@ public class FieldExamplesLoader implements ExamplesLoader {
    * @param field The field to retrieve the example from.
    * @return An example optional.
    */
-  private static Optional<Example.Builder> retrieveExample(final Field field) {
+  private static Optional<List<Example.Builder>> retrieveExample(final Field field) {
     if (!Modifier.isStatic(field.getModifiers())) {
       LOGGER.warn(
           String.format(
@@ -67,7 +76,11 @@ public class FieldExamplesLoader implements ExamplesLoader {
     }
     try {
       field.setAccessible(true);
-      return Optional.of((Example.Builder) field.get(null));
+      if (field.getType().isAssignableFrom(Example.Builder.class)) {
+        return Optional.of(singletonList((Example.Builder) field.get(null)));
+      } else {
+        return Optional.of(((Example.Multiple) field.get(null)).getExamples());
+      }
     } catch (Throwable e) {
       LOGGER.warn(
           String.format(

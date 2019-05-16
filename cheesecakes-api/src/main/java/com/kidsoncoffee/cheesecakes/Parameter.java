@@ -38,31 +38,33 @@ public @interface Parameter {
 
   @Value.Immutable
   @Value.Style(builder = "converter")
-  interface Converter<R> extends Predicate<Class> {
+  //TODO fchovich THIS CAN BE AN INTERFACE
+  abstract class Converter<R> implements Predicate<Class> {
 
     @Value.Parameter(order = 0)
-    Class<R> getTargetType();
+    public abstract Class<R> getTargetType();
 
     @Value.Parameter(order = 1)
-    Function<Convertible, R> getConverter();
+    public abstract Function<Convertible, R> getConverter();
 
     @Value.Auxiliary
-    default R convert(final Convertible input) {
+    public R convert(final Convertible input) {
       return this.getConverter().apply(input);
     }
 
     @Value.Auxiliary
-    default boolean test(final Class outputClass) {
+    public boolean test(final Class outputClass) {
       return true;
     }
   }
 
   @Value.Immutable
   @Value.Style(builder = "registrableConverter")
-  interface RegistrableConverter<R> extends Converter<R> {
+  abstract class RegistrableConverter<R> extends Converter<R> {
 
     @Value.Auxiliary
-    default boolean test(final Class outputClass) {
+    @Override
+    public boolean test(final Class outputClass) {
       return getTargetType().isAssignableFrom(outputClass);
     }
   }

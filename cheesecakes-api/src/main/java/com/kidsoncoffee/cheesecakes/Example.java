@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
  * @author fernando.chovich
  * @since 1.0
  */
-public @interface Example {
+public interface Example {
 
   interface Source {
     // MARKER INTERFACE
@@ -71,6 +72,27 @@ public @interface Example {
 
     public void setValue(final Parameter.Schema parameter, final Object value) {
       this.setValue(parameter.getName(), value);
+    }
+  }
+
+  static Multiple multiple(final Example.Builder... examples) {
+    return multiple(Arrays.asList(examples));
+  }
+
+  static Multiple multiple(final List<Example.Builder> examples) {
+    return new Multiple(examples);
+  }
+
+  class Multiple {
+
+    private final List<Example.Builder> examples;
+
+    public Multiple(final List<Builder> examples) {
+      this.examples = examples;
+    }
+
+    public List<Builder> getExamples() {
+      return examples;
     }
   }
 }

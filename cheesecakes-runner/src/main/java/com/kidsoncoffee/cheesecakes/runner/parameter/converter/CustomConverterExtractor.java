@@ -53,10 +53,11 @@ public class CustomConverterExtractor implements ParameterConverterExtractor<Met
       final Class<? extends Parameter.Converter> converter =
           parameter.getAnnotation(Parameter.Conversion.class).value();
 
-      final boolean publicNoParameters =
-          Arrays.stream(converter.getConstructors()).anyMatch(c -> c.getParameterCount() == 0);
+      final boolean noParameterConstructor =
+          Arrays.stream(converter.getDeclaredConstructors()).anyMatch(c -> c.getParameterCount() == 0);
+      //TODO fchovich HOW TO DEAL WITH INNER CLASSES? USE ENCLOSING CLASS BUT BISECT LOGIC HERE
 
-      if (!publicNoParameters) {
+      if (!noParameterConstructor) {
         LOGGER.error(
             "The custom converter '{}' for '{}' must have one constructor with zero parameters.",
             converter,
