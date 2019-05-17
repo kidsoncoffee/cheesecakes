@@ -41,7 +41,6 @@
   <a href="#quickstart">Quickstart</a> •
   <a href="#deep-dive">Deep dive</a> •
   <a href="#download">Download</a> •
-  <a href="#credits">Credits</a> •
   <a href="#related">Related</a> 
 </p>
 
@@ -68,8 +67,8 @@ We assume that **you are already familiar with Junit** (if that's not the case g
 
 +    <dependency>
 +      <groupId>com.github.kidsoncoffee</groupId>
-+      <artifactId>cheesecakes-all</artifactId>
-+      <version>LATEST</version>
++      <artifactId>cheesecakes</artifactId>
++      <version>...</version>
 +      <scope>test</scope>
 +    </dependency>
 
@@ -488,6 +487,6 @@ Looking at the example above, for a parameter to be specifically converted, is r
 
 Check it out @ [Nexus](https://oss.sonatype.org/service/local/repositories/releases/content/com/github/kidsoncoffee/cheesecakes/1.0.0/cheesecakes-1.0.0.jar).
 
-## Credits
-
 ## Related
+
+* [Data driven testing @ wikipedia](https://en.wikipedia.org/wiki/Data-driven_testing)
