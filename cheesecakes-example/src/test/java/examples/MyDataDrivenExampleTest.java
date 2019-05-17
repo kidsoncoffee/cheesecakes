@@ -24,6 +24,10 @@ public class MyDataDrivenExampleTest {
    * John      | Doe      | John Doe
    * Exene     | Cervenka | Exene Cervenka
    * </pre>
+   *
+   * @param firstName The first name.
+   * @param lastName The last name.
+   * @param completeName The expected complete concatenated name.
    */
   @Test
   public void concatenatesSuccessfully(

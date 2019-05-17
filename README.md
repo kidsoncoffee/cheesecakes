@@ -45,8 +45,6 @@
   <a href="#related">Related</a> 
 </p>
 
-_ ADD HERE AN EYE CATCHING FEATURE
-
 ## Key Features
 
 * Write test scenarios using *data-driven* tables, with the test method **Javadoc** as the single source of information
@@ -249,12 +247,6 @@ In *Cheesecakes*, **an *Example* is the definition of requisites and expectation
 There are a couple of different ways to create *Examples* for a given *Scenario*:
 * Programmatically with a builder-like syntax
 * Through a data-driven table in the *Scenario* method *Javadoc*.
-
-#### Summary
-
-To help illustrate these concepts, we can consider the example of the *Quickstart* in the following manner:
-
-_ ADD A ILLUSTRATION OF THE QUICKSTART AND CONCEPTS POINTED OUT _
 
 ### Creating an *Example* for a *Scenario*
 
@@ -493,6 +485,8 @@ Looking at the example above, for a parameter to be specifically converted, is r
 * The parameter to be converted to be annotated with `@Parameter.Conversion` and the class of the custom converter to be passed as the value to the converter.
 
 ## Download
+
+Check it out @ [Nexus](https://oss.sonatype.org/service/local/repositories/releases/content/com/github/kidsoncoffee/cheesecakes/1.0.0/cheesecakes-1.0.0.jar).
 
 ## Credits
 

@@ -44,6 +44,13 @@ public class JavadocRetriever {
         .filter(StringUtils::isNotBlank)
         .filter(docLine -> !docLine.contains("<pre>"))
         .filter(docLine -> !docLine.contains("</pre>"))
+        .filter(docLine -> !docLine.trim().startsWith("@param"))
+        .filter(docLine -> !docLine.trim().startsWith("@return"))
+        .filter(docLine -> !docLine.trim().startsWith("@deprecated"))
+        .filter(docLine -> !docLine.trim().startsWith("@exception"))
+        .filter(docLine -> !docLine.trim().startsWith("@throws"))
+        .filter(docLine -> !docLine.trim().startsWith("@see"))
+        .filter(docLine -> !docLine.trim().startsWith("@since"))
         .collect(Collectors.toList());
   }
 }
