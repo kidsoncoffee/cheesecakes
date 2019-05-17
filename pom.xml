@@ -6,7 +6,7 @@
 
     <groupId>com.github.kidsoncoffee</groupId>
     <artifactId>cheesecakes-root</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Cheesecakes</name>
