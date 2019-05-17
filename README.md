@@ -9,8 +9,8 @@
 <h4 align="center">A data-driven testing framework built on top of <a href="https://junit.org/junit4/" target="_blank">Junit</a>.</h4>
 
 <p align="center">
-  <a href="https://oss.sonatype.org/service/local/repositories/releases/content/com/github/kidsoncoffee/cheesecakes/">
-    <img alt="Sonatype Nexus (Releases)" src="https://img.shields.io/nexus/r/https/oss.sonatype.org/com.github.kidsoncoffee/cheesecakes.svg">
+  <a href="https://oss.sonatype.org/#nexus-search;quick~kidsoncoffee">
+    <img alt="Sonatype Nexus (Releases)" src="https://img.shields.io/nexus/r/https/oss.sonatype.org/com.github.kidsoncoffee/cheesecakes.svg?style=popout-square">
   </a>
   <a href="https://travis-ci.org/kidsoncoffee/cheesecakes">
       <img src="https://travis-ci.org/kidsoncoffee/cheesecakes.svg?branch=master"/>
