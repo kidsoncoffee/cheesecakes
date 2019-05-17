@@ -12,8 +12,8 @@
   <a href="https://oss.sonatype.org/#nexus-search;quick~kidsoncoffee">
     <img alt="Sonatype Nexus (Releases)" src="https://img.shields.io/nexus/r/https/oss.sonatype.org/com.github.kidsoncoffee/cheesecakes.svg?style=popout-square">
   </a>
-  <a href="https://travis-ci.org/kidsoncoffee/cheesecakes">
-      <img src="https://travis-ci.org/kidsoncoffee/cheesecakes.svg?branch=master"/>
+  <a href="https://circleci.com/gh/kidsoncoffee/workflows/cheesecakes">
+      <img src="https://circleci.com/gh/kidsoncoffee/cheesecakes.svg?style=svg"/>
   </a>
   <a href="https://www.codacy.com/app/fernandochovich/cheesecakes?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kidsoncoffee/cheesecakes&amp;utm_campaign=Badge_Grade">
       <img src="https://api.codacy.com/project/badge/Grade/d06b366b33a74e1ba180a44fe68d20cd"/>
