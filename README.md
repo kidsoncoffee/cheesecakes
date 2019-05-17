@@ -94,10 +94,6 @@ package examples;
 import org.junit.Test;
 + import org.junit.runner.RunWith;
 
-/**
- * @author fernando.chovich
- * @since 1.0
- */
 + @RunWith(Cheesecakes.class)
 public class MyDataDrivenExampleTest {
 
@@ -120,10 +116,6 @@ import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * @author fernando.chovich
- * @since 1.0
- */
 @RunWith(Cheesecakes.class)
 public class MyDataDrivenExampleTest {
 
@@ -159,10 +151,6 @@ import com.kidsoncoffee.cheesecakes.runner.Cheesecakes;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * @author fernando.chovich
- * @since 1.0
- */
 @RunWith(Cheesecakes.class)
 public class MyDataDrivenExampleTest {
 
@@ -295,10 +283,6 @@ import examples.MyProgrammaticallyExampleTest_ExampleBuilder.ConcatenatesSuccess
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * @author fernando.chovich
- * @since 1.0
- */
 @RunWith(Cheesecakes.class)
 public class MyProgrammaticallyExampleTest {
 
@@ -352,10 +336,6 @@ import org.junit.runner.RunWith;
 
 import static com.kidsoncoffee.cheesecakes.Example.multiple;
 
-/**
- * @author fernando.chovich
- * @since 1.0
- */
 @RunWith(Cheesecakes.class)
 public class MyProgrammaticallyMultipleExamplesTest {
 
@@ -432,10 +412,6 @@ import org.junit.runner.RunWith;
 
 import java.util.function.Function;
 
-/**
- * @author fernando.chovich
- * @since 1.0
- */
 @RunWith(Cheesecakes.class)
 public class MyCustomConverterExampleTest {
 
