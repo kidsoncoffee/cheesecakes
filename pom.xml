@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.kidsoncoffee</groupId>
-    <artifactId>cheesecakes</artifactId>
+    <groupId>com.github.kidsoncoffee</groupId>
+    <artifactId>cheesecakes-root</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -22,7 +22,11 @@
         <java.target>8</java.target>
 
         <!-- PLUGINS -->
+        <plugin.maven-compiler.version>3.8.1</plugin.maven-compiler.version>
         <plugin.maven-jar.version>3.1.1</plugin.maven-jar.version>
+        <plugin.maven-javadoc.version>2.9.1</plugin.maven-javadoc.version>
+        <plugin.maven-source.version>2.2.1</plugin.maven-source.version>
+        <plugin.nexus.version>1.6.7</plugin.nexus.version>
 
         <!-- DEPENDENCIES -->
         <apache.commons-io.version>2.6</apache.commons-io.version>
@@ -45,6 +49,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${plugin.maven-compiler.version}</version>
                 <configuration>
                     <source>${java.source}</source>
                     <target>${java.target}</target>
@@ -82,6 +87,54 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${plugin.nexus.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${plugin.maven-source.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${plugin.maven-javadoc.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${plugin.nexus.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -112,29 +165,29 @@
         <dependencies>
             <!-- PROJECT -->
             <dependency>
-                <groupId>com.kidsoncoffee.cheesecakes</groupId>
-                <artifactId>cheesecakes-all</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.kidsoncoffee.cheesecakes</groupId>
+                <groupId>com.github.kidsoncoffee</groupId>
                 <artifactId>cheesecakes-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.kidsoncoffee.cheesecakes</groupId>
+                <groupId>com.github.kidsoncoffee</groupId>
                 <artifactId>cheesecakes-runner</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.kidsoncoffee.cheesecakes</groupId>
+                <groupId>com.github.kidsoncoffee</groupId>
                 <artifactId>cheesecakes-processor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.kidsoncoffee</groupId>
+                <artifactId>cheesecakes</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <!-- PROJECT TEST -->
             <dependency>
-                <groupId>com.kidsoncoffee.cheesecakes</groupId>
+                <groupId>com.github.kidsoncoffee</groupId>
                 <artifactId>cheesecakes-api</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
@@ -224,4 +277,15 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 </project>

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -53,27 +54,50 @@ public class CustomConverterExtractor implements ParameterConverterExtractor<Met
       final Class<? extends Parameter.Converter> converter =
           parameter.getAnnotation(Parameter.Conversion.class).value();
 
-      final boolean noParameterConstructor =
-          Arrays.stream(converter.getDeclaredConstructors()).anyMatch(c -> c.getParameterCount() == 0);
-      //TODO fchovich HOW TO DEAL WITH INNER CLASSES? USE ENCLOSING CLASS BUT BISECT LOGIC HERE
+      if(converter.getEnclosingClass() == null || Modifier.isStatic(converter.getModifiers())){
+        final boolean noParameterConstructor =
+                Arrays.stream(converter.getDeclaredConstructors()).anyMatch(c -> c.getParameterCount() == 0);
 
-      if (!noParameterConstructor) {
-        LOGGER.error(
-            "The custom converter '{}' for '{}' must have one constructor with zero parameters.",
-            converter,
-            parameter.getDeclaringExecutable().getName());
-        return Optional.empty();
-      }
+        if (!noParameterConstructor) {
+          LOGGER.error(
+                  "The custom converter '{}' for '{}' must have one constructor with zero parameters.",
+                  converter,
+                  parameter.getDeclaringExecutable().getName());
+          return Optional.empty();
+        }
 
-      try {
-        final Constructor<? extends Parameter.Converter> constructor = converter.getConstructor();
-        constructor.setAccessible(true);
-        return Optional.of(constructor.newInstance());
-      } catch (Throwable e) {
-        LOGGER.error(
-            "Error instantiating the custom converter '{}' for '{}'.",
-            converter,
-            parameter.getDeclaringExecutable().getName());
+        try {
+          final Constructor<? extends Parameter.Converter> constructor = converter.getConstructor();
+          constructor.setAccessible(true);
+          return Optional.of(constructor.newInstance());
+        } catch (Throwable e) {
+          LOGGER.error(
+                  "Error instantiating the custom converter '{}' for '{}'.",
+                  converter,
+                  parameter.getDeclaringExecutable().getName());
+        }
+      } else {
+        final boolean noParameterConstructor =
+                Arrays.stream(converter.getDeclaredConstructors()).anyMatch(c -> c.getParameterCount() == 1);
+
+        if (!noParameterConstructor) {
+          LOGGER.error(
+                  "The custom converter '{}' for '{}' must have one constructor with zero parameters.",
+                  converter,
+                  parameter.getDeclaringExecutable().getName());
+          return Optional.empty();
+        }
+
+        try {
+          final Constructor<? extends Parameter.Converter> constructor = converter.getDeclaredConstructor(converter.getEnclosingClass());
+          constructor.setAccessible(true);
+          return Optional.of(constructor.newInstance(converter.getEnclosingClass().newInstance()));
+        } catch (Throwable e) {
+          LOGGER.error(
+                  "Error instantiating the custom converter '{}' for '{}'.",
+                  converter,
+                  parameter.getDeclaringExecutable().getName());
+        }
       }
     }
     return Optional.empty();

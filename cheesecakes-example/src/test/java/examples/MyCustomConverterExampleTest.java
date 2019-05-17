@@ -52,7 +52,7 @@ public class MyCustomConverterExampleTest {
 
     @Override
     public Function<Parameter.Convertible, String> getConverter() {
-      return raw -> WordUtils.capitalize(raw.getValue());
+      return raw -> WordUtils.capitalize(raw.getValue().toLowerCase());
     }
   }
 }

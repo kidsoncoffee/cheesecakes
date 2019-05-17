@@ -9,8 +9,8 @@
 <h4 align="center">A data-driven testing framework built on top of <a href="https://junit.org/junit4/" target="_blank">Junit</a>.</h4>
 
 <p align="center">
-  <a href="#">
-    <img alt="Maven Central" src="https://img.shields.io/maven-central/v/com.kidsoncoffee.cheesecakes/cheesecakes-all.svg"/>
+  <a href="">
+    <img alt="Sonatype Nexus (Releases)" src="https://img.shields.io/nexus/r/https/oss.sonatype.org/com.github.kidsoncoffee/cheesecakes.svg">
   </a>
   <a href="https://travis-ci.org/kidsoncoffee/cheesecakes">
       <img src="https://travis-ci.org/kidsoncoffee/cheesecakes.svg?branch=master"/>
@@ -40,7 +40,6 @@
   <a href="#key-features">Key features</a> •
   <a href="#quickstart">Quickstart</a> •
   <a href="#deep-dive">Deep dive</a> •
-  <a href="#under-the-hood">Under the hood</a> •
   <a href="#download">Download</a> •
   <a href="#credits">Credits</a> •
   <a href="#related">Related</a> 
@@ -70,7 +69,7 @@ We assume that **you are already familiar with Junit** (if that's not the case g
 <dependencies>
 
 +    <dependency>
-+      <groupId>com.kidsoncoffee.cheesecakes</groupId>
++      <groupId>com.github.kidsoncoffee</groupId>
 +      <artifactId>cheesecakes-all</artifactId>
 +      <version>LATEST</version>
 +      <scope>test</scope>
@@ -474,7 +473,7 @@ public class MyCustomConverterExampleTest {
     assert actualCompleteName.equals(completeName);
   }
 
-  private class PascalCaseConverter implements Parameter.Converter<String> {
+  private class PascalCaseConverter extends Parameter.Converter<String> {
 
     @Override
     public Class<String> getTargetType() {
@@ -483,7 +482,7 @@ public class MyCustomConverterExampleTest {
 
     @Override
     public Function<Parameter.Convertible, String> getConverter() {
-      return raw -> WordUtils.capitalize(raw.getValue());
+      return raw -> WordUtils.capitalize(raw.getValue().toLowerCase());
     }
   }
 }
@@ -492,18 +491,6 @@ public class MyCustomConverterExampleTest {
 Looking at the example above, for a parameter to be specifically converted, is required:
 * The custom converter to implement `Parameter.Converter`
 * The parameter to be converted to be annotated with `@Parameter.Conversion` and the class of the custom converter to be passed as the value to the converter.
-
-## Under the hood
-
-Under the hood, **Cheesecakes** uses annotation processing to generate custom classes based on the scenario method. The same classes used to generate the scenarios based on a test case method **Javadoc**, can be used programmatically to define the test cases.
-
-### Parameter Schema Source
-
-For each *feature class* an equivalent class is created with the suffix **_ParameterSchemaSource**. This class extends `Parameter.SchemaSource` and serves as a *namespace* for *scenario parameter schemas enum* for the *scenario methods* within the *feature class**. The *enum* extends `Parameter.Schema`.
-
-### Example Builder
-
-### Example Source
 
 ## Download
 
