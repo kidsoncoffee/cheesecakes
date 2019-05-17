@@ -80,7 +80,7 @@ We assume that **you are already familiar with Junit** (if that's not the case g
 ```diff
 dependencies {
 
-+  testImplementation 'com.kidsoncoffee.cheesecakes:cheesecakes-all:LATEST'
++  testImplementation 'com.kidsoncoffee.cheesecakes:cheesecakes:...'
 
 }
 ```
