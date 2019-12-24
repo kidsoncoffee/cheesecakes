@@ -25,6 +25,7 @@
         <module>cheesecakes-example</module>
         <module>cheesecakes-processor</module>
         <module>cheesecakes-runner</module>
+        <module>cheesecakes-jupiter</module>
     </modules>
 
     <properties>
