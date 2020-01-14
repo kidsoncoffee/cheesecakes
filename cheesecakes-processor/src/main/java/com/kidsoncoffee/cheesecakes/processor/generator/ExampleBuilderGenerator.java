@@ -6,13 +6,7 @@ import com.kidsoncoffee.cheesecakes.Feature;
 import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.FeatureToGenerate;
 import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.ParameterToGenerate;
 import com.kidsoncoffee.cheesecakes.processor.aggregator.domain.ScenarioToGenerate;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import org.apache.commons.lang3.text.WordUtils;
 
 import javax.annotation.processing.Filer;
@@ -75,12 +69,14 @@ public class ExampleBuilderGenerator {
 
     // CREATE CONSTRUCTOR
 
+    final String testTargetClass =
+        String.format("%s.%s", feature.getTestClassPackage(), feature.getTestClassName());
+
     final MethodSpec constructor =
         MethodSpec.constructorBuilder()
             .addStatement(
-                "super($L.$L.class, $S, asList($T.values()))",
-                feature.getTestClassPackage(),
-                feature.getTestClassName(),
+                "super($S, $S, asList($T.values()))",
+                testTargetClass,
                 definition.getTestMethod(),
                 generatedSchema)
             .addStatement("this.$N = new $T(this)", requisitesField, requisitesClassName)

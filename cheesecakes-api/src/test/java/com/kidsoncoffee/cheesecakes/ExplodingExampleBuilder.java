@@ -9,7 +9,7 @@ import java.util.List;
 public class ExplodingExampleBuilder extends Example.Builder {
   public ExplodingExampleBuilder(
       Class featureClass, String scenarioMethodName, List<Parameter.Schema> schema) {
-    super(featureClass, scenarioMethodName, schema);
+    super(featureClass.getSimpleName(), scenarioMethodName, schema);
     throw new UnsupportedOperationException("KA-BOOM!!!");
   }
 }

@@ -22,5 +22,5 @@ public class InitializationErrorExampleFieldsProvider {
   /** Valid example field for {@link InitializationErrorExampleFieldsProvider} (target feature class). */
   private static final Example.Builder fieldForTargetClass =
       new Example.Builder(
-          InitializationErrorExampleFieldsProvider.class, "EXAMPLE_TARGET_CLASS", emptyList());
+          InitializationErrorExampleFieldsProvider.class.getSimpleName(), "EXAMPLE_TARGET_CLASS", emptyList());
 }

@@ -91,17 +91,18 @@ public class DataTableExampleGenerator {
       final ClassName generatedSchema,
       final int id) {
     final String methodName = format("%s_%s", scenario.getTestMethod(), id);
+    final String testTargetClass =
+        format("%s.%s", feature.getTestClassPackage(), feature.getTestClassName());
     final MethodSpec.Builder method =
         MethodSpec.methodBuilder(methodName)
             .addAnnotation(Example.Supplier.class)
             .addModifiers(Modifier.STATIC, Modifier.FINAL)
             .returns(Example.Builder.class)
             .addStatement(
-                "final $T example = new $T($L.$L.class, $S, asList($T.values()))",
+                "final $T example = new $T($S, $S, asList($T.values()))",
                 Example.Builder.class,
                 Example.Builder.class,
-                feature.getTestClassPackage(),
-                feature.getTestClassName(),
+                testTargetClass,
                 scenario.getTestMethod(),
                 generatedSchema);
     scenario

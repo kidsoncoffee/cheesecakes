@@ -25,16 +25,20 @@ public interface Example {
   @interface Supplier {}
 
   class Builder {
-    private final Class featureClass;
+    private Class featureClass;
     private final String scenarioMethodName;
     private final List<Parameter.Schema> schema;
     private final Map<String, Object> values;
 
     public Builder(
-        final Class featureClass,
+        final String featureClass,
         final String scenarioMethodName,
         final List<Parameter.Schema> schema) {
-      this.featureClass = featureClass;
+      try {
+        this.featureClass = (featureClass == null) ? null : Class.forName(featureClass);
+      } catch (ClassNotFoundException e) {
+        this.featureClass = null;
+      }
       this.scenarioMethodName = scenarioMethodName;
       this.schema = schema;
       this.values = new HashMap<>();

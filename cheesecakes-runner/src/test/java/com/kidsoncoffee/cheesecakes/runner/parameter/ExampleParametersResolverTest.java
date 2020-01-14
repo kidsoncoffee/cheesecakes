@@ -64,7 +64,7 @@ public class ExampleParametersResolverTest {
 
     given:
     // TODO fchovich feature class and scenario name are unnecessary here
-    example = new Example.Builder(ExampleParametersResolverTest.class, "", Collections.emptyList());
+    example = new Example.Builder(ExampleParametersResolverTest.class.getName(), "", Collections.emptyList());
     testMethod = retrieveMethod("withoutParameters");
 
     orchestrate:
@@ -94,7 +94,7 @@ public class ExampleParametersResolverTest {
 
     given:
     // TODO fchovich feature class and scenario name are unnecessary here
-    example = new Example.Builder(ExampleParametersResolverTest.class, "", Collections.emptyList());
+    example = new Example.Builder(ExampleParametersResolverTest.class.getName(), "", Collections.emptyList());
     testMethod = retrieveMethod("withoutParameters");
 
     orchestrate:
@@ -135,7 +135,7 @@ public class ExampleParametersResolverTest {
     // TODO fchovich feature class and scenario name are unnecessary here
     example =
         new Example.Builder(
-            ExampleParametersResolverTest.class,
+            ExampleParametersResolverTest.class.getName(),
             "",
             // TODO fchovich SIMPLIFY EXAMPLE BUILDER -> separate parts
             Arrays.asList(

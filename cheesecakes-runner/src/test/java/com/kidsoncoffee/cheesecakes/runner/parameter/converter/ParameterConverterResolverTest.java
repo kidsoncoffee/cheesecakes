@@ -69,7 +69,7 @@ public class ParameterConverterResolverTest {
     given:
     // TODO fchovich feature class and scenario name are unnecessary here
     example =
-        new Example.Builder(ParameterConverterResolverTest.class, "", Collections.emptyList());
+        new Example.Builder(ParameterConverterResolverTest.class.getSimpleName(), "", Collections.emptyList());
     testMethod = retrieveMethod("noParameters");
 
     defaultConverters = new Optional[] {Optional.empty()};
@@ -107,7 +107,7 @@ public class ParameterConverterResolverTest {
     given:
     // TODO fchovich feature class and scenario name are unnecessary here
     example =
-        new Example.Builder(ParameterConverterResolverTest.class, "", Collections.emptyList());
+        new Example.Builder(ParameterConverterResolverTest.class.getSimpleName(), "", Collections.emptyList());
     testMethod = retrieveMethod("noParameters");
 
     customConverter = new ParameterConverterMethodsProvider.DummyConverter();
@@ -153,7 +153,7 @@ public class ParameterConverterResolverTest {
     given:
     // TODO fchovich feature class and scenario name are unnecessary here
     example =
-        new Example.Builder(ParameterConverterResolverTest.class, "", Collections.emptyList());
+        new Example.Builder(ParameterConverterResolverTest.class.getSimpleName(), "", Collections.emptyList());
     testMethod = retrieveMethod("noParameters");
 
     defaultConverter = new ParameterConverterMethodsProvider.DummyConverter();
@@ -199,7 +199,7 @@ public class ParameterConverterResolverTest {
     given:
     // TODO fchovich feature class and scenario name are unnecessary here
     example =
-        new Example.Builder(ParameterConverterResolverTest.class, "", Collections.emptyList());
+        new Example.Builder(ParameterConverterResolverTest.class.getSimpleName(), "", Collections.emptyList());
     testMethod = retrieveMethod("noParameters");
 
     defaultConverters = new Optional[] {Optional.empty()};

@@ -20,7 +20,7 @@ public class SecondExampleSource implements Example.Source {
    */
   @Example.Supplier
   public static Example.Builder exampleSupplier() {
-    return new Example.Builder(Integer.class, "SCENARIO", Collections.emptyList());
+    return new Example.Builder(Integer.class.getName(), "SCENARIO", Collections.emptyList());
   }
 
   /**

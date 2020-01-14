@@ -34,7 +34,7 @@ public class ConvertibleParametersCreatorTest {
 
     // TODO fchovich SHOULD THIS RECEIVE THE SCHEMA LIST ONLY?
     example =
-        new Example.Builder(ConvertibleParametersCreatorTest.class, "", Collections.emptyList());
+        new Example.Builder(ConvertibleParametersCreatorTest.class.getSimpleName(), "", Collections.emptyList());
     testMethod = retrieveMethod("methodReference");
 
     when:
@@ -77,7 +77,7 @@ public class ConvertibleParametersCreatorTest {
 
     example =
         new Example.Builder(
-            ConvertibleParametersCreatorTest.class,
+            ConvertibleParametersCreatorTest.class.getSimpleName(),
             "",
             Arrays.asList(firstParameterSchema, secondParameterSchema));
     example.setValue(firstParameterSchema, firstValue);

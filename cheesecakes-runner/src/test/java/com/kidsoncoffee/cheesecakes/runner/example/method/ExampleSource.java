@@ -35,7 +35,7 @@ public class ExampleSource implements Example.Source {
    */
   @Example.Supplier
   public Example.Builder exampleSupplierNotStatic() {
-    return new Example.Builder(Integer.class, EXAMPLE_SUPPLIER_NOT_STATIC, Collections.emptyList());
+    return new Example.Builder(Integer.class.getName(), EXAMPLE_SUPPLIER_NOT_STATIC, Collections.emptyList());
   }
 
   /**
@@ -47,7 +47,7 @@ public class ExampleSource implements Example.Source {
   @Example.Supplier
   public static Example.Builder exampleSupplierWithParameters(final String unused) {
     return new Example.Builder(
-        Integer.class, EXAMPLE_SUPPLIER_WITH_PARAMETERS, Collections.emptyList());
+        Integer.class.getName(), EXAMPLE_SUPPLIER_WITH_PARAMETERS, Collections.emptyList());
   }
 
   /**
@@ -68,7 +68,7 @@ public class ExampleSource implements Example.Source {
   @Example.Supplier
   public static Example.Builder exampleSupplierTestClass() {
     return new Example.Builder(
-        ClassExamplesLoaderTest.class, EXAMPLE_SUPPLIER_STATIC_TEST_CLASS, Collections.emptyList());
+        ClassExamplesLoaderTest.class.getName(), EXAMPLE_SUPPLIER_STATIC_TEST_CLASS, Collections.emptyList());
   }
 
   /**
@@ -79,6 +79,6 @@ public class ExampleSource implements Example.Source {
   @Example.Supplier
   public static Example.Builder exampleSupplierMainClass() {
     return new Example.Builder(
-        ClassExamplesLoader.class, EXAMPLE_SUPPLIER_STATIC_MAIN_CLASS, Collections.emptyList());
+        ClassExamplesLoader.class.getName(), EXAMPLE_SUPPLIER_STATIC_MAIN_CLASS, Collections.emptyList());
   }
 }
