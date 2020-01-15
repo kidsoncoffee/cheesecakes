@@ -459,9 +459,10 @@ Looking at the example above, for a parameter to be specifically converted, is r
 * The custom converter to implement `Parameter.Converter`
 * The parameter to be converted to be annotated with `@Parameter.Conversion` and the class of the custom converter to be passed as the value to the converter.
 
-## Download
+## Release
 
-Check it out @ [Nexus](https://oss.sonatype.org/service/local/repositories/releases/content/com/github/kidsoncoffee/cheesecakes/1.0.0/cheesecakes-1.0.0.jar).
+* https://central.sonatype.org/pages/apache-maven.html
+* https://central.sonatype.org/pages/releasing-the-deployment.html
 
 ## Related
 
