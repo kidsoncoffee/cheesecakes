@@ -15,9 +15,6 @@
   <a href="https://circleci.com/gh/kidsoncoffee/workflows/cheesecakes">
       <img src="https://circleci.com/gh/kidsoncoffee/cheesecakes.svg?style=svg"/>
   </a>
-  <a href="https://www.codacy.com/app/fernandochovich/cheesecakes?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kidsoncoffee/cheesecakes&amp;utm_campaign=Badge_Grade">
-      <img src="https://api.codacy.com/project/badge/Grade/d06b366b33a74e1ba180a44fe68d20cd"/>
-  </a>
   <a href="https://github.com/kidsoncoffee/cheesecakes/issues">
       <img src="https://img.shields.io/github/issues/kidsoncoffee/cheesecakes.svg"/>
   </a>
