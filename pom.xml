@@ -42,7 +42,7 @@
         <apache.commons-lang3.version>3.5</apache.commons-lang3.version>
         <assertj.version>3.12.2</assertj.version>
         <autoservice.version>1.0-rc1</autoservice.version>
-        <guava.version>27.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <guice.version>4.2.2</guice.version>
         <immutables.version>2.7.5</immutables.version>
         <jackson-databind.version>2.9.10.1</jackson-databind.version>
