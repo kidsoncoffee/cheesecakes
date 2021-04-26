@@ -38,7 +38,7 @@
         <plugin.nexus.version>1.6.7</plugin.nexus.version>
 
         <!-- DEPENDENCIES -->
-        <apache.commons-io.version>2.6</apache.commons-io.version>
+        <apache.commons-io.version>2.7</apache.commons-io.version>
         <apache.commons-lang3.version>3.5</apache.commons-lang3.version>
         <assertj.version>3.12.2</assertj.version>
         <autoservice.version>1.0-rc1</autoservice.version>
